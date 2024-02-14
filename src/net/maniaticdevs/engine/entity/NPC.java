@@ -39,9 +39,13 @@ public class NPC extends Entity {
 	
 	protected void setDefaultValues() {}
 	
-	public void onInteract() {}
-
+	public void react() {}
+	
+	protected void altTick() {}
+	
 	public void tick() {
+		
+		altTick();
 		
 		actionLockCounter++;
 		

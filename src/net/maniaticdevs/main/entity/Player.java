@@ -1,5 +1,6 @@
 package net.maniaticdevs.main.entity;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -11,6 +12,7 @@ import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.entity.EntityDirection;
+import net.maniaticdevs.engine.entity.Monster;
 import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.network.ChatMessage;
@@ -73,12 +75,32 @@ public class Player extends Entity {
 	@Override
 	protected void setDefaultValues() {
 		name = Main.playerName;
+		level = 1;
 		maxHealth = 6;
 		health = maxHealth;
+		strength = 1; // the higher the strength. the higher the damage
+		dexterity = 1; // the higher the uh (what is it? oh dex- dexitrry? no? dexterity? oh ok.) dexterity the lesser the damage
+		exp = 0;
+		nextLevelExp = 5;
+		coin = 0;
 		screenPos = new Vector2((Main.getInstance().getWidth() / 2 - (Settings.tileSize / 2)), Main.getInstance().getHeight() / 2 - (Settings.tileSize / 2));
 		position.set(Settings.tileSize*4, Settings.tileSize*4);
 		sprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
 		deadSprite = ImageUtils.scaleImage(ResourceLoader.loadImage("/textures/player/player_dead.png"), Settings.tileSize, Settings.tileSize);
+	}
+	
+	private void checkLevelUp() {
+		if(exp >= nextLevelExp) {
+			Main.sfxLib.play(SoundSFXEnum.powerUp);
+			level++;
+			nextLevelExp = nextLevelExp*2;
+			maxHealth += 2;
+			strength++;
+			dexterity++;
+			//attack = getAttack();
+			//defense = getDefense();
+		}
+		
 	}
 
 	public void updateScreenPos() {
@@ -87,6 +109,8 @@ public class Player extends Entity {
 
 	@Override
 	public void tick() {
+		if (isInvince) { invinceCounter++; if (invinceCounter > 40) { isInvince = false; invinceCounter = 0; } }
+		
 		if(ticks != 0 && GuiInGame.message != null) {
 			ticks--;
 			if(ticks <= 0 && GuiInGame.message != null) {
@@ -157,13 +181,24 @@ public class Player extends Entity {
 				CollisionChecker.checkOtherPlayer(this);
 			}
 			
+			if(ent instanceof Monster) {
+				if(!isInvince) {
+					((Monster)ent).react();
+					changePlayerHealth(-((Monster)ent).attack);
+					Main.sfxLib.play(SoundSFXEnum.recieveDmg);
+					isInvince = true;
+				}
+				
+				
+			}
+			
 			OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
 			if(Input.isKeyDown(Input.KEY_ENTER)) {
 				
 				if(ent != null) {
 					if(ent instanceof NPC) {
 						if(!((NPC)ent).lock) {
-							((NPC)ent).onInteract();
+							((NPC)ent).react();
 						}
 					}
 				}
@@ -226,6 +261,16 @@ public class Player extends Entity {
 			direction = EntityDirection.IDLE;
 		}
 	}
+	
+	public void changePlayerHealth(int amount) {
+		health += amount;
+		if(health > maxHealth) {
+			health = maxHealth;
+		} else if(health < 0) {
+			health = 0;
+			isInvince = false;
+		}
+	}
 
 	/**
 	 * Checks if index of a soon to be selected item is valid
@@ -259,6 +304,9 @@ public class Player extends Entity {
 	@Override
 	public void draw(Graphics2D g2) {
 		//if debug flag is enabled
+		if (isInvince) {
+			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+		}
 		if(Main.debug) {
 			g2.setColor(Color.WHITE);
 			g2.setStroke(new BasicStroke(2));
@@ -295,7 +343,7 @@ public class Player extends Entity {
 		} else {
 			g2.drawImage(deadSprite, null, screenPos.x, screenPos.y);
 		}
-		
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
 	}
 

@@ -16,7 +16,7 @@ public class Test extends NPC {
 	public Test(Vector2 position) {
 		super(position);
 		//player/playerSheet
-		sprites = ImageUtils.setupSheet("npc/watcher_sprite", 6, 5);
+		sprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
 		try {
 			dialogueToBeLoaded = StringUtil.loadTextFile("dialogues/test.txt");
 		} catch (IOException e) {
@@ -25,19 +25,14 @@ public class Test extends NPC {
 	}
 	
 	public void tickers() {
-		float distance = (float) (Math.abs(Main.thePlayer.getPosition().magnitude() - getPosition().magnitude())/Settings.tileSize);
-		if(distance <= 2) {
-			GuiInGame.sizeGlitches = 5;
-		} else {
-			GuiInGame.sizeGlitches = 0;
-		}
+		
 	}
 	
 	public void setDefaultValues() {
 		speed = 2;
 	}
 	
-	public void onInteract() {
+	public void react() {
 		Main.currentScreen = new GuiDialogue(false, dialogueToBeLoaded, this);
 	}
 

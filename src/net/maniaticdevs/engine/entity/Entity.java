@@ -64,6 +64,9 @@ public abstract class Entity {
 	/** Moolas... */
 	public int coin;
 	
+	public boolean isInvince;
+	public int invinceCounter;
+	
 	/** Calls {@link #setDefaultValues()} */
 	public Entity() {
 		setDefaultValues();

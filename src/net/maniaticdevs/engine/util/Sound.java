@@ -6,6 +6,10 @@ import java.io.InputStream;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
+/**
+ * Proof of concept class but once development goes in far enough this will be a functioning one
+ * @author Oikmo
+ */
 public class Sound {
 	
 	/**

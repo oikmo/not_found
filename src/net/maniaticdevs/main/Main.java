@@ -24,11 +24,15 @@ public class Main extends JPanel implements Runnable  {
 	/** 02/08/2022 */
 	private static final long serialVersionUID = 282022L;
 	
+	/** Where gameplay is seen. */
 	private static JFrame window;
+	/** In case there's some <b><i>freaky</i></b> bugs! */
 	public static boolean debug = false;
 	
+	/** As to be used for the Main class as it Implements Runnable which is a core for Threads in java. */
 	private Thread gameThread;
 	
+	/** Yo!!! */
 	private Player player;
 	
 	/**
@@ -69,13 +73,12 @@ public class Main extends JPanel implements Runnable  {
 		gameThread.setName("Main thread");
 	}
 	
+	/**
+	 * Starts any defined threads.
+	 */
 	public void runThreads() {
 		gameThread.run();
 	}
-	
-	float posx = 0.0f;
-	float posy = 0.0f;
-	float speed = 1;
 	
 	@Override
 	public void run() {
@@ -116,10 +119,16 @@ public class Main extends JPanel implements Runnable  {
 		}
 	}
 	
+	/**
+	 * Logic function that syncs with the 60 tick interval as to maintain a constant speed
+	 */
 	private void tick() {
 		player.tick();
 	}
 	
+	/**
+	 * Draws all entities and tiles and whatnots in here!
+	 */
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;

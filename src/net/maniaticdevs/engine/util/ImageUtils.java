@@ -5,6 +5,10 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 
+/**
+ * Handles BufferedImage in ways of scaling and slicing sprite sheets into image arrays
+ * @author Oikmo
+ */
 public class ImageUtils {
 	
 	/**
@@ -102,14 +106,46 @@ public class ImageUtils {
 		return imgs;
 	}
 	
+	/**
+	 * Basically, it creates an empty BufferedImage 2D array (of size specified by the rows and cols) in which it creates an empty sub image in that array that then draws from the given BufferedImage into that sub image.
+	 * <br><br>
+	 * <b>But this time the size is capped at 16.</b>
+	 * @param image
+	 * @param rows
+	 * @param cols
+	 * @return
+	 */
 	public static BufferedImage[][] fromSheet2D(BufferedImage image, int rows, int cols) {
 		return fromSheet2D(image, rows, cols, 16, 16, 16, 16);
 	}
-	
+	/**
+	 * Basically, it creates an empty BufferedImage 2D array (of size specified by the rows and cols) in which it creates an empty sub image in that array that then draws from the given BufferedImage into that sub image.
+	 * 
+	 * @param image
+	 * @param rows
+	 * @param cols
+	 * @param width
+	 * @param height
+	 * @return
+	 */
 	public static BufferedImage[][] fromSheet2D(BufferedImage image, int rows, int cols, int width, int height) {
 		return fromSheet2D(image, rows, cols, width, height, image.getWidth()/cols,image.getHeight()/rows);
 	}
 	
+	/**
+	 * Full fucking thang
+	 * 
+	 * Basically, it creates an empty BufferedImage 2D array (of size specified by the rows and cols) in which it creates an empty sub image in that array that then draws from the given BufferedImage into that sub image.
+	 * 
+	 * @param image
+	 * @param rows
+	 * @param cols
+	 * @param width
+	 * @param height
+	 * @param chunkWidth
+	 * @param chunkHeight
+	 * @return
+	 */
 	private static BufferedImage[][] fromSheet2D(BufferedImage image, int rows, int cols, int width, int height, int chunkWidth, int chunkHeight) {
 		int chunks = rows * cols;
 	    

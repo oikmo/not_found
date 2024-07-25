@@ -1,5 +1,9 @@
 package net.maniaticdevs.engine;
 
+/**
+ * Stores values for screen sizes and tile sizes. Options may be stored here.
+ * @author Oikmo
+ */
 public class Settings {
 	
 	private static final int originalTileSize = 16;

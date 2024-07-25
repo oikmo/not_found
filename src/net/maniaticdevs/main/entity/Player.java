@@ -12,6 +12,12 @@ import net.maniaticdevs.engine.util.ImageUtils;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.main.Main;
 
+/**
+ * Player class! Does player things...
+ * 
+ * @author Oikmo
+ *
+ */
 public class Player extends Entity {
 	
 	@Override
@@ -63,7 +69,4 @@ public class Player extends Entity {
 		//g2.drawRect(position.x, position.y, Settings.tileSize, Settings.tileSize);
 		g2.drawImage(image, null, position.x, position.y);
 	}
-
-	
-
 }

@@ -37,8 +37,8 @@ public class Main extends JPanel implements Runnable  {
 	
 	/**
 	 * Starts threads and opens window.
-	 * @param args
-	 * @throws InterruptedException 
+	 * @param args - program arguments
+	 * @throws InterruptedException - incase something goes funky
 	 */
 	public static void main(String[] args) throws InterruptedException {
 		//handles arguments given by cli
@@ -60,9 +60,12 @@ public class Main extends JPanel implements Runnable  {
 		mainPanel.runThreads();
 	}
 	
+	/**
+	 * Main constructor, sets ups the panel values such as size and listeners and threads
+	 */
 	public Main() {
 		this.setPreferredSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
-		this.setBackground(Color.BLACK);
+		this.setBackground(Color.BLUE);
 		this.setDoubleBuffered(true); // better performance
 		this.addKeyListener(new Input());
 		this.setFocusable(true); // so that the input class can actually work
@@ -132,6 +135,8 @@ public class Main extends JPanel implements Runnable  {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
+		
+		// Fast rendering
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
 	    g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -140,6 +145,7 @@ public class Main extends JPanel implements Runnable  {
         g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR); 
 		
+        //draw entities
         player.draw(g2);
         
 		g2.dispose();

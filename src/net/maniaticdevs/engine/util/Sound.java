@@ -14,7 +14,7 @@ public class Sound {
 	
 	/**
 	 * Proof of concept, still yet to be properly done.
-	 * @param fileName
+	 * @param fileName - name and location of mp3
 	 */
 	public static void play(String fileName) {
 		new Thread(new Runnable() {

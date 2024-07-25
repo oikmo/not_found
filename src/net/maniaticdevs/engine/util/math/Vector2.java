@@ -7,6 +7,9 @@ package net.maniaticdevs.engine.util.math;
  */
 public class Vector2 {
 	
+	/**
+	 * Coordinates
+	 */
 	public int x, y;
 	
 	/**
@@ -20,8 +23,8 @@ public class Vector2 {
 	/**
 	 * Basic contructor
 	 * 
-	 * @param x
-	 * @param y
+	 * @param x X coordinate
+	 * @param y Y coordinate
 	 */
 	public Vector2(int x, int y) {
 		this.x = x;
@@ -30,8 +33,8 @@ public class Vector2 {
 	
 	/**
 	 * Offsets from currently set values
-	 * @param x
-	 * @param y
+	 * @param x amount of X to change
+	 * @param y amount of Y to change
 	 */
 	public void change(int x, int y) {
 		this.x += x;
@@ -41,8 +44,8 @@ public class Vector2 {
 	/**
 	 * Sets values
 	 * 
-	 * @param x
-	 * @param y
+	 * @param x X coordinate to be set to
+	 * @param y Y coordinate to be set to
 	 */
 	public void set(int x, int y) {
 		this.x = x;

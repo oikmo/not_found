@@ -38,6 +38,7 @@ public class Player extends Entity {
 	
 	/** Player inventory for storing {@link OBJ}s */
 	public List<OBJ> inventory = new ArrayList<>();
+	/** Currently holding item */
 	public OBJ holdingItem;
 	
 	@Override
@@ -161,6 +162,11 @@ public class Player extends Entity {
 		}
 	}
 	
+	/**
+	 * Checks if index of a soon to be selected item is valid
+	 * @param index Index to be checked
+	 * @return {@link Boolean}
+	 */
 	public boolean isItemAtIndex(int index) {
 		if(index+1 <= inventory.size()) {
 			if(inventory.get(index) != null) {
@@ -170,6 +176,10 @@ public class Player extends Entity {
 		return false;
 	}
 	
+	/**
+	 * Selects item to be used for {@link #holdingItem}
+	 * @param index Index for item to be chosen
+	 */
 	public void selectItem(int index) {
 		if(index+1 <= inventory.size()) {
 			holdingItem = inventory.get(index);

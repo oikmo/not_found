@@ -19,11 +19,16 @@ public class GuiCharacterScreen extends GuiScreen {
 	public int slotCol = 0;
 	/** Inventory slot column position */
 	public int slotRow = 0;
-
+	
+	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockLeft = false;
+	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockRight = false;
+	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockUp = false;
+	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockDown = false;
+	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockEnter = false;
 	
 	public void tick() {

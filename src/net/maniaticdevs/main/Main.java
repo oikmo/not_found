@@ -153,8 +153,9 @@ public class Main extends JPanel implements Runnable  {
 			}
 		}
 	}
-	
+	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockToggleInventory = false;
+	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockEscapeToGame = false;
 	
 	/**

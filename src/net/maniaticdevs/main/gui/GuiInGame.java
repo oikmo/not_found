@@ -1,0 +1,51 @@
+package net.maniaticdevs.main.gui;
+
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+import net.maniaticdevs.engine.ResourceLoader;
+import net.maniaticdevs.engine.Settings;
+import net.maniaticdevs.engine.gui.GuiScreen;
+import net.maniaticdevs.engine.util.ImageUtils;
+import net.maniaticdevs.main.Main;
+
+/**
+ * HUD for the player
+ * @author Oikmo
+ */
+public class GuiInGame extends GuiScreen {
+	
+	/**
+	 * Heart sprites. Loaded statically as to not reload the same image over and over again.
+	 */
+	private static BufferedImage[] sprites = ImageUtils.setupSheet("player/heartSheet", 3, 1);
+	
+	public void draw(Graphics2D g2) {
+		//this.drawImage(g2, image, Main.getInstance().getWidth()/2, Main.getInstance().getHeight()/2, 128, 128);
+		
+		//this.drawImage(g2, sprites[0], 10, 10, 20, 20);
+		
+		int x = Settings.tileSize/2;
+		int y = Settings.tileSize/2;
+		int i = 0;
+		//draw max life
+		while(i < Main.thePlayer.maxHealth/2) {
+			g2.drawImage(sprites[2], x, y, null);
+			i++;
+			x += Settings.tileSize;
+		}
+		//reset
+		x = Settings.tileSize/2;
+		y = Settings.tileSize/2;
+		i = 0;
+		//draw current life
+		while(i<Main.thePlayer.health) {
+			g2.drawImage(sprites[1], x, y, null);
+			i++;
+			if(i<Main.thePlayer.health) { g2.drawImage(sprites[0], x, y, null); }
+			i++;
+			x += Settings.tileSize;
+		}
+	}
+
+}

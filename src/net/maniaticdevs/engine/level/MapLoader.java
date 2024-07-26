@@ -18,7 +18,7 @@ import net.maniaticdevs.main.Main;
  * Handles map files to give as {@link Level}s
  * @author Oikmo
  */
-public class LevelLoader  {
+public class MapLoader  {
 	/**
 	 * Tile data
 	 */
@@ -76,30 +76,21 @@ public class LevelLoader  {
 	
 	/**
 	 * Loads map resources from /maps/<br><br>
-	 * Map data goes as follows:
-	 * <br> - Name
-	 * <br> - Width
-	 * <br> - Height
-	 * <br> - Data
 	 * 
 	 * @param mapPath what map to load
-	 * @return {@link Level}
+	 * @param width Width of map
+	 * @param height Height of map
+	 * @return {@link LevelData}
 	 */
-	public static Level loadMap(String mapPath) {
-		Level level = null;
+	public static LevelData loadMap(String mapPath, int width, int height) {
+		LevelData level = null;
 		try {
-			InputStream is = LevelLoader.class.getResourceAsStream("/maps/"+mapPath+".map");
+			InputStream is = MapLoader.class.getResourceAsStream("/maps/"+mapPath+".map");
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			
-			String name = br.readLine().split("name:")[1];
-			int width = Integer.parseInt(br.readLine().split("width:")[1]);
-			int height = Integer.parseInt(br.readLine().split("height:")[1]);
 			
 			BufferedImage map = new BufferedImage(width*16, height*16, BufferedImage.TYPE_INT_RGB);
 			Graphics2D g2 = map.createGraphics();
-			
-			level = new Level(name, width, height);
-			
+			Tile[][] tiles = new Tile[width][height];
 			int col = 0;
 			int row = 0;
 			
@@ -119,9 +110,8 @@ public class LevelLoader  {
 					int worldX = col*16;
 					int worldY = row*16;
 					
-					g2.drawImage(tiles[Integer.parseInt(numbers[col])].image, worldX, worldY, 16, 16, null);
-					
-					level.setTileAt(col, row, Integer.parseInt(numbers[col]));
+					g2.drawImage(MapLoader.tiles[Integer.parseInt(numbers[col])].image, worldX, worldY, 16, 16, null);
+					tiles[col][row] = MapLoader.tiles[Integer.parseInt(numbers[col])];
 					col++;
 				}
 				if(col == width) {
@@ -130,16 +120,50 @@ public class LevelLoader  {
 				}
 			}
 			g2.dispose();
-			level.setImage(map);
+			level = new LevelData(map, tiles);
 			
 			br.close();
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
-		
-		
-		
 		System.gc();
 		return level;
+	}
+	
+	/**
+	 * Easy passing of map information
+	 * @author Oikmo
+	 */
+	public static class LevelData {
+		/** Rendered map */
+		private BufferedImage mapImage;
+		/** Tiles from map */
+		private Tile[][] tiles;
+		
+		/**
+		 * Data constructor
+		 * @param mapImage rendered map
+		 * @param tiles tile data
+		 */
+		public LevelData(BufferedImage mapImage, Tile[][] tiles) {
+			this.mapImage = mapImage;
+			this.tiles = tiles;
+		}
+		
+		/**
+		 * Get rendered map
+		 * @return {@link BufferedImage}
+		 */
+		public BufferedImage getMapImage() {
+			return mapImage;
+		}
+
+		/**
+		 * Get tile data
+		 * @return {@link Tile}[][]
+		 */
+		public Tile[][] getTiles() {
+			return tiles;
+		}
 	}
 }

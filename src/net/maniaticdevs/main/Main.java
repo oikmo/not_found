@@ -11,12 +11,16 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import net.maniaticdevs.engine.Settings;
+import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.level.Level;
-import net.maniaticdevs.engine.level.LevelLoader;
+import net.maniaticdevs.engine.level.MapLoader;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.engine.util.os.EnumOS;
 import net.maniaticdevs.engine.util.os.EnumOSMappingHelper;
 import net.maniaticdevs.main.entity.Player;
+import net.maniaticdevs.main.gui.GuiCharacterScreen;
+import net.maniaticdevs.main.gui.GuiInGame;
+import net.maniaticdevs.main.level.SampleLevel;
 
 /**
  * Main class, enters thread, is thread.
@@ -52,6 +56,9 @@ public class Main extends JPanel implements Runnable  {
 	/** The active level */
 	public static Level currentLevel;
 	
+	/** GuiScreen to render */
+	public static GuiScreen currentScreen;
+	
 	/**
 	 * Starts threads and opens window.
 	 * @param args - program arguments
@@ -72,6 +79,8 @@ public class Main extends JPanel implements Runnable  {
 		window.pack();
 		window.setLocationRelativeTo(null); // center window
 		window.setVisible(true);
+		window.setPreferredSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
+		window.setMinimumSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
 		
 		mainPanel.runThreads();
 	}
@@ -80,6 +89,7 @@ public class Main extends JPanel implements Runnable  {
 	 * Main constructor, sets ups the panel values such as size and listeners and threads
 	 */
 	public Main() {
+		
 		this.setPreferredSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
 		this.setBackground(Color.BLUE);
 		this.setDoubleBuffered(true); // better performance
@@ -91,11 +101,11 @@ public class Main extends JPanel implements Runnable  {
 		
 		instance = this;
 		thePlayer = new Player(); // would you look at that
+		GuiScreen.init();
+		MapLoader.init();
 		
-		LevelLoader.init();
-		
-		currentLevel = LevelLoader.loadMap("sample");
-		System.out.println(currentLevel.getName());
+		currentLevel = new SampleLevel();
+		currentScreen = new GuiInGame();
 	}
 	
 	/**
@@ -144,10 +154,38 @@ public class Main extends JPanel implements Runnable  {
 		}
 	}
 	
+	private boolean lockToggleInventory = false;
+	private boolean lockEscapeToGame = false;
+	
 	/**
 	 * Logic function that syncs with the 60 tick interval as to maintain a constant speed
 	 */
 	private void tick() {
+		if(Input.isKeyDown(Input.KEY_E)) {
+			if(!lockToggleInventory) {
+				if(currentScreen instanceof GuiInGame) {
+					currentScreen = new GuiCharacterScreen();
+				} else if(currentScreen instanceof GuiCharacterScreen) {
+					currentScreen = new GuiInGame();
+				}
+			}
+			lockToggleInventory = true;
+		} else {
+			lockToggleInventory = false;
+		}
+		if(Input.isKeyDown(Input.KEY_ESC)) {
+			if(!lockEscapeToGame) {
+				if(!(currentScreen instanceof GuiInGame)) {
+					currentScreen = new GuiInGame();
+				}
+			}
+			lockEscapeToGame = true;
+		} else {
+			lockEscapeToGame = false;
+		}
+		if(currentScreen != null) {
+			currentScreen.tick();
+		}
 		thePlayer.tick();
 	}
 	
@@ -164,9 +202,17 @@ public class Main extends JPanel implements Runnable  {
         g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
         g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         
-        currentLevel.draw(g2);
+        currentLevel.draw(g2, thePlayer.getPosition(), thePlayer.getScreenPosition());
         //draw entities
         thePlayer.draw(g2);
+        
+        if(currentScreen != null) {
+        	currentScreen.draw(g2);
+        }
+        
+        g2.setColor(Color.WHITE);
+        g2.setFont(GuiScreen.font.deriveFont(18.0F));
+        g2.drawString("not_found <REMAKE> [[A1.0.0]]", 0, 18);
         
 		g2.dispose();
 	}

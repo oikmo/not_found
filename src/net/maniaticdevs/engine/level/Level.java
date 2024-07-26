@@ -7,9 +7,10 @@ import java.util.List;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
+import net.maniaticdevs.engine.level.MapLoader.LevelData;
 import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.tile.Tile;
-import net.maniaticdevs.main.Main;
+import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.entity.Player;
 
 /**
@@ -20,13 +21,11 @@ public class Level {
 	
 	/** For like a loading screen or something */
 	private String name;
-	/** For loading map file */
-	private String internalName;
 	
 	/** Active entities */
-	private List<Entity> entities = new ArrayList<>();
+	protected List<Entity> entities = new ArrayList<>();
 	/** Active objects */
-	private List<OBJ> objects = new ArrayList<>();
+	protected List<OBJ> objects = new ArrayList<>();
 	/** Fuck no I ain't using tile based rendering because that shit lags.<br>Here's a better solution that's tiny in memory and is easy to render! */
 	private BufferedImage mapImage;
 	/** Tile data from map file */
@@ -35,45 +34,58 @@ public class Level {
 	private int width, height;
 	
 	/**
-	 * Level contructor, used by {@link LevelLoader} only.
-	 * @param name given from map file
-	 * @param width given from map file
-	 * @param height given from map file
+	 * Level contructor, used by {@link MapLoader} only.
+	 * @param internalName for loading map file
+	 * @param name Name of level
+	 * @param width Width of level
+	 * @param height Height of level
 	 */
-	public Level(String name, int width, int height) {
+	public Level(String internalName, String name, int width, int height) {
 		this.name = name;
 		this.width = width;
 		this.height = height;
-		tiles = new Tile[width][height];
+		LevelData data = MapLoader.loadMap(internalName, width, height);
+		this.tiles = data.getTiles();
+		this.mapImage = data.getMapImage();
+		loadEverything();
 	}
+	
+	/**
+	 * Called on construction, this can be redefined by abstracted classes so that they can set their own objects and enemies easily.
+	 */
+	protected void loadEverything() {}
 	
 	/**
 	 * Draws {@link #mapImage} based on {@link Player} coordinates.
 	 * @param g2 Renderer for mapImage
+	 * @param position Player position
+	 * @param screenPosition Player's screen position
 	 */
-	public void draw(Graphics2D g2) {
-		int screenX = 0 - Main.thePlayer.getPosition().x + Main.thePlayer.getScreenPosition().x;
-		int screenY = 0 - Main.thePlayer.getPosition().y + Main.thePlayer.getScreenPosition().y;
+	public void draw(Graphics2D g2, Vector2 position, Vector2 screenPosition) {
+		int screenX = 0 - position.x + screenPosition.x;
+		int screenY = 0 - position.y + screenPosition.y;
 		g2.drawImage(mapImage, screenX, screenY, width*Settings.tileSize, height*Settings.tileSize, null);
+		
+		for(OBJ obj : objects) {
+			obj.draw(g2, position, screenPosition);
+		}
+		
+		if(entities.size() != 0) {
+			for(Entity e : entities) {
+				e.draw(g2);
+			}
+		}
 	}
 	
 	/**
-	 * Updates {@link #mapImage} with a new one
-	 * @param image to update {@link #mapImage} with
-	 */
-	public void setImage(BufferedImage image) {
-		this.mapImage = image;
-	}
-	
-	/**
-	 * Sets a tile from {@link LevelLoader#tiles} on specified grid position
+	 * Sets a tile from {@link MapLoader#tiles} on specified grid position
 	 * 
 	 * @param x tile coord X
 	 * @param y tile coord Y
-	 * @param type given from {@link LevelLoader#tiles}[]
+	 * @param type given from {@link MapLoader#tiles}[]
 	 */
 	public void setTileAt(int x, int y, int type) {
-		setTileAt(x,y, LevelLoader.tiles[type]);
+		setTileAt(x,y, MapLoader.tiles[type]);
 	}
 	
 	/**
@@ -105,5 +117,11 @@ public class Level {
 		return name;
 	}
 	
-	
+	/**
+	 * Returns the objects in memory
+	 * @return {@link List} {@link OBJ}
+	 */
+	public List<OBJ> getObjects() {
+		return objects;
+	}
 }

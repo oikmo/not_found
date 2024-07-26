@@ -16,7 +16,7 @@ public abstract class Entity {
 	public String name;
 	
 	/** Visual representation of Entity to be displayed on screen. */
-	protected BufferedImage[] sprites = null;
+	public BufferedImage[] sprites = null;
 	/** Direction of entity */
 	protected EntityDirection direction = EntityDirection.IDLE;
 	/** World position of entity */
@@ -28,12 +28,38 @@ public abstract class Entity {
 	protected Rectangle hitBox = new Rectangle(8, 1, 32, 46);
 	
 	/** Index for sprite sheets, 5 frames expected. */
-	protected int spriteNum = 0;
+	public int spriteNum = 0;
 	/** Keeps track of ticks, used in {@link #animate()} */
 	protected int spriteCounter = 0;
 	
 	/** If this is true then no matter what direction the entity is, it will add speed to it's opposite direction */
 	public boolean colliding = false;
+	
+	/* STATS */
+	/** maximum amount of health */
+	public int maxHealth;
+	/** current health */
+	public int health;
+	/** maximum amount of mana */
+	public int maxMana;
+	/** current mana */
+	public int mana;
+	/** Leveling system like cmon */
+	public int level;
+	/** Modifier for how much {@link #attack} the can entity do */
+	public int strength;
+	/** Stealth or something */
+	public int dexterity;
+	/** The amount of damage that can be done by entity */
+	public int attack;
+	/** The amount of damage that can be resisted */
+	public int defense;
+	/** Leveling system */
+	public int exp;
+	/** Leveling system */
+	public int nextLevelExp;
+	/** Moolas... */
+	public int coin;
 	
 	/** Calls {@link #setDefaultValues()} */
 	public Entity() {

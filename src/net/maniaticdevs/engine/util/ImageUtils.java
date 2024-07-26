@@ -4,12 +4,9 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
+import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
-import net.maniaticdevs.engine.entity.Entity;
 
 /**
  * Handles BufferedImage in ways of scaling and slicing sprite sheets into image arrays
@@ -142,6 +139,7 @@ public class ImageUtils {
 	 * @return {@link BufferedImage}[][]
 	 */
 	public static BufferedImage[][] fromSheet2D(BufferedImage image, int rows, int cols) {
+		System.out.println("image is" + image);
 		return fromSheet2D(image, rows, cols, image.getWidth()/cols,image.getHeight()/rows);
 	}
 	
@@ -159,7 +157,6 @@ public class ImageUtils {
 	 */
 	private static BufferedImage[][] fromSheet2D(BufferedImage image, int rows, int cols, int chunkWidth, int chunkHeight) {
 		int chunks = rows * cols;
-	    
 		BufferedImage imgs[][] = new BufferedImage[chunks][chunks]; //Image array to hold image chunks
 		for (int x = 0; x < cols; x++) {
 			for (int y = 0; y < rows; y++) {
@@ -199,20 +196,14 @@ public class ImageUtils {
 	 * @return {@link BufferedImage }[]
 	 */
 	public static BufferedImage[] setupSheet(String filePath, int row, int col, int width, int height) {
-		BufferedImage[] result = null;
-		try {
-			BufferedImage spriteSheet = ImageIO.read(Entity.class.getResourceAsStream("/textures/" + filePath +".png"));
-			result = new BufferedImage[row * col];
-			if(width == -1 && height == -1) {
-				result = ImageUtils.fromSheet(spriteSheet, row, col, 16, 16);
-				result = scaleArray(result, Settings.tileSize, Settings.tileSize);
-			} else {
-				result = ImageUtils.fromSheet(spriteSheet, row, col, width, height);
-				result = scaleArray(result, width, height);
-			}
-			
-		} catch (IOException e) {
-			System.err.println("[ERROR] \"/textures/"+ filePath + ".png\" could not be loaded!");
+		BufferedImage spriteSheet = ResourceLoader.loadImage("/textures/" + filePath +".png");
+		BufferedImage[] result = new BufferedImage[row * col];
+		if(width == -1 && height == -1) {
+			result = ImageUtils.fromSheet(spriteSheet, row, col, 16, 16);
+			result = scaleArray(result, Settings.tileSize, Settings.tileSize);
+		} else {
+			result = ImageUtils.fromSheet(spriteSheet, row, col, width, height);
+			result = scaleArray(result, width, height);
 		}
 		
 		return result;

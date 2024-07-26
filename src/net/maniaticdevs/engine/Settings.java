@@ -14,9 +14,9 @@ public class Settings {
 	/** Calculated tileSize from the {@link #originalTileSize} multiplied by the {@link #scale } */
 	public static final int tileSize = originalTileSize * scale;
 	/** Maximum tiles that can be shown at once on the screen horizontally */
-	public static final int maxScreenCol = 16;
+	public static final int maxScreenCol = 17;
 	/** Maximum tiles that can be shown at once on the screen vertically */
-	public static final int maxScreenRow = 12;
+	public static final int maxScreenRow = 13;
 	/** Window width calculated with {@link #tileSize} and {@link #maxScreenCol} */
 	public static final int windowWidth = tileSize * maxScreenCol;
 	/** Window width calculated with {@link #tileSize} and {@link #maxScreenRow} */

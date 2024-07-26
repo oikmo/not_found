@@ -41,6 +41,16 @@ public class Vector2 {
 		this.y += y;
 	}
 	
+	
+	/**
+	 * Sets values
+	 * 
+	 * @param vec Vector coordinates to be set to
+	 */
+	public void set(Vector2 vec) {
+		set(vec.x, vec.y);
+	}
+	
 	/**
 	 * Sets values
 	 * 
@@ -65,4 +75,7 @@ public class Vector2 {
 		return x << 16 ^ y;
 	}
 	
+	public String toString() {
+		return "Vector2[x="+x+",y="+y+"]";
+	}
 }

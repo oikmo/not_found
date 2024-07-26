@@ -1,5 +1,6 @@
 package net.maniaticdevs.main.gui;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
@@ -19,6 +20,8 @@ public class GuiInGame extends GuiScreen {
 	 * Heart sprites. Loaded statically as to not reload the same image over and over again.
 	 */
 	private static BufferedImage[] sprites = ImageUtils.setupSheet("player/heartSheet", 3, 1);
+	
+	public static String message = null;
 	
 	public void draw(Graphics2D g2) {
 		//this.drawImage(g2, image, Main.getInstance().getWidth()/2, Main.getInstance().getHeight()/2, 128, 128);
@@ -45,6 +48,17 @@ public class GuiInGame extends GuiScreen {
 			if(i<Main.thePlayer.health) { g2.drawImage(sprites[0], x, y, null); }
 			i++;
 			x += Settings.tileSize;
+		}
+		
+		if(message != null) {
+			int frameHeight = Settings.tileSize;
+			int frameY = 10;
+			int textWidth = (int) g2.getFontMetrics(font).getStringBounds(message, g2).getWidth();
+			int frameX = (Main.getInstance().getWidth()/2)-(textWidth+Settings.tileSize)/2;
+			int frameWidth = textWidth+Settings.tileSize;
+			
+			drawSubWindow(g2, frameX,frameY, frameWidth,frameHeight, 2);
+			this.drawStringCentered(g2, font, Color.WHITE, message, frameX+frameWidth/2, frameY+(int)(Settings.tileSize/1.25));
 		}
 	}
 

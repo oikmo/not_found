@@ -56,7 +56,7 @@ public class GuiScreen {
 	protected void drawStringCentered(Graphics2D g2, Font font, Color c, String text, int x, int y) {
 		int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
 		int height = (int)g2.getFontMetrics().getStringBounds(text, g2).getHeight();
-		drawStringCentered(g2, font, c, text, x-(length/2), y-(height/2));
+		drawString(g2, font, c, text, x-(length/2), y-(height/2));
 	}
 	
 	/**
@@ -145,6 +145,7 @@ public class GuiScreen {
 		g2.drawRoundRect(x+5, y+5, width-10, height-10, 25, 25);
 		
 	}
+	
 	/**
 	 * Get X For Centered Text on whole screen
 	 * @param g2 Graphics

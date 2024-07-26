@@ -66,15 +66,32 @@ public class Level {
 		int screenY = 0 - position.y + screenPosition.y;
 		g2.drawImage(mapImage, screenX, screenY, width*Settings.tileSize, height*Settings.tileSize, null);
 		
-		for(OBJ obj : objects) {
-			obj.draw(g2, position, screenPosition);
-		}
-		
-		if(entities.size() != 0) {
-			for(Entity e : entities) {
-				e.draw(g2);
+		try {
+			for(OBJ obj : objects) {
+				obj.draw(g2, position, screenPosition);
 			}
-		}
+			
+			if(entities.size() != 0) {
+				for(Entity e : entities) {
+					e.draw(g2);
+				}
+			}
+		} catch(java.util.ConcurrentModificationException e) {}
+	}
+	
+	/** Logic function */
+	public void tick() {
+		try {
+			for(OBJ obj : objects) {
+				obj.tick();
+			}
+			
+			if(entities.size() != 0) {
+				for(Entity e : entities) {
+					e.tick();
+				}
+			}
+		} catch(java.util.ConcurrentModificationException e) {}
 	}
 	
 	/**
@@ -124,4 +141,6 @@ public class Level {
 	public List<OBJ> getObjects() {
 		return objects;
 	}
+
+	
 }

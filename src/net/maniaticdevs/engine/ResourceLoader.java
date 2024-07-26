@@ -9,8 +9,6 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import com.esotericsoftware.kryonet.FrameworkMessage;
-
 /**
  * Loads files into memory as to not use a lot of disk usage (also easy file management)
  * @author Oikmo

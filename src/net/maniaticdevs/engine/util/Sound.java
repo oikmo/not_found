@@ -1,5 +1,8 @@
 package net.maniaticdevs.engine.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jaco.mp3.player.MP3Player;
 import net.maniaticdevs.engine.ResourceLoader;
 
@@ -8,6 +11,8 @@ import net.maniaticdevs.engine.ResourceLoader;
  * @author Oikmo
  */
 public class Sound {
+	
+	private static Map<String, MP3Player> players = new HashMap<>();
 	
 	/**
 	 * Plays MP3 files from the sound directory!

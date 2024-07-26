@@ -20,7 +20,7 @@ public class Door extends OBJ {
 	 * @param key Key required to open door
 	 * @param removesKey {@link #removesKey}
 	 */
-	public Door(int x, int y, Key key, boolean removesKey) {
+	public Door(Key key, boolean removesKey, int x, int y) {
 		this.removesKey = removesKey;
 		name = "Door";
 		image = ResourceLoader.loadImage("/textures/object/door.png");

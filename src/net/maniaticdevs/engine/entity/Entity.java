@@ -28,7 +28,7 @@ public abstract class Entity {
 	protected Rectangle hitBox = new Rectangle(8, 1, 32, 46);
 	
 	/** Index for sprite sheets, 5 frames expected. */
-	public int spriteNum = 0;
+	protected int spriteNum = 0;
 	/** Keeps track of ticks, used in {@link #animate()} */
 	protected int spriteCounter = 0;
 	

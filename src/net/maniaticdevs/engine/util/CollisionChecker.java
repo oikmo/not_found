@@ -150,4 +150,42 @@ public class CollisionChecker {
 		}
 		return interactedOBJ;
 	}
+	
+	/**
+	 * Check if contact is made with object
+	 * @return {@link OBJ}
+	 */
+	public static OBJ checkIfTouchingObj(Entity entity) {
+		Rectangle entityChecker = new Rectangle();
+		Rectangle objChecker = new Rectangle();
+		
+		for(OBJ obj : Main.currentLevel.getObjects()) {
+			int solidEntityX = entity.getPosition().x + entity.getHitBox().x;
+			int solidEntityY = entity.getPosition().y + entity.getHitBox().y;
+			entityChecker.x = solidEntityX;
+			entityChecker.y = solidEntityY;
+			entityChecker.width = entity.getHitBox().width;
+			entityChecker.height = entity.getHitBox().height;
+			
+			int solidObjX = obj.position.x + obj.getHitBox().x;
+			int solidObjY = obj.position.y + obj.getHitBox().y;
+			
+			objChecker.x = solidObjX;
+			objChecker.y = solidObjY;
+			objChecker.width = obj.getHitBox().width;
+			objChecker.height = obj.getHitBox().height;
+			
+			int xDist = Math.abs(entityChecker.x - objChecker.x);
+			int yDist = Math.abs(entityChecker.y - objChecker.y);
+			int dist = Math.max(xDist, yDist);
+			
+			if(dist < Settings.tileSize) {
+				if(entityChecker.intersects(objChecker)) {
+					return obj;
+				}
+				
+			}
+		}
+		return null;
+	}
 }

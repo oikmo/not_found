@@ -18,8 +18,8 @@ import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.engine.util.os.EnumOS;
 import net.maniaticdevs.engine.util.os.EnumOSMappingHelper;
 import net.maniaticdevs.main.entity.Player;
-import net.maniaticdevs.main.gui.GuiCharacterScreen;
 import net.maniaticdevs.main.gui.GuiInGame;
+import net.maniaticdevs.main.gui.GuiPauseScreen;
 import net.maniaticdevs.main.level.SampleLevel;
 
 /**
@@ -50,7 +50,7 @@ public class Main extends JPanel implements Runnable  {
 	/** As to be used for the Main class as it Implements Runnable which is a core for Threads in java. */
 	private Thread gameThread;
 	
-	/** Yo!!! */
+	/** The player <br>cool kid and allat :3 */
 	public static Player thePlayer;
 	
 	/** The active level */
@@ -59,8 +59,11 @@ public class Main extends JPanel implements Runnable  {
 	/** GuiScreen to render */
 	public static GuiScreen currentScreen;
 	
+	/** Playtime tracker */
+	public static long startedPlaying = System.currentTimeMillis();
+	
 	/**
-	 * Starts threads and opens window.
+	 * Opens window and starts game.
 	 * @param args - program arguments
 	 * @throws InterruptedException - incase something goes funky
 	 */
@@ -73,10 +76,13 @@ public class Main extends JPanel implements Runnable  {
 		}
 		
 		window = new JFrame("not_found"); // create window with name of "not_found"
+		/** MAKES THE WINDOW BORDERLESS */
+		//window.setUndecorated(true);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Main mainPanel = new Main();
 		window.add(mainPanel); // since Main class is JPanel we can just add it here.
 		window.pack();
+		
 		window.setLocationRelativeTo(null); // center window
 		window.setVisible(true);
 		window.setPreferredSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
@@ -89,9 +95,8 @@ public class Main extends JPanel implements Runnable  {
 	 * Main constructor, sets ups the panel values such as size and listeners and threads
 	 */
 	public Main() {
-		
 		this.setPreferredSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
-		this.setBackground(Color.BLUE);
+		this.setBackground(new Color(20,20,20));
 		this.setDoubleBuffered(true); // better performance
 		this.addKeyListener(new Input());
 		this.setFocusable(true); // so that the input class can actually work
@@ -154,30 +159,16 @@ public class Main extends JPanel implements Runnable  {
 		}
 	}
 	/** To prevent action to be done repeatedly in a short period of time */
-	private boolean lockToggleInventory = false;
-	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockEscapeToGame = false;
 	
 	/**
 	 * Logic function that syncs with the 60 tick interval as to maintain a constant speed
 	 */
 	private void tick() {
-		if(Input.isKeyDown(Input.KEY_E)) {
-			if(!lockToggleInventory) {
-				if(currentScreen instanceof GuiInGame) {
-					currentScreen = new GuiCharacterScreen();
-				} else if(currentScreen instanceof GuiCharacterScreen) {
-					currentScreen = new GuiInGame();
-				}
-			}
-			lockToggleInventory = true;
-		} else {
-			lockToggleInventory = false;
-		}
 		if(Input.isKeyDown(Input.KEY_ESC)) {
 			if(!lockEscapeToGame) {
-				if(!(currentScreen instanceof GuiInGame)) {
-					currentScreen = new GuiInGame();
+				if(currentScreen instanceof GuiInGame) {
+					currentScreen = new GuiPauseScreen();
 				}
 			}
 			lockEscapeToGame = true;
@@ -187,7 +178,13 @@ public class Main extends JPanel implements Runnable  {
 		if(currentScreen != null) {
 			currentScreen.tick();
 		}
-		thePlayer.tick();
+		
+		thePlayer.updateScreenPos();
+		if(currentScreen instanceof GuiInGame) {
+			thePlayer.tick();
+			currentLevel.tick();
+		}
+		
 	}
 	
 	/**

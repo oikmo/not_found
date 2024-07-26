@@ -11,10 +11,10 @@ import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.entity.EntityDirection;
-import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
 import net.maniaticdevs.engine.objects.OBJ;
+import net.maniaticdevs.engine.objects.PickableObject;
 import net.maniaticdevs.engine.util.CollisionChecker;
 import net.maniaticdevs.engine.util.ImageUtils;
 import net.maniaticdevs.engine.util.Input;
@@ -40,6 +40,15 @@ public class Player extends Entity {
 	public List<OBJ> inventory = new ArrayList<>();
 	/** Currently holding item */
 	public OBJ holdingItem;
+	/** You died, so it goes. */
+	public boolean died = false;
+	
+	/** To prevent action to be done repeatedly in a short period of time */
+	boolean lockTakeLife = false;
+	/** To prevent action to be done repeatedly in a short period of time */
+	boolean lockGiveLife = false;
+	
+	private int ticks = 0;
 	
 	@Override
 	protected void setDefaultValues() {
@@ -52,18 +61,24 @@ public class Player extends Entity {
 	}
 	
 	//float motionX, motionY;
-	/** To prevent action to be done repeatedly in a short period of time */
-	boolean lockTakeLife = false;
-	/** To prevent action to be done repeatedly in a short period of time */
-	boolean lockGiveLife = false;
+	
+	
+	public void updateScreenPos() {
+		screenPos.set((Main.getInstance().getWidth() / 2 - (Settings.tileSize / 2)), Main.getInstance().getHeight() / 2 - (Settings.tileSize / 2));
+	}
+	
 	@Override
 	public void tick() {
-		screenPos.set((Main.getInstance().getWidth() / 2 - (Settings.tileSize / 2)), Main.getInstance().getHeight() / 2 - (Settings.tileSize / 2));
+		if(ticks != 0 && GuiInGame.message != null) {
+			ticks--;
+			if(ticks <= 0 && GuiInGame.message != null) {
+				GuiInGame.message = null;
+			}
+		}
 		
 		animate();
 		
 		direction = EntityDirection.IDLE;
-		
 		if(Main.currentScreen instanceof GuiInGame) {
 			if(Input.isKeyDown(Input.KEY_D)) {
 				direction = EntityDirection.EAST;
@@ -75,7 +90,6 @@ public class Player extends Entity {
 				direction = EntityDirection.NORTH;
 			}
 		}
-		
 		
 		if(Input.isKeyDown(Input.KEY_MINUS)) {
 			if(!lockTakeLife) {
@@ -116,11 +130,21 @@ public class Player extends Entity {
 		CollisionChecker.checkTile(this);
 		OBJ obj = CollisionChecker.checkObject(this);
 		if(obj != null) {
-			if(obj instanceof Key) {
-				inventory.add(obj);
-				Main.currentLevel.getObjects().remove(obj);
-				Sound.playSFX("key");
+			
+		}
+		
+		OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
+		if(Input.isKeyDown(Input.KEY_ENTER)) {
+			if(contactOBJ instanceof PickableObject) {
+				inventory.add(((PickableObject)contactOBJ).getItem());
+				ticks = 180;
+				GuiInGame.message = "You picked up: "+((PickableObject)contactOBJ).getItem().name;
+				if(((PickableObject)contactOBJ).getItem() instanceof Key) {
+					Sound.playSFX("key");
+				}
+				Main.currentLevel.getObjects().remove(contactOBJ);
 			}
+			
 			if(obj instanceof Door) {
 				if(holdingItem == ((Door)obj).getRequiredKey()) {
 					if(((Door)obj).removeKeyAfterUse()) {
@@ -131,6 +155,7 @@ public class Player extends Entity {
 				}
 			}
 		}
+		
 		
 		if(!colliding) {
 			if(getDirection() != EntityDirection.IDLE) {
@@ -190,18 +215,25 @@ public class Player extends Entity {
 
 	@Override
 	public void draw(Graphics2D g2) {
+		//if debug flag is enabled
 		if(Main.debug) {
 			g2.setColor(Color.WHITE);
 			g2.setStroke(new BasicStroke(2));
+			//shows hitbox
 			g2.drawRect(screenPos.x+getHitBox().x, screenPos.y+getHitBox().y, getHitBox().width, getHitBox().height);
+			//prints info on screen
 			g2.drawString("direction:"+direction.name(), 0, 10);
 			g2.drawString("KEY_W:"+Input.isKeyDown(Input.KEY_W), 0, 25);
 			g2.drawString("KEY_A:"+Input.isKeyDown(Input.KEY_A), 0, 50);
 			g2.drawString("KEY_S:"+Input.isKeyDown(Input.KEY_S), 0, 75);
 			g2.drawString("KEY_D:"+Input.isKeyDown(Input.KEY_D), 0, 100);
 		}
-		g2.setColor(Color.WHITE);
-		g2.setFont(GuiScreen.font);
+		//username stuff (for networking) 
+		// I
+		// V
+		
+		//g2.setColor(Color.WHITE);
+		//g2.setFont(GuiScreen.font);
 		//int length = (int)g2.getFontMetrics(GuiScreen.font).getStringBounds(name, g2).getWidth();
 		//int height = (int)g2.getFontMetrics(GuiScreen.font).getStringBounds(name, g2).getHeight();
 		//g2.drawString(name, (Main.getInstance().getWidth()/2)-(length/2), screenPos.y-(height/2));

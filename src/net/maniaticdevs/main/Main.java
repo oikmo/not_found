@@ -5,12 +5,17 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.io.File;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import net.maniaticdevs.engine.Settings;
+import net.maniaticdevs.engine.level.Level;
+import net.maniaticdevs.engine.level.LevelLoader;
 import net.maniaticdevs.engine.util.Input;
+import net.maniaticdevs.engine.util.os.EnumOS;
+import net.maniaticdevs.engine.util.os.EnumOSMappingHelper;
 import net.maniaticdevs.main.entity.Player;
 
 /**
@@ -24,6 +29,15 @@ public class Main extends JPanel implements Runnable  {
 	/** 02/08/2022 */
 	private static final long serialVersionUID = 282022L;
 	
+	/** Current instance of {@link Main} */
+	private static Main instance;
+	/** Returns current instance of {@link Main} 
+	 * @return {@link Main}
+	 */
+	public static Main getInstance() {
+		return instance;
+	}
+	
 	/** Where gameplay is seen. */
 	private static JFrame window;
 	/** In case there's some <b><i>freaky</i></b> bugs! */
@@ -33,7 +47,10 @@ public class Main extends JPanel implements Runnable  {
 	private Thread gameThread;
 	
 	/** Yo!!! */
-	private Player player;
+	public static Player thePlayer;
+	
+	/** The active level */
+	public static Level currentLevel;
 	
 	/**
 	 * Starts threads and opens window.
@@ -50,7 +67,6 @@ public class Main extends JPanel implements Runnable  {
 		
 		window = new JFrame("not_found"); // create window with name of "not_found"
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setResizable(false); // for now
 		Main mainPanel = new Main();
 		window.add(mainPanel); // since Main class is JPanel we can just add it here.
 		window.pack();
@@ -70,10 +86,16 @@ public class Main extends JPanel implements Runnable  {
 		this.addKeyListener(new Input());
 		this.setFocusable(true); // so that the input class can actually work
 		
-		player = new Player(); // would you look at that
-		
 		gameThread = new Thread(this);
 		gameThread.setName("Main thread");
+		
+		instance = this;
+		thePlayer = new Player(); // would you look at that
+		
+		LevelLoader.init();
+		
+		currentLevel = LevelLoader.loadMap("sample");
+		System.out.println(currentLevel.getName());
 	}
 	
 	/**
@@ -126,7 +148,7 @@ public class Main extends JPanel implements Runnable  {
 	 * Logic function that syncs with the 60 tick interval as to maintain a constant speed
 	 */
 	private void tick() {
-		player.tick();
+		thePlayer.tick();
 	}
 	
 	/**
@@ -139,16 +161,58 @@ public class Main extends JPanel implements Runnable  {
 		// Fast rendering
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
 	    g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-        g2.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
         g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR); 
-		
+        
+        currentLevel.draw(g2);
         //draw entities
-        player.draw(g2);
+        thePlayer.draw(g2);
         
 		g2.dispose();
 	}
+	
+	/**
+	 * Retrieves data directory of .blockbase/ using {@code Main.getWorkingDirectory(String)}
+	 * @return Directory (File)
+	 */
+	public static File getWorkingDirectory() {
+		return getWorkingDirectory("blockbase");
+	}
 
+	/**
+	 * Uses {@link EnumOSMappingHelper} to locate an APPDATA directory in the system.
+	 * Then it creates a new directory based on the given name e.g <b>.name/</b>
+	 * 
+	 * @param name (String)
+	 * @return Directory (File)
+	 */
+	public static File getWorkingDirectory(String name) {
+		String userDir = System.getProperty("user.home", ".");
+		File folder;
+		switch(EnumOSMappingHelper.os[EnumOS.getOS().ordinal()]) {
+		case 1:
+		case 2:
+			folder = new File(userDir, '.' + name + '/');
+			break;
+		case 3:
+			String appdataLocation = System.getenv("APPDATA");
+			if(appdataLocation != null) {
+				folder = new File(appdataLocation, "." + name + '/');
+			} else {
+				folder = new File(userDir, '.' + name + '/');
+			}
+			break;
+		case 4:
+			folder = new File(userDir, "Library/Application Support/" + name);
+			break;
+		default:
+			folder = new File(userDir, name + '/');
+		}
+
+		if(!folder.exists() && !folder.mkdirs()) {
+			throw new RuntimeException("The working directory could not be created: " + folder);
+		} else {
+			return folder;
+		}
+	}
 }

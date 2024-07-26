@@ -1,6 +1,7 @@
 package net.maniaticdevs.engine.entity;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import net.maniaticdevs.engine.util.math.Vector2;
@@ -11,17 +12,28 @@ import net.maniaticdevs.engine.util.math.Vector2;
  */
 public abstract class Entity {
 	
+	/** Entity name for like easier tracking and nameplates */
+	public String name;
+	
 	/** Visual representation of Entity to be displayed on screen. */
-	public BufferedImage[] sprites = null;
+	protected BufferedImage[] sprites = null;
+	/** Direction of entity */
+	protected EntityDirection direction = EntityDirection.IDLE;
 	/** World position of entity */
-	public Vector2 position = new Vector2();
+	protected Vector2 position = new Vector2();
 	/** Speed, measured in px/s */
-	public int speed = 5;
+	protected int speed = 5;
+	
+	/** Used for collision checking */
+	protected Rectangle hitBox = new Rectangle(8, 1, 32, 46);
 	
 	/** Index for sprite sheets, 5 frames expected. */
-	public int spriteNum = 0;
+	protected int spriteNum = 0;
 	/** Keeps track of ticks, used in {@link #animate()} */
-	public int spriteCounter = 0;
+	protected int spriteCounter = 0;
+	
+	/** If this is true then no matter what direction the entity is, it will add speed to it's opposite direction */
+	public boolean colliding = false;
 	
 	/** Calls {@link #setDefaultValues()} */
 	public Entity() {
@@ -67,4 +79,36 @@ public abstract class Entity {
 	 * @param g2 - Graphics2D class used to draw shapes and images on screen.
 	 */
 	public abstract void draw(Graphics2D g2);
+	
+	/** 
+	 * Returns entity world position  
+	 *  @return {@link Vector2}
+	 */
+	public Vector2 getPosition() {
+		return position;
+	}
+	
+	/**
+	 * Returns the direction of Entity from the {@link EntityDirection}
+	 * @return {@link EntityDirection}
+	 */
+	public EntityDirection getDirection() {
+		return direction;
+	}
+	
+	/**
+	 * Returns hit box of entity
+	 * @return {@link Rectangle}
+	 */
+	public Rectangle getHitBox() {
+		return hitBox;
+	}
+	
+	/**
+	 * Returns the speed of entity (default 5)
+	 * @return {@link Integer}
+	 */
+	public int getSpeed() {
+		return speed;
+	}
 }

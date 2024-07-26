@@ -1,11 +1,17 @@
 package net.maniaticdevs.main.entity;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
+import net.maniaticdevs.engine.entity.EntityDirection;
+import net.maniaticdevs.engine.util.CollisionChecker;
 import net.maniaticdevs.engine.util.ImageUtils;
 import net.maniaticdevs.engine.util.Input;
+import net.maniaticdevs.engine.util.math.Vector2;
+import net.maniaticdevs.main.Main;
 
 /**
  * Player class! Does player things...
@@ -15,9 +21,13 @@ import net.maniaticdevs.engine.util.Input;
  */
 public class Player extends Entity {
 	
+	/** Position data for player to be at the center of the screen */
+	private Vector2 screenPos = new Vector2();
+	
 	@Override
 	protected void setDefaultValues() {
-		position.set(25, 25);
+		screenPos = new Vector2((Main.getInstance().getWidth() / 2 - (Settings.tileSize / 2)), Main.getInstance().getHeight() / 2 - (Settings.tileSize / 2));
+		position.set(Settings.tileSize*2, Settings.tileSize*2);
 		sprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
 	}
 	
@@ -25,19 +35,20 @@ public class Player extends Entity {
 	
 	@Override
 	public void tick() {
+		screenPos.set((Main.getInstance().getWidth() / 2 - (Settings.tileSize / 2)), Main.getInstance().getHeight() / 2 - (Settings.tileSize / 2));
+		
 		animate();
 		
-		int xa = 0;
-		int ya = 0;
-		
 		if(Input.isKeyDown(Input.KEY_D)) {
-			xa += speed;
+			direction = EntityDirection.EAST;
 		} else if(Input.isKeyDown(Input.KEY_A)) {
-			xa -= speed;
+			direction = EntityDirection.WEST;
 		} else if(Input.isKeyDown(Input.KEY_S)) {
-			ya += speed;
+			direction = EntityDirection.SOUTH;
 		} else if(Input.isKeyDown(Input.KEY_W)) {
-			ya -= speed;
+			direction = EntityDirection.NORTH;
+		} else {
+			direction = EntityDirection.IDLE;
 		}
 		
 		/*float dist = xa * xa + ya * ya;
@@ -51,13 +62,45 @@ public class Player extends Entity {
 		
 		this.motionX *= 0.91F;
 		this.motionY *= 0.91F;*/
-		
-		move(xa,ya);
+		colliding = false;
+		CollisionChecker.checkTile(this);
+		if(!colliding) {
+			switch(getDirection()) {
+			case EAST:
+				position.x += speed;
+				break;
+			case NORTH:
+				position.y -= speed;
+				break;
+			case SOUTH:
+				position.y += speed;
+				break;
+			case WEST:
+				position.x -= speed;
+				break;
+			default:
+				break;
+			
+			}
+		}
 	}
 
 	@Override
 	public void draw(Graphics2D g2) {
-		g2.setColor(Color.WHITE);
-		g2.drawImage(sprites[spriteNum], null, position.x, position.y);
+		if(Main.debug) {
+			g2.setColor(Color.WHITE);
+			g2.setStroke(new BasicStroke(2));
+			g2.drawRect(screenPos.x+getHitBox().x, screenPos.y+getHitBox().y, getHitBox().width, getHitBox().height);
+		}
+		g2.drawImage(sprites[spriteNum+(getDirection().ordinal()*6)], null, screenPos.x, screenPos.y);
+		
+	}
+	
+	/**
+	 * Returns {@link #screenPos}
+	 * @return {@link Vector2}
+	 */
+	public Vector2 getScreenPosition() {
+		return screenPos;
 	}
 }

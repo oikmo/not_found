@@ -98,8 +98,7 @@ public class GuiScreen {
 		g2.setColor(c);
 		g2.fillRoundRect(x, y, width, height, 35, 35);
 		
-		c = new Color(255, 255, 255);
-		g2.setColor(c);
+		g2.setColor(Color.white);
 		g2.setStroke(new BasicStroke(5));
 		g2.drawRoundRect(x+5, y+5, width-10, height-10, 25, 25);	
 	}

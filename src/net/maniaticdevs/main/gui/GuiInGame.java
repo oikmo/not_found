@@ -58,7 +58,8 @@ public class GuiInGame extends GuiScreen {
 			int frameWidth = textWidth+Settings.tileSize;
 			
 			drawSubWindow(g2, frameX,frameY, frameWidth,frameHeight, 2);
-			this.drawStringCentered(g2, font, Color.WHITE, message, frameX+frameWidth/2, frameY+(int)(Settings.tileSize/1.25));
+			
+			this.drawStringCentered(g2, font, Color.WHITE, message, this.getXforCenteredText(g2, message, frameX), frameY+(int)(Settings.tileSize/1.25));
 		}
 	}
 

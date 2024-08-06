@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.util.Input;
-import net.maniaticdevs.engine.util.Sound;
 import net.maniaticdevs.main.Main;
+import net.maniaticdevs.main.SoundSFXEnum;
 
 /**
  * Shows inventory screen and item stats
@@ -39,14 +39,14 @@ public class GuiInventoryScreen extends GuiScreen {
 			tickDelay--;
 		}
 		
-		if(Input.isKeyDown(Input.KEY_UP)) {
+		if(Input.isKeyDownExplicit(Input.KEY_UP)) {
 			if(!lockUp) {
 				if(slotRow !=0) {
 					slotRow--;
-					Sound.playSFX("cursor");
+					Main.sfxLib.play(SoundSFXEnum.cursor);
 				}  else {
 					slotRow = 3;
-					Sound.playSFX("cursor");
+					Main.sfxLib.play(SoundSFXEnum.cursor);
 				}
 			}
 			lockUp = true;
@@ -54,14 +54,14 @@ public class GuiInventoryScreen extends GuiScreen {
 			lockUp = false;
 		}
 
-		if(Input.isKeyDown(Input.KEY_DOWN)) {
+		if(Input.isKeyDownExplicit(Input.KEY_DOWN)) {
 			if(!lockDown) {
 				if(slotRow !=3) {
 					slotRow++;
-					Sound.playSFX("cursor");
+					Main.sfxLib.play(SoundSFXEnum.cursor);
 				} else {
 					slotRow = 0;
-					Sound.playSFX("cursor");
+					Main.sfxLib.play(SoundSFXEnum.cursor);
 				}
 			}
 			lockDown = true;
@@ -69,20 +69,20 @@ public class GuiInventoryScreen extends GuiScreen {
 			lockDown = false;
 		}
 
-		if(Input.isKeyDown(Input.KEY_RIGHT)) {
+		if(Input.isKeyDownExplicit(Input.KEY_RIGHT)) {
 			if(!lockRight) {
 				if(slotCol != 4) {
 					slotCol++;
-					Sound.playSFX("cursor");
+					Main.sfxLib.play(SoundSFXEnum.cursor);
 				} else {
 					if(slotRow != 3) {
 						slotCol = 0;
 						slotRow++;
-						Sound.playSFX("cursor");
+						Main.sfxLib.play(SoundSFXEnum.cursor);
 					} else {
 						slotCol = 0;
 						slotRow = 0;
-						Sound.playSFX("cursor");
+						Main.sfxLib.play(SoundSFXEnum.cursor);
 					}
 				}
 			}
@@ -91,20 +91,20 @@ public class GuiInventoryScreen extends GuiScreen {
 			lockRight = false;
 		}
 
-		if(Input.isKeyDown(Input.KEY_LEFT)) {
+		if(Input.isKeyDownExplicit(Input.KEY_LEFT)) {
 			if(!lockLeft) {
 				if(slotCol != 0) {
 					slotCol--;
-					Sound.playSFX("cursor");
+					Main.sfxLib.play(SoundSFXEnum.cursor);
 				} else {
 					if(slotRow != 0) {
 						slotCol = 4;
 						slotRow--;
-						Sound.playSFX("cursor");
+						Main.sfxLib.play(SoundSFXEnum.cursor);
 					} else {
 						slotCol = 4;
 						slotRow = 3;
-						Sound.playSFX("cursor");
+						Main.sfxLib.play(SoundSFXEnum.cursor);
 					}
 				}
 			}
@@ -113,12 +113,12 @@ public class GuiInventoryScreen extends GuiScreen {
 			lockLeft = false;
 		}
 
-		if(Input.isKeyDown(Input.KEY_ENTER)) {
+		if(Input.isKeyDownExplicit(Input.KEY_ENTER)) {
 			if(!lockEnter) {
 				if(tickDelay <= 0) {
 					Main.thePlayer.selectItem(getItemIndexOnSlot());
 					if(Main.thePlayer.isItemAtIndex(getItemIndexOnSlot())) {
-						Sound.playSFX("hitmonster");
+						Main.sfxLib.play(SoundSFXEnum.hit);
 					}
 				}
 			}

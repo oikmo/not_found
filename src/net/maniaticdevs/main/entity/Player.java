@@ -6,8 +6,6 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import jaco.mp3.player.MP3Player;
-import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.entity.EntityDirection;
@@ -18,9 +16,9 @@ import net.maniaticdevs.engine.objects.PickableObject;
 import net.maniaticdevs.engine.util.CollisionChecker;
 import net.maniaticdevs.engine.util.ImageUtils;
 import net.maniaticdevs.engine.util.Input;
-import net.maniaticdevs.engine.util.Sound;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
+import net.maniaticdevs.main.SoundSFXEnum;
 import net.maniaticdevs.main.gui.GuiInGame;
 
 /**
@@ -33,8 +31,6 @@ public class Player extends Entity {
 	
 	/** Position data for player to be at the center of the screen */
 	private Vector2 screenPos = new Vector2();
-	/** Footsteps sound effect */
-	MP3Player footSteps = new MP3Player(ResourceLoader.loadResource("/sounds/sfx/bfsl-minifigfoots1.mp3"));
 	
 	/** Player inventory for storing {@link OBJ}s */
 	public List<OBJ> inventory = new ArrayList<>();
@@ -52,7 +48,7 @@ public class Player extends Entity {
 	
 	@Override
 	protected void setDefaultValues() {
-		name = "Player";
+		name = Main.playerName;
 		maxHealth = 6;
 		health = maxHealth;
 		screenPos = new Vector2((Main.getInstance().getWidth() / 2 - (Settings.tileSize / 2)), Main.getInstance().getHeight() / 2 - (Settings.tileSize / 2));
@@ -140,7 +136,7 @@ public class Player extends Entity {
 				ticks = 180;
 				GuiInGame.message = "You picked up: "+((PickableObject)contactOBJ).getItem().name;
 				if(((PickableObject)contactOBJ).getItem() instanceof Key) {
-					Sound.playSFX("key");
+					Main.sfxLib.play(SoundSFXEnum.key);
 				}
 				Main.currentLevel.getObjects().remove(contactOBJ);
 			}
@@ -151,20 +147,21 @@ public class Player extends Entity {
 						inventory.remove(((Door)obj).getRequiredKey());
 					}
 					Main.currentLevel.getObjects().remove(obj);
-					Sound.playSFX("door");
+					//Sound.playSFX("door");
+					Main.sfxLib.play(SoundSFXEnum.door);
 				}
 			}
 		}
 		
 		
 		if(!colliding) {
-			if(getDirection() != EntityDirection.IDLE) {
+			/*if(getDirection() != EntityDirection.IDLE) {
 				if(footSteps.isStopped()) {
 					footSteps.play();
 				}
 			} else {
 				footSteps.stop();
-			}
+			}*/
 			switch(getDirection()) {
 			case EAST:
 				position.x += speed;

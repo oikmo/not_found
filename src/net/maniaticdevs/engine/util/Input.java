@@ -53,6 +53,13 @@ public class Input implements KeyListener {
 	 *<pre>public static final int KEY_ENTER</pre> */
 	public static int KEY_ENTER = KeyEvent.VK_ENTER;
 	
+	public static int lastFuckingKey = -1;
+	
+	public static int lengthInput = 15;
+	public static boolean needsInput = false;
+	private static String inputFull = "";
+	
+	
 	/**
 	 * Adds defined Keys to keyMap.
 	 */
@@ -78,6 +85,24 @@ public class Input implements KeyListener {
 		if(keyMap.get(code) != null) {
 			keyMap.replace(code, true);
 		}
+		
+		if(needsInput) {
+			if(Character.isAlphabetic(e.getKeyChar()) || Character.isDigit(e.getKeyChar())) {
+				if(inputFull.length() < lengthInput) {
+					inputFull += e.getKeyChar();
+				}
+				
+			} else {
+				if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+					if(inputFull.length() != 0) {
+						inputFull = inputFull.substring(0, inputFull.length()-1);
+					}
+					
+				}
+			}	
+		}
+		
+		lastFuckingKey = code;
 	}
 
 	@Override
@@ -99,6 +124,26 @@ public class Input implements KeyListener {
 	 * @return {@link Boolean}
 	 */
 	public static boolean isKeyDown(int keyToCheckFor) {
-		return keyMap.get(keyToCheckFor);
+		boolean key = keyMap.get(keyToCheckFor);
+		return key;
+	}
+	
+	/**
+	 *	You give a key and it spews back if that key is currently being pressed
+	 * @param keyToCheckFor - Key defined by Input class
+	 * @return {@link Boolean}
+	 */
+	public static boolean isKeyDownExplicit(int keyToCheckFor) {
+		boolean key = keyMap.get(keyToCheckFor);
+		keyMap.replace(keyToCheckFor, false);
+		return key;
+	}
+	
+	public static int getLastKeyPressed() {
+		return lastFuckingKey;
+	}
+
+	public static String getTextInput() {
+		return inputFull;
 	}
 }

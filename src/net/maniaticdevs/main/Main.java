@@ -6,6 +6,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -17,8 +21,10 @@ import net.maniaticdevs.engine.level.MapLoader;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.engine.util.os.EnumOS;
 import net.maniaticdevs.engine.util.os.EnumOSMappingHelper;
+import net.maniaticdevs.engine.util.sound.Sound;
 import net.maniaticdevs.main.entity.Player;
 import net.maniaticdevs.main.gui.GuiInGame;
+import net.maniaticdevs.main.gui.GuiMainMenu;
 import net.maniaticdevs.main.gui.GuiPauseScreen;
 import net.maniaticdevs.main.level.SampleLevel;
 
@@ -62,6 +68,10 @@ public class Main extends JPanel implements Runnable  {
 	/** Playtime tracker */
 	public static long startedPlaying = System.currentTimeMillis();
 	
+	public static String playerName;
+	
+	public static Sound sfxLib;
+	
 	/**
 	 * Opens window and starts game.
 	 * @param args - program arguments
@@ -94,6 +104,7 @@ public class Main extends JPanel implements Runnable  {
 	/**
 	 * Main constructor, sets ups the panel values such as size and listeners and threads
 	 */
+	@SuppressWarnings("deprecation")
 	public Main() {
 		this.setPreferredSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
 		this.setBackground(new Color(20,20,20));
@@ -105,12 +116,26 @@ public class Main extends JPanel implements Runnable  {
 		gameThread.setName("Main thread");
 		
 		instance = this;
-		thePlayer = new Player(); // would you look at that
 		GuiScreen.init();
 		MapLoader.init();
 		
-		currentLevel = new SampleLevel();
-		currentScreen = new GuiInGame();
+		
+		try {
+			ArrayList<URL> urlsList = new ArrayList<URL>();
+			File dir = new File(Main.class.getResource("/sounds/sfx").toURI());
+			for (File nextFile : dir.listFiles()) {
+		        // Do something with nextFile
+				urlsList.add(nextFile.toURL());
+		    }
+			URL[] urls = new URL[urlsList.size()];
+			sfxLib = new Sound(urlsList.toArray(urls));
+		} catch (URISyntaxException | MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		currentScreen = new GuiMainMenu();
 	}
 	
 	/**
@@ -178,12 +203,14 @@ public class Main extends JPanel implements Runnable  {
 		if(currentScreen != null) {
 			currentScreen.tick();
 		}
-		
-		thePlayer.updateScreenPos();
-		if(currentScreen instanceof GuiInGame) {
-			thePlayer.tick();
-			currentLevel.tick();
+		if(thePlayer != null) {
+			thePlayer.updateScreenPos();
+			if(currentScreen instanceof GuiInGame) {
+				thePlayer.tick();
+				currentLevel.tick();
+			}
 		}
+		
 		
 	}
 	
@@ -200,9 +227,12 @@ public class Main extends JPanel implements Runnable  {
         g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
         g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         
-        currentLevel.draw(g2, thePlayer.getPosition(), thePlayer.getScreenPosition());
-        //draw entities
-        thePlayer.draw(g2);
+        if(thePlayer != null) {
+        	currentLevel.draw(g2, thePlayer.getPosition(), thePlayer.getScreenPosition());
+            //draw entities
+            thePlayer.draw(g2);
+        }
+        
         
         if(currentScreen != null) {
         	currentScreen.draw(g2);
@@ -220,7 +250,7 @@ public class Main extends JPanel implements Runnable  {
 	 * @return Directory (File)
 	 */
 	public static File getWorkingDirectory() {
-		return getWorkingDirectory("blockbase");
+		return getWorkingDirectory("not_found");
 	}
 
 	/**

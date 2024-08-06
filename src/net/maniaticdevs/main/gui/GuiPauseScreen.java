@@ -6,8 +6,8 @@ import java.awt.Graphics2D;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.util.Input;
-import net.maniaticdevs.engine.util.Sound;
 import net.maniaticdevs.main.Main;
+import net.maniaticdevs.main.SoundSFXEnum;
 
 /**
  * I paused my game to be here.
@@ -41,7 +41,7 @@ public class GuiPauseScreen extends GuiScreen {
 			tickDelay--;
 		}
 
-		if(Input.isKeyDown(Input.KEY_ESC)) {
+		if(Input.isKeyDownExplicit(Input.KEY_ESC)) {
 			if(!lockEscape) {
 				if(optionSelected != -1) {
 					optionSelected = -1;
@@ -50,45 +50,45 @@ public class GuiPauseScreen extends GuiScreen {
 						Main.currentScreen = new GuiInGame();
 					}
 				}
-				Sound.playSFX("cursor");
+				Main.sfxLib.play(SoundSFXEnum.cursor);
 			}
 			lockEscape = true;
 		} else {
 			lockEscape = false;
 		}
 		if(optionSelected == -1) {
-			if(Input.isKeyDown(Input.KEY_UP)) {
+			if(Input.isKeyDownExplicit(Input.KEY_UP)) {
 				if(!lockUp) {
 					if(optionSelection !=0) {
 						optionSelection--;
 					} else {
 						optionSelection = 4;
 					}
-					Sound.playSFX("cursor");
+					Main.sfxLib.play(SoundSFXEnum.cursor);
 				}
 				lockUp = true;
 			} else {
 				lockUp = false;
 			}
 
-			if(Input.isKeyDown(Input.KEY_DOWN)) {
+			if(Input.isKeyDownExplicit(Input.KEY_DOWN)) {
 				if(!lockDown) {
 					if(optionSelection !=4) {
 						optionSelection++;
 					} else {
 						optionSelection = 0;
 					}
-					Sound.playSFX("cursor");
+					Main.sfxLib.play(SoundSFXEnum.cursor);
 				}
 				lockDown = true;
 			} else {
 				lockDown = false;
 			}
 
-			if(Input.isKeyDown(Input.KEY_ENTER)) {
+			if(Input.isKeyDownExplicit(Input.KEY_ENTER)) {
 				if(!lockEnter) {
 					optionSelected = optionSelection;
-					Sound.playSFX("hitmonster");
+					Main.sfxLib.play(SoundSFXEnum.hit);
 				}
 				lockEnter = true;
 			} else {

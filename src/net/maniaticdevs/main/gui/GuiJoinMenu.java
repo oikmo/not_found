@@ -1,28 +1,32 @@
 package net.maniaticdevs.main.gui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
+import net.maniaticdevs.engine.network.client.NetworkHandler;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
 import net.maniaticdevs.main.entity.Player;
-import net.maniaticdevs.main.level.SampleLevel;
 
 /**
- * When the player first opens the game or ragequits they go here :P
+ * To join a server you must ip
  * @author Oikmo
  */
-public class GuiPlayMenu extends GuiScreen {
+public class GuiJoinMenu extends GuiScreen {
+	
 	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockUp = false;
 	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockDown = false;
 	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockEnter = false;
+	
+	private boolean hasSet = false;
 
 	/** Hovering option */
 	private int optionSelected = 0;
@@ -67,70 +71,110 @@ public class GuiPlayMenu extends GuiScreen {
 			if(!lockEnter) {
 				switch(optionSelected) {
 				case 0:
-					Main.currentLevel = new SampleLevel(false);
-					Main.thePlayer = new Player(); // would you look at that
-					Main.currentScreen = new GuiInGame();
+					Input.needsInput = false;
+					hasSet = false;
+					if(!Input.getTextInput().isEmpty()) {
+						Main.thePlayer = new Player();
+						Main.currentScreen = new GuiInGame();
+						try {
+							Main.theNetwork = new NetworkHandler(Input.getTextInput().trim());
+						} catch (Exception e) {
+							Main.disconnect(false, "");
+						}
+					}
 					break;
 				case 1:
-					Main.currentScreen = new GuiMultiplayerChoice();
+					if(!Input.getTextInput().isEmpty()) {
+						Main.thePlayer = new Player();
+						Main.currentScreen = new GuiInGame();
+						try {
+							Main.theNetwork = new NetworkHandler(Input.getTextInput().trim());
+						} catch (Exception e) {
+							Main.disconnect(false, "");
+						}
+					}
 					break;
 				case 2:
-					Main.currentScreen  = new GuiMainMenu();
+					Main.currentScreen = new GuiMainMenu();
 					break;
 				}
-				
 				Main.sfxLib.play(SoundSFXEnum.hit);
 			}
 			lockEnter = true;
 		} else {
 			lockEnter = false;
 		}
-
 	}
 
 	public void draw(Graphics2D g2) {
-		drawPlayMenuScreen(g2);
+		if(!Input.needsInput && !hasSet) {
+			Input.needsInput = true;
+			hasSet = true;
+		}
+		
+		if(this.optionSelected != 0) {
+			Input.needsInput = false;
+		} else {
+			Input.needsInput = true;
+		}
+		
+		if(Input.lengthInput != 30) {
+			Input.lengthInput = 30;
+		}
+		
+		Input.ipEnabled = true;
+		
+		drawSelectNameScreen(g2);
 	}
 	
 	/**
-	 * Draws the title screen
+	 * Draws the menu
 	 * @param g2 Graphics
 	 */
-	public void drawPlayMenuScreen(Graphics2D g2) {
+	public void drawSelectNameScreen(Graphics2D g2) {
 		g2.setColor(Color.black);
 		g2.fillRect(0, 0, Main.getInstance().getWidth(), Main.getInstance().getHeight());
-		
-		g2.setColor(Color.WHITE);
-		g2.setFont(font);
-		//menu
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 24F));
-		String text = "You are " + Main.playerName + " and always will be";
-		g2.drawString(text, getXforCenteredText(g2, text), 48);
-		
 
 		//System.out.println((gp.screenWidth/2) - (gp.tileSize + (gp.tileSize*2) + 16));
 		int x = (Main.getInstance().getWidth()/2);
 		int y = (Main.getInstance().getHeight()/2);
 		//g2.drawImage(gp.player.shadow, x,(int) (y - gp.tileSize), gp.tileSize*5, gp.tileSize*5, null);
 		
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
-		text = "SOLO";
+		g2.setColor(Color.WHITE);
+		g2.setFont(font);
+		//menu
+		
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 28F));
+		String text = "Enter IP...";
 		x = getXforCenteredText(g2, text);
-		g2.drawString(text, x, y);
-		if(optionSelected == 0) {
-			g2.drawString(">", x-Settings.tileSize, y);
+		g2.drawString(text, x, (int) (y-g2.getFontMetrics().getStringBounds(text, g2).getHeight()*2));
+		
+		text = Input.getTextInput();
+		x = getXforCenteredText(g2, text);
+		g2.drawString(text, x+(optionSelected == 0 ? 15 : 0), y);
+		
+		g2.setColor(Color.white);
+		g2.setStroke(new BasicStroke(3));
+		
+		
+		int width = (int)(Settings.tileSize*8.5f);
+		if(Input.getTextInput().length() > 20) {
+			width = (int)(g2.getFontMetrics().getStringBounds(text, g2).getWidth() + Settings.tileSize*1.15f);
 		}
-
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
-		text = "MULTIPLAYER";
+		int height = (int) (Settings.tileSize*1.2f);
+		int subX = ((Main.getInstance().getWidth()/2)-width/2);
+		
+		g2.drawRoundRect(subX+5, (y-height+15), width-10, height-10, 25, 25);	
+		if(optionSelected == 0) {
+			g2.drawString(">",subX+15, y);
+		}
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
+		text = "JOIN";
 		x = getXforCenteredText(g2, text);
 		y += Settings.tileSize;
 		g2.drawString(text, x, y);
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
 		if(optionSelected == 1) {
 			g2.drawString(">", x-Settings.tileSize, y);
-			g2.setColor(Color.white);
-			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
 		}
 
 		text = "BACK";

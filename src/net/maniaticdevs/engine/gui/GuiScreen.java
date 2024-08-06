@@ -22,7 +22,7 @@ public class GuiScreen {
 	/** Sets up fonts */
 	public static void init() {
 		try {
-			font = Font.createFont(Font.TRUETYPE_FONT, ResourceLoader.loadStream("/fonts/VCR.TTF")).deriveFont(16F);
+			font = Font.createFont(Font.TRUETYPE_FONT, GuiScreen.class.getResourceAsStream("/fonts/VCR.TTF")).deriveFont(16F);
 		} catch (FontFormatException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

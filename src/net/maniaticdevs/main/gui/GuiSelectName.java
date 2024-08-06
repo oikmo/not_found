@@ -105,6 +105,12 @@ public class GuiSelectName extends GuiScreen {
 			Input.needsInput = true;
 		}
 		
+		if(Input.lengthInput != 15) {
+			Input.lengthInput = 15;
+		}
+		
+		Input.ipEnabled = false;
+		
 		drawSelectNameScreen(g2);
 	}
 	

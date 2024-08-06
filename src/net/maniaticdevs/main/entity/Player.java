@@ -122,33 +122,35 @@ public class Player extends Entity {
 		
 		this.motionX *= 0.91F;
 		this.motionY *= 0.91F;*/
-		colliding = false;
-		CollisionChecker.checkTile(this);
-		OBJ obj = CollisionChecker.checkObject(this);
-		if(obj != null) {
+		if(Main.currentLevel != null) {
+			colliding = false;
+			CollisionChecker.checkTile(this);
+			OBJ obj = CollisionChecker.checkObject(this);
 			
-		}
-		
-		OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
-		if(Input.isKeyDown(Input.KEY_ENTER)) {
-			if(contactOBJ instanceof PickableObject) {
-				inventory.add(((PickableObject)contactOBJ).getItem());
-				ticks = 180;
-				GuiInGame.message = "You picked up: "+((PickableObject)contactOBJ).getItem().name;
-				if(((PickableObject)contactOBJ).getItem() instanceof Key) {
-					Main.sfxLib.play(SoundSFXEnum.key);
-				}
-				Main.currentLevel.getObjects().remove(contactOBJ);
-			}
-			
-			if(obj instanceof Door) {
-				if(holdingItem == ((Door)obj).getRequiredKey()) {
-					if(((Door)obj).removeKeyAfterUse()) {
-						inventory.remove(((Door)obj).getRequiredKey());
+			OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
+			if(Input.isKeyDown(Input.KEY_ENTER)) {
+				if(contactOBJ instanceof PickableObject) {
+					inventory.add(((PickableObject)contactOBJ).getItem());
+					ticks = 180;
+					GuiInGame.message = "You picked up: "+((PickableObject)contactOBJ).getItem().name;
+					if(((PickableObject)contactOBJ).getItem() instanceof Key) {
+						Main.sfxLib.play(SoundSFXEnum.key);
 					}
-					Main.currentLevel.getObjects().remove(obj);
-					//Sound.playSFX("door");
-					Main.sfxLib.play(SoundSFXEnum.door);
+					Main.currentLevel.removeObject(contactOBJ);
+				}
+				
+				if(obj instanceof Door) {
+					if(holdingItem != null) {
+						if(holdingItem.networkID.contentEquals(((Door)obj).getRequiredKey().networkID)) {
+							if(((Door)obj).removeKeyAfterUse()) {
+								inventory.remove(((Door)obj).getRequiredKey());
+							}
+							Main.currentLevel.removeObject(obj);
+							//Sound.playSFX("door");
+							Main.sfxLib.play(SoundSFXEnum.door);
+						}
+					}
+					
 				}
 			}
 		}

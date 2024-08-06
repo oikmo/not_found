@@ -2,7 +2,6 @@ package net.maniaticdevs.main.save;
 
 import java.io.Serializable;
 
-import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.entity.Player;
 
 public class PlayerSaveData implements Serializable {

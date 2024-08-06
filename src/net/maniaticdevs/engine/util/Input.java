@@ -56,6 +56,8 @@ public class Input implements KeyListener {
 	public static int lastFuckingKey = -1;
 	
 	public static int lengthInput = 15;
+	
+	public static boolean ipEnabled = false;
 	public static boolean needsInput = false;
 	private static String inputFull = "";
 	
@@ -87,7 +89,7 @@ public class Input implements KeyListener {
 		}
 		
 		if(needsInput) {
-			if(Character.isAlphabetic(e.getKeyChar()) || Character.isDigit(e.getKeyChar())) {
+			if(Character.isAlphabetic(e.getKeyChar()) || Character.isDigit(e.getKeyChar()) || (e.getKeyChar() == '.' && ipEnabled)) {
 				if(inputFull.length() < lengthInput) {
 					inputFull += e.getKeyChar();
 				}

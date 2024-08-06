@@ -26,8 +26,11 @@ public class Sound {
 	 * Expects a URL list as to load into itself
 	 * @param urls URL list expected to be loaded
 	 */
-	public Sound(URL... urls) {
-		soundURL = urls;
+	public Sound(String... urls) {
+		soundURL = new URL[urls.length];
+		for(int i = 0; i < urls.length; i++) {
+			soundURL[i] = Sound.class.getResource("/sounds/"+urls[i]+".wav");
+		}
 	}
 	
 	/**

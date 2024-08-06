@@ -3,6 +3,7 @@ package net.maniaticdevs.engine.objects;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.UUID;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.util.math.Vector2;
@@ -13,6 +14,9 @@ import net.maniaticdevs.main.Main;
  * @author Oikmo
  */
 public abstract class OBJ {
+	
+	public String networkID = UUID.randomUUID().toString();
+	
 	/** Sprite */
 	public BufferedImage image;
 	/** Custom names */
@@ -25,7 +29,7 @@ public abstract class OBJ {
 	public Vector2 position = new Vector2();
 	/** Used for collision checking */
 	protected Rectangle hitBox = new Rectangle(0, 0, Settings.tileSize, Settings.tileSize);
-
+	
 	/**
 	 * Draws object, if is not seen by player then it is not drawn
 	 * @param g2 Graphics
@@ -57,5 +61,9 @@ public abstract class OBJ {
 	 */
 	public Rectangle getHitBox() {
 		return hitBox;
+	}
+	
+	public void setNetworkID(String netID) {
+		this.networkID = netID;
 	}
 }

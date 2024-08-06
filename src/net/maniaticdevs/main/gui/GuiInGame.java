@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.util.ImageUtils;
@@ -32,6 +31,7 @@ public class GuiInGame extends GuiScreen {
 		int y = Settings.tileSize/2;
 		int i = 0;
 		//draw max life
+		if(Main.thePlayer == null) { return; }
 		while(i < Main.thePlayer.maxHealth/2) {
 			g2.drawImage(sprites[2], x, y, null);
 			i++;

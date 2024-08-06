@@ -4,9 +4,13 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
+import net.maniaticdevs.main.Main;
 
 /**
  * Handles BufferedImage in ways of scaling and slicing sprite sheets into image arrays
@@ -196,7 +200,13 @@ public class ImageUtils {
 	 * @return {@link BufferedImage }[]
 	 */
 	public static BufferedImage[] setupSheet(String filePath, int row, int col, int width, int height) {
-		BufferedImage spriteSheet = ResourceLoader.loadImage("/textures/" + filePath +".png");
+		BufferedImage spriteSheet = null;
+		try {
+			spriteSheet = ImageIO.read(Main.class.getResourceAsStream("/textures/" + filePath +".png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		BufferedImage[] result = new BufferedImage[row * col];
 		if(width == -1 && height == -1) {
 			result = ImageUtils.fromSheet(spriteSheet, row, col, 16, 16);

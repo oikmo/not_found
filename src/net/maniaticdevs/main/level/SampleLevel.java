@@ -15,8 +15,8 @@ public class SampleLevel extends Level {
 	/**
 	 * Loads sample map
 	 */
-	public SampleLevel() {
-		super("sample", "Sample", 32, 32);
+	public SampleLevel(boolean dontLoad) {
+		super("sample", "Sample", 32, 32, dontLoad);
 	}
 	
 	protected void loadEverything() {

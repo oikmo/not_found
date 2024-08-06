@@ -58,11 +58,10 @@ public class ResourceLoader {
 	 * @return  {@link BufferedImage}
 	 */
 	public static BufferedImage loadImage(String loc) {
-		InputStream file = loadStream(loc);
-		System.out.println("file is: " + file +", " + loc);
 		try {
-			return ImageIO.read(file);
+			return ImageIO.read(ResourceLoader.class.getResourceAsStream(loc));
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

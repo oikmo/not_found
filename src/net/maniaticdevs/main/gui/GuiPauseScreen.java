@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
+import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
@@ -105,6 +106,7 @@ public class GuiPauseScreen extends GuiScreen {
 		g2.fillRect(Main.getInstance().getX(),Main.getInstance().getY(),Main.getInstance().getWidth(),Main.getInstance().getHeight());
 		g2.setFont(GuiScreen.font);
 		drawPauseMenu(g2);
+		
 		if(optionSelected != -1) {
 			switch(optionSelected) {
 			case 0:
@@ -143,6 +145,9 @@ public class GuiPauseScreen extends GuiScreen {
 				subScreen = null;
 			}
 			drawTimeStamp(g2);
+			if(Main.theNetwork != null) {
+				drawOnlinePlayers(g2);
+			}
 		}
 		if(subScreen != null) {
 			subScreen.draw(g2);
@@ -240,5 +245,46 @@ public class GuiPauseScreen extends GuiScreen {
 		
 		g2.drawString(time, textX, textY);
 	}
+	
+	/**
+	 * Draws a sub window showing how long the player has been playing for from {@link Main#startedPlaying}
+	 * @param g2 Graphics
+	 */
+	public void drawOnlinePlayers(Graphics2D g2) {
+		//frame
+		int frameY = (int) (Settings.tileSize*2 + Settings.tileSize*1.5f);
+		int frameWidth = (int) (Settings.tileSize*6.075);
+		int frameHeight = (int) (Settings.tileSize*8.35f);
+		
+		int x = Settings.tileSize;
+		int tailX = (x + Main.getInstance().getWidth()) - frameWidth/2;
+		int frameX = tailX - frameWidth;
 
+		drawSubWindow(g2, frameX, frameY, frameWidth, frameHeight, 3);
+		
+		g2.setColor(Color.white);
+		g2.setFont(g2.getFont().deriveFont(16f));
+
+		int textX = frameX + Settings.tileSize/2;
+		int textY = (int) (frameY + Settings.tileSize/1.5);
+		
+		final int lineHeight = 32;
+		
+		g2.drawString("Online Players", (int) (textX+this.getXforCenteredText(g2, "Online Players", frameWidth)/1.5), textY);
+		g2.setFont(g2.getFont().deriveFont(22f));
+		
+		textY += lineHeight;
+		
+		if(Main.theNetwork.players.values().size() != 0) {
+			try {
+				for(OtherPlayer p : Main.theNetwork.players.values()) { 
+					g2.drawString(p.userName, textX, textY);
+					textY += lineHeight;
+				}
+			} catch(Exception e) {}
+		} else {
+			g2.drawString("It's just you!", textX, textY);	
+		}
+		
+	}
 }

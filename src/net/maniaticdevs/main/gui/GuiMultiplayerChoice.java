@@ -6,17 +6,18 @@ import java.awt.Graphics2D;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
+import net.maniaticdevs.engine.network.client.NetworkHandler;
+import net.maniaticdevs.engine.network.server.MainServer;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
 import net.maniaticdevs.main.entity.Player;
-import net.maniaticdevs.main.level.SampleLevel;
 
 /**
  * When the player first opens the game or ragequits they go here :P
  * @author Oikmo
  */
-public class GuiPlayMenu extends GuiScreen {
+public class GuiMultiplayerChoice extends GuiScreen {
 	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockUp = false;
 	/** To prevent action to be done repeatedly in a short period of time */
@@ -31,6 +32,11 @@ public class GuiPlayMenu extends GuiScreen {
 	private int tickDelay = 30;
 
 	public void tick() {
+		if(Main.theNetwork != null) {
+			Main.theNetwork.disconnect();
+			Main.theNetwork.players.clear();
+			Main.theNetwork = null;
+		}
 		if(tickDelay != 0) { 
 			tickDelay--;
 		}
@@ -67,18 +73,23 @@ public class GuiPlayMenu extends GuiScreen {
 			if(!lockEnter) {
 				switch(optionSelected) {
 				case 0:
-					Main.currentLevel = new SampleLevel(false);
-					Main.thePlayer = new Player(); // would you look at that
+					Main.server = new MainServer(25565, "sample");
+					Main.thePlayer = new Player();
 					Main.currentScreen = new GuiInGame();
+					try {
+						Main.theNetwork = new NetworkHandler("localhost");
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					break;
 				case 1:
-					Main.currentScreen = new GuiMultiplayerChoice();
+					Main.currentScreen = new GuiJoinMenu();
 					break;
 				case 2:
-					Main.currentScreen  = new GuiMainMenu();
+					Main.currentScreen = new GuiPlayMenu();
 					break;
 				}
-				
 				Main.sfxLib.play(SoundSFXEnum.hit);
 			}
 			lockEnter = true;
@@ -114,7 +125,7 @@ public class GuiPlayMenu extends GuiScreen {
 		//g2.drawImage(gp.player.shadow, x,(int) (y - gp.tileSize), gp.tileSize*5, gp.tileSize*5, null);
 		
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
-		text = "SOLO";
+		text = "HOST & PLAY";
 		x = getXforCenteredText(g2, text);
 		g2.drawString(text, x, y);
 		if(optionSelected == 0) {
@@ -122,7 +133,7 @@ public class GuiPlayMenu extends GuiScreen {
 		}
 
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
-		text = "MULTIPLAYER";
+		text = "JOIN";
 		x = getXforCenteredText(g2, text);
 		y += Settings.tileSize;
 		g2.drawString(text, x, y);

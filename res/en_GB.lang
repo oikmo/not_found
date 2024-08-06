@@ -1,0 +1,58 @@
+gui.done=Done
+gui.delete=Delete
+gui.cancel=Cancel
+gui.quit=Back to main menu
+
+title.singleplayer=Singleplayer
+title.multiplayer=Multiplayer
+title.quit=Quit
+
+pause.title=Game menu
+pause.players.title=Players
+pause.players.identifier=You
+options.title=Options
+options.fov.low=telescope
+options.fov.normal=Normal
+options.fov.high=QUAKE PRO!!!
+options.fov=FOV
+options.sensitivity.low=*yawn*
+options.sensitivity.high=hyperspeed!!!
+options.sensitivity=Sensitivity
+options.vsync=VSYNC
+options.volume=Volume
+options.distance=View Distance
+options.distance.tiny=TINY
+options.distance.small=SMALL
+options.distance.normal=NORMAL
+options.distance.far=FAR
+
+inventory.title=Blocks
+
+world.create.superflat=Superflat
+world.create.seed=Seed here...
+world.create=Create world
+world.select.create=Create new world...
+
+network.connecting=Connecting
+
+network.error.noinput=No input given!
+network.error.server=Couldn't connect to server!
+
+network.disconnect.l=Login failed.
+network.disconnect.p=Wrong protocol! (%s)
+network.disconnect.g=disconnected
+network.disconnect.u=Unknown
+network.disconnect.ux=Unknown (Wrong protocol?)
+network.disconnect.n=Network was null!
+
+network.quit.d=Disconnected: 
+network.quit.k=Kicked: 
+
+network.servers.add=Add server
+network.servers.refresh=Refresh
+
+network.servers.add.title=Type in server...
+network.servers.add.save=Add server
+network.servers.add.input.name=Name of server here...
+network.servers.add.input.ip=IP of server here...
+network.servers.add.quit=Back to server list

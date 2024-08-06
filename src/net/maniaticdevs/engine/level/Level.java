@@ -8,9 +8,11 @@ import java.util.List;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.level.MapLoader.LevelData;
+import net.maniaticdevs.engine.network.packet.PacketRemoveObject;
 import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.tile.Tile;
 import net.maniaticdevs.engine.util.math.Vector2;
+import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.entity.Player;
 
 /**
@@ -40,14 +42,17 @@ public class Level {
 	 * @param width Width of level
 	 * @param height Height of level
 	 */
-	public Level(String internalName, String name, int width, int height) {
+	public Level(String internalName, String name, int width, int height, boolean dontLoad) {
 		this.name = name;
 		this.width = width;
 		this.height = height;
 		LevelData data = MapLoader.loadMap(internalName, width, height);
 		this.tiles = data.getTiles();
 		this.mapImage = data.getMapImage();
-		loadEverything();
+		if(!dontLoad) {
+			loadEverything();
+		}
+		
 	}
 	
 	/**
@@ -76,7 +81,10 @@ public class Level {
 					e.draw(g2);
 				}
 			}
-		} catch(java.util.ConcurrentModificationException e) {}
+		} catch(Exception e) {
+			System.err.println("[LEVEL] I am infact shitting myself");
+		}
+		
 	}
 	
 	/** Logic function */
@@ -92,6 +100,20 @@ public class Level {
 				}
 			}
 		} catch(java.util.ConcurrentModificationException e) {}
+	}
+	
+	public void removeObject(OBJ obj) {
+		if(Main.theNetwork != null) {
+			PacketRemoveObject packet = new PacketRemoveObject();
+			packet.id = Main.theNetwork.client.getID();
+			packet.networkID = obj.networkID;
+			Main.theNetwork.client.sendTCP(packet);
+		}
+		removeObjectNoNet(obj);
+	}
+	
+	public void removeObjectNoNet(OBJ obj) {
+		objects.remove(obj);
 	}
 	
 	/**
@@ -141,6 +163,9 @@ public class Level {
 	public List<OBJ> getObjects() {
 		return objects;
 	}
-
+	
+	public void addObject(OBJ obj) {
+		objects.add(obj);
+	}
 	
 }

@@ -143,7 +143,7 @@ public class NetworkHandler {
 		try {
 			for(OtherPlayer p : players.values()) {
 				if(p.userName.contentEquals(Main.playerName)) {
-					players.remove(p.id);
+					players.remove(p.c.getID());
 				}
 			}
 		} catch(Exception e) {}

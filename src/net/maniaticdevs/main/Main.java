@@ -23,9 +23,9 @@ import net.maniaticdevs.engine.util.os.EnumOSMappingHelper;
 import net.maniaticdevs.engine.util.properties.LanguageHandler;
 import net.maniaticdevs.engine.util.sound.Sound;
 import net.maniaticdevs.main.entity.Player;
+import net.maniaticdevs.main.gui.GuiDisconnected;
 import net.maniaticdevs.main.gui.GuiInGame;
 import net.maniaticdevs.main.gui.GuiMainMenu;
-import net.maniaticdevs.main.gui.GuiMultiplayerChoice;
 import net.maniaticdevs.main.gui.GuiPauseScreen;
 
 /**
@@ -113,7 +113,7 @@ public class Main extends JPanel implements Runnable  {
 	 */
 	public static void disconnect(boolean kick, String message) {
 		if(server != null) {
-			MainServer.stopServer();
+			server.stopServer();
 			server = null;
 		}
 
@@ -128,12 +128,10 @@ public class Main extends JPanel implements Runnable  {
 		} catch(Exception e) {}		
 
 		Main.theNetwork = null;
-		System.out.println("kick: "+message);
-		//Main.currentScreen = new GuiDisconnected(kick, message);
 		Main.currentLevel = null;
 		Main.thePlayer = null;
 		
-		Main.currentScreen = new GuiMultiplayerChoice();
+		Main.currentScreen = new GuiDisconnected(kick, message);
 	}
 
 	/**

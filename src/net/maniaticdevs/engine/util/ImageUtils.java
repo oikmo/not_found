@@ -8,7 +8,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.main.Main;
 

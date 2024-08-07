@@ -8,7 +8,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.main.Main;
 
 /**

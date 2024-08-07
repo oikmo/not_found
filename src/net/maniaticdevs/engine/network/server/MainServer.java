@@ -76,17 +76,13 @@ public class MainServer {
 	}
 
 	public void startServer() {
-		Logger.log(LogLevel.INFO,"Starting Server");
-		append("Starting Server...\n");
+		append("Starting Server ("+version+") ...");
 		server.start();
 		try {
 			server.bind(tcpPort, udpPort);
 			server.addListener(listener);
-			append("Server online! (PORT="+ tcpPort +")\n");
-			append("Don't forget to port forward 25555 for server info!\n");
-			Logger.log(LogLevel.INFO, "Server online! (PORT="+ tcpPort +")");
+			append("Server online! (PORT="+ tcpPort +")");
 			append("----------------------------");
-			append("\n");
 			saveThread = new Thread(new Runnable() {
 				public void run() {
 					while(true) {
@@ -105,16 +101,13 @@ public class MainServer {
 		} catch (IOException e) {
 			Logger.log(LogLevel.INFO,"Port already used");
 			append("Port already in use");
-			append("\n");
 			e.printStackTrace();
 		}
 	}
 
-	// Try changing this to non static and see where this effects our game
-	public static void stopServer() {
+	public void stopServer() {
 		Logger.log(LogLevel.INFO,"Server stopped");
 		append("Server stopped.");
-		append("\n");
 		for (OtherPlayer p : MainServerListener.players.values()) {
 			PacketRemovePlayer packetDisconnect = new PacketRemovePlayer();
 			packetDisconnect.id = p.c.getID();
@@ -150,16 +143,16 @@ public class MainServer {
 		return splashes[new Random().nextInt(splashes.length)];
 	}
 
+	@SuppressWarnings("unused")
 	private static void handleCommand(String cmd) {
 		String command = cmd.replace("/", "");
 
 		if(command.contentEquals("help")) {
-			append("\n");
-			append("setSpawn - sets spawn location of server - (setSpawn <x> <z>)\n");
-			append("seed - returns the seed of the world - (seed)\n");
-			append("save - saves the world - (save)\n");
-			append("kick - kicks a player from their ip - (kick <id> <reason>) or (kick <playerName> <reason>)\n");
-			append("chunks - returns total chunk size of world - (chunks)\n");
+			append("setSpawn - sets spawn location of server - (setSpawn <x> <z>)");
+			append("seed - returns the seed of the world - (seed)");
+			append("save - saves the world - (save)");
+			append("kick - kicks a player from their ip - (kick <id> <reason>) or (kick <playerName> <reason>)");
+			append("chunks - returns total chunk size of world - (chunks)");
 			append("players - see every player on server - (players)");
 		} else if(command.startsWith("setSpawn ")) {
 			String[] split = cmd.split(" ");
@@ -190,7 +183,7 @@ public class MainServer {
 
 				append("Successfully set spawn position to: [X="+xSpawn+", Z="+zSpawn+"]!");
 			} else {
-				append("Unable to set spawn position as inputted values were invalid.\n");
+				append("Unable to set spawn position as inputted values were invalid.");
 			}
 		} else if(command.contentEquals("save")) {
 			//theWorld.saveWorld();
@@ -245,17 +238,17 @@ public class MainServer {
 				packetKick.message = reason;
 				MainServer.server.sendToAllTCP(packetKick);
 
-				append("Kicked " + (noIDGiven ? toID : playerID) + " from the server.\n");
+				append("Kicked " + (noIDGiven ? toID : playerID) + " from the server.");
 
 			} else {
-				append("ID was not valid / Reason was not supplied\n");
+				append("ID was not valid / Reason was not supplied");
 			}
 		} else if(command.startsWith("say ")) {
 			String message = command.substring(4);
 			PacketChatMessage packet = new PacketChatMessage();
 			packet.message=" [SERVER] " + message;
 			server.sendToAllUDP(packet);
-			append(packet.message+"\n");
+			append(packet.message+"");
 		} else if(command.contentEquals("players")) {
 			if(MainServerListener.players.size() != 0) {
 				for(Map.Entry<Integer, OtherPlayer> entry : MainServerListener.players.entrySet()) {
@@ -265,7 +258,7 @@ public class MainServer {
 				append("No players!");
 			}
 		} else {
-			append("Command \""+ cmd + "\" was not recognized!\n");
+			append("Command \""+ cmd + "\" was not recognized!");
 		}
 	}
 
@@ -315,10 +308,7 @@ public class MainServer {
 	}
 	
 	public static void append(String toAppend) {
-		String toPrint = toAppend.replaceAll("\n", "").trim();
-		if(!toPrint.isEmpty()) {
-			Logger.log(LogLevel.INFO, toPrint);
-		}
+		Logger.log(LogLevel.INFO, toAppend);
 	}
 
 } // end total class

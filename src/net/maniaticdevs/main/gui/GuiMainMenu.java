@@ -74,7 +74,9 @@ public class GuiMainMenu extends GuiScreen {
 					} else {
 						Main.currentScreen = new GuiSelectName();
 					}
-					
+					break;
+				case 2:
+					System.exit(0);
 					break;
 				}
 				Main.sfxLib.play(SoundSFXEnum.hit);

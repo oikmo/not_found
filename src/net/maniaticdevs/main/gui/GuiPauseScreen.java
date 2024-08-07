@@ -137,7 +137,15 @@ public class GuiPauseScreen extends GuiScreen {
 				}
 				break;
 			case 4:
-				System.exit(0);
+				if(Main.theNetwork != null) {
+					Main.theNetwork.disconnect();
+					if(Main.server != null) {
+						Main.server.stopServer();
+					}
+				}
+				Main.currentLevel = null;
+				Main.thePlayer = null;
+				Main.currentScreen = new GuiMainMenu();
 				break;
 			}
 		} else {

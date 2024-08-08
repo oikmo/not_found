@@ -167,5 +167,9 @@ public class Level {
 	public void addObject(OBJ obj) {
 		objects.add(obj);
 	}
+
+	public List<Entity> getEntities() {
+		return entities;
+	}
 	
 }

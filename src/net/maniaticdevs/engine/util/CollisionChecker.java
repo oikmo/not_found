@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
+import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.tile.Tile;
 import net.maniaticdevs.main.Main;
@@ -149,6 +150,153 @@ public class CollisionChecker {
 			}
 		}
 		return interactedOBJ;
+	}
+	
+	/**
+	 * Checks to see if entity is colliding with an entity from {@link Main#currentLevel}<br>
+	 * If entity is player, then the collided entity will be returned.
+	 * 
+	 * @param entity subject to collision testing
+	 * @return {@link Entity}
+	 */
+	public static Entity checkEntity(Entity entity) {
+		boolean player = entity instanceof Player;
+		
+		Entity interactedEntity = null;
+		
+		Rectangle selfEntityChecker = new Rectangle();
+		Rectangle entityChecker = new Rectangle();
+		
+		for(Entity ent : Main.currentLevel.getEntities()) {
+			int solidSelfEntityX = entity.getPosition().x + entity.getHitBox().x;
+			int solidSelfEntityY = entity.getPosition().y + entity.getHitBox().y;
+			selfEntityChecker.x = solidSelfEntityX;
+			selfEntityChecker.y = solidSelfEntityY;
+			selfEntityChecker.width = entity.getHitBox().width;
+			selfEntityChecker.height = entity.getHitBox().height;
+			
+			int solidEntityX = ent.getPosition().x + ent.getHitBox().x;
+			int solidEntityY = ent.getPosition().y + ent.getHitBox().y;
+			
+			entityChecker.x = solidEntityX;
+			entityChecker.y = solidEntityY;
+			entityChecker.width = ent.getHitBox().width;
+			entityChecker.height = ent.getHitBox().height;
+			switch(entity.getDirection()) {
+			case EAST:
+				selfEntityChecker.x += entity.getSpeed();
+				if(selfEntityChecker.intersects(entityChecker)) {
+					entity.colliding = true;
+					if(player) {
+						interactedEntity = ent;
+					}
+				}
+				break;
+			case NORTH:
+				selfEntityChecker.y -= entity.getSpeed();
+				if(selfEntityChecker.intersects(entityChecker)) {
+					entity.colliding = true;
+					if(player) {
+						interactedEntity = ent;
+					}
+				}
+				break;
+			case SOUTH:
+				selfEntityChecker.y += entity.getSpeed();
+				if(selfEntityChecker.intersects(entityChecker)) {
+					entity.colliding = true;
+					if(player) {
+						interactedEntity = ent;
+					}
+				}
+				break;
+			case WEST:
+				selfEntityChecker.x -= entity.getSpeed();
+				if(selfEntityChecker.intersects(entityChecker)) {
+					entity.colliding = true;
+					if(player) {
+						interactedEntity = ent;
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		return interactedEntity;
+	}
+	
+	/** Checks to see if entity is colliding with another player from {@link NetworkHandler}<br>
+	 * If entity is player, then the collided player will be returned.
+	 * 
+	 * @param entity subject to collision testing
+	 * @return {@link OtherPlayer}
+	 */
+	public static OtherPlayer checkOtherPlayer(Entity entity) {
+		boolean player = entity instanceof Player;
+		
+		OtherPlayer interactedPlayer = null;
+		
+		Rectangle selfEntityChecker = new Rectangle();
+		Rectangle entityChecker = new Rectangle();
+		
+		for(OtherPlayer otherplayer : Main.theNetwork.players.values()) {
+			int solidSelfEntityX = entity.getPosition().x + entity.getHitBox().x;
+			int solidSelfEntityY = entity.getPosition().y + entity.getHitBox().y;
+			selfEntityChecker.x = solidSelfEntityX;
+			selfEntityChecker.y = solidSelfEntityY;
+			selfEntityChecker.width = entity.getHitBox().width;
+			selfEntityChecker.height = entity.getHitBox().height;
+			
+			int solidEntityX = otherplayer.x + otherplayer.getHitBox().x;
+			int solidEntityY = otherplayer.y + otherplayer.getHitBox().y;
+			
+			entityChecker.x = solidEntityX;
+			entityChecker.y = solidEntityY;
+			entityChecker.width = otherplayer.getHitBox().width;
+			entityChecker.height = otherplayer.getHitBox().height;
+			switch(entity.getDirection()) {
+			case EAST:
+				selfEntityChecker.x += entity.getSpeed();
+				if(selfEntityChecker.intersects(entityChecker)) {
+					entity.colliding = true;
+					if(player) {
+						interactedPlayer = otherplayer;
+					}
+				}
+				break;
+			case NORTH:
+				selfEntityChecker.y -= entity.getSpeed();
+				if(selfEntityChecker.intersects(entityChecker)) {
+					entity.colliding = true;
+					if(player) {
+						interactedPlayer = otherplayer;
+					}
+				}
+				break;
+			case SOUTH:
+				selfEntityChecker.y += entity.getSpeed();
+				if(selfEntityChecker.intersects(entityChecker)) {
+					entity.colliding = true;
+					if(player) {
+						interactedPlayer = otherplayer;
+					}
+				}
+				break;
+			case WEST:
+				selfEntityChecker.x -= entity.getSpeed();
+				if(selfEntityChecker.intersects(entityChecker)) {
+					entity.colliding = true;
+					if(player) {
+						interactedPlayer = otherplayer;
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		return interactedPlayer;
 	}
 	
 	/**

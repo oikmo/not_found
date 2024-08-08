@@ -2,6 +2,7 @@ package net.maniaticdevs.engine.network;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 
 import com.esotericsoftware.kryonet.Connection;
 
@@ -20,6 +21,9 @@ public class OtherPlayer {
 	public int direction;
 	
 	public int x, y;
+	
+	/** Used for collision checking */
+	protected Rectangle hitBox = new Rectangle(8, 1, 32, 46);
 	
 	public void updatePosition(int x, int y) {
 		this.x = x;
@@ -49,5 +53,9 @@ public class OtherPlayer {
 			int height = (int)g2.getFontMetrics(GuiScreen.font).getStringBounds(userName, g2).getHeight();
 			g2.drawString(userName, screenX, screenY-(height/2));
 		}
+	}
+	
+	public Rectangle getHitBox() {
+		return hitBox;
 	}
 }

@@ -111,7 +111,8 @@ public class Player extends Entity {
 			lockGiveLife = false;
 		}
 		
-		/*float dist = xa * xa + ya * ya;
+		/* Smooth Movement 
+		float dist = xa * xa + ya * ya;
 		if(dist >= 0.01F) {
 			dist = speed / (float)Math.sqrt((double)dist);
 			xa *= dist;
@@ -122,10 +123,15 @@ public class Player extends Entity {
 		
 		this.motionX *= 0.91F;
 		this.motionY *= 0.91F;*/
+		
 		if(Main.currentLevel != null) {
 			colliding = false;
 			CollisionChecker.checkTile(this);
+			Entity ent = CollisionChecker.checkEntity(this);
 			OBJ obj = CollisionChecker.checkObject(this);
+			if(Main.theNetwork != null) {
+				CollisionChecker.checkOtherPlayer(this);
+			}
 			
 			OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
 			if(Input.isKeyDown(Input.KEY_ENTER)) {

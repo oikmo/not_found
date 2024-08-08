@@ -1,6 +1,5 @@
 package net.maniaticdevs.engine.network.server;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
@@ -28,8 +27,6 @@ import net.maniaticdevs.engine.network.packet.PacketUserName;
 import net.maniaticdevs.engine.network.packet.RandomNumber;
 import net.maniaticdevs.engine.util.Logger;
 import net.maniaticdevs.engine.util.Logger.LogLevel;
-import net.maniaticdevs.engine.util.os.EnumOS;
-import net.maniaticdevs.engine.util.os.EnumOSMappingHelper;
 import net.maniaticdevs.main.level.SampleLevel;
 
 public class MainServer {
@@ -108,16 +105,10 @@ public class MainServer {
 	public void stopServer() {
 		Logger.log(LogLevel.INFO,"Server stopped");
 		append("Server stopped.");
-		for (OtherPlayer p : MainServerListener.players.values()) {
-			PacketRemovePlayer packetDisconnect = new PacketRemovePlayer();
-			packetDisconnect.id = p.c.getID();
-			packetDisconnect.message = "Server closed";
-			// connection.sendTCP(packetUserName2);
-			p.c.sendUDP(packetDisconnect);
-		}
-		//SaveSystem.saveWorldPosition("server-level", new WorldPositionData(xSpawn, zSpawn));
+		PacketRemovePlayer packetDisconnect = new PacketRemovePlayer();
+		packetDisconnect.message = "Server closed";
+		server.sendToAllUDP(packetDisconnect);
 		server.stop();
-		Logger.saveLog();
 	}
 
 	private void registerKryoClasses() {
@@ -261,54 +252,8 @@ public class MainServer {
 			append("Command \""+ cmd + "\" was not recognized!");
 		}
 	}
-
-	/**
-	 * Retrieves data directory of .blockbase/ using {@code Main.getAppDir(String)}
-	 * @return Directory (File)
-	 */
-	public static File getWorkingDirectory() {
-		return getWorkingDirectory("not_found-server");
-	}
-
-	/**
-	 * Uses {@code Main.getOS} to locate an APPDATA directory in the system.
-	 * Then it creates a new directory based on the given name e.g <b>.name/</b>
-	 * 
-	 * @param name (String)
-	 * @return Directory (File)
-	 */
-	public static File getWorkingDirectory(String name) {
-		String userDir = System.getProperty("user.home", ".");
-		File folder;
-		switch(EnumOSMappingHelper.os[EnumOS.getOS().ordinal()]) {
-		case 1:
-		case 2:
-			folder = new File(userDir, '.' + name + '/');
-			break;
-		case 3:
-			String appdataLocation = System.getenv("APPDATA");
-			if(appdataLocation != null) {
-				folder = new File(appdataLocation, "." + name + '/');
-			} else {
-				folder = new File(userDir, '.' + name + '/');
-			}
-			break;
-		case 4:
-			folder = new File(userDir, "Library/Application Support/" + name);
-			break;
-		default:
-			folder = new File(userDir, name + '/');
-		}
-
-		if(!folder.exists() && !folder.mkdirs()) {
-			throw new RuntimeException("The working directory could not be created: " + folder);
-		} else {
-			return folder;
-		}
-	}
 	
 	public static void append(String toAppend) {
 		Logger.log(LogLevel.INFO, toAppend);
 	}
-
-} // end total class
+}

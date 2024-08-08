@@ -9,6 +9,8 @@ import java.util.List;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.entity.EntityDirection;
+import net.maniaticdevs.engine.gui.GuiScreen;
+import net.maniaticdevs.engine.network.ChatMessage;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
 import net.maniaticdevs.engine.objects.OBJ;
@@ -28,24 +30,39 @@ import net.maniaticdevs.main.gui.GuiInGame;
  *
  */
 public class Player extends Entity {
-	
+
+	/*float motionX, motionY; //Smooth Movement 
+	float dist = xa * xa + ya * ya;
+	if(dist >= 0.01F) {
+		dist = speed / (float)Math.sqrt((double)dist);
+		xa *= dist;
+		ya *= dist;
+		this.motionX += xa;
+		this.motionY += ya ;
+	}
+
+	this.motionX *= 0.91F;
+	this.motionY *= 0.91F;*/
+
 	/** Position data for player to be at the center of the screen */
 	private Vector2 screenPos = new Vector2();
-	
+
 	/** Player inventory for storing {@link OBJ}s */
 	public List<OBJ> inventory = new ArrayList<>();
 	/** Currently holding item */
 	public OBJ holdingItem;
 	/** You died, so it goes. */
 	public boolean died = false;
-	
+
 	/** To prevent action to be done repeatedly in a short period of time */
 	boolean lockTakeLife = false;
 	/** To prevent action to be done repeatedly in a short period of time */
 	boolean lockGiveLife = false;
-	
+
 	private int ticks = 0;
-	
+
+	public List<ChatMessage> messages = new ArrayList<>();
+
 	@Override
 	protected void setDefaultValues() {
 		name = Main.playerName;
@@ -55,14 +72,11 @@ public class Player extends Entity {
 		position.set(Settings.tileSize*4, Settings.tileSize*4);
 		sprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
 	}
-	
-	//float motionX, motionY;
-	
-	
+
 	public void updateScreenPos() {
 		screenPos.set((Main.getInstance().getWidth() / 2 - (Settings.tileSize / 2)), Main.getInstance().getHeight() / 2 - (Settings.tileSize / 2));
 	}
-	
+
 	@Override
 	public void tick() {
 		if(ticks != 0 && GuiInGame.message != null) {
@@ -71,22 +85,34 @@ public class Player extends Entity {
 				GuiInGame.message = null;
 			}
 		}
-		
+
 		animate();
-		
+
+		for(int i = 0; i < messages.size(); i++) {
+			if(messages.size() > 5) {
+				messages.remove(0);
+			}
+
+			messages.get(i).tick();
+		}
+
 		direction = EntityDirection.IDLE;
-		if(Main.currentScreen instanceof GuiInGame) {
-			if(Input.isKeyDown(Input.KEY_D)) {
-				direction = EntityDirection.EAST;
-			} else if(Input.isKeyDown(Input.KEY_A)) {
-				direction = EntityDirection.WEST;
-			} else if(Input.isKeyDown(Input.KEY_S)) {
+		if(Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) {
+			if(Input.needsInput) {
+				Input.clearInput();
+			}
+			
+			if(Input.isKeyDown(Input.KEY_S)) {
 				direction = EntityDirection.SOUTH;
 			} else if(Input.isKeyDown(Input.KEY_W)) {
 				direction = EntityDirection.NORTH;
+			}if(Input.isKeyDown(Input.KEY_D)) {
+				direction = EntityDirection.EAST;
+			} else if(Input.isKeyDown(Input.KEY_A)) {
+				direction = EntityDirection.WEST;
 			}
 		}
-		
+
 		if(Input.isKeyDown(Input.KEY_MINUS)) {
 			if(!lockTakeLife) {
 				health--;
@@ -98,7 +124,7 @@ public class Player extends Entity {
 		} else {
 			lockTakeLife = false;
 		}
-		
+
 		if(Input.isKeyDown(Input.KEY_EQUALS)) {
 			if(!lockGiveLife) {
 				health++;
@@ -110,29 +136,16 @@ public class Player extends Entity {
 		} else {
 			lockGiveLife = false;
 		}
-		
-		/* Smooth Movement 
-		float dist = xa * xa + ya * ya;
-		if(dist >= 0.01F) {
-			dist = speed / (float)Math.sqrt((double)dist);
-			xa *= dist;
-			ya *= dist;
-			this.motionX += xa;
-			this.motionY += ya ;
-		}
-		
-		this.motionX *= 0.91F;
-		this.motionY *= 0.91F;*/
-		
+
 		if(Main.currentLevel != null) {
 			colliding = false;
 			CollisionChecker.checkTile(this);
-			Entity ent = CollisionChecker.checkEntity(this);
+			//Entity ent = CollisionChecker.checkEntity(this);
 			OBJ obj = CollisionChecker.checkObject(this);
 			if(Main.theNetwork != null) {
 				CollisionChecker.checkOtherPlayer(this);
 			}
-			
+
 			OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
 			if(Input.isKeyDown(Input.KEY_ENTER)) {
 				if(contactOBJ instanceof PickableObject) {
@@ -144,7 +157,7 @@ public class Player extends Entity {
 					}
 					Main.currentLevel.removeObject(contactOBJ);
 				}
-				
+
 				if(obj instanceof Door) {
 					if(holdingItem != null) {
 						if(holdingItem.networkID.contentEquals(((Door)obj).getRequiredKey().networkID)) {
@@ -156,12 +169,11 @@ public class Player extends Entity {
 							Main.sfxLib.play(SoundSFXEnum.door);
 						}
 					}
-					
 				}
 			}
 		}
-		
-		
+
+
 		if(!colliding) {
 			/*if(getDirection() != EntityDirection.IDLE) {
 				if(footSteps.isStopped()) {
@@ -185,13 +197,13 @@ public class Player extends Entity {
 				break;
 			default:
 				break;
-			
+
 			}
 		} else {
 			direction = EntityDirection.IDLE;
 		}
 	}
-	
+
 	/**
 	 * Checks if index of a soon to be selected item is valid
 	 * @param index Index to be checked
@@ -205,7 +217,7 @@ public class Player extends Entity {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Selects item to be used for {@link #holdingItem}
 	 * @param index Index for item to be chosen
@@ -233,19 +245,29 @@ public class Player extends Entity {
 			g2.drawString("KEY_S:"+Input.isKeyDown(Input.KEY_S), 0, 75);
 			g2.drawString("KEY_D:"+Input.isKeyDown(Input.KEY_D), 0, 100);
 		}
-		//username stuff (for networking) 
-		// I
-		// V
-		
-		//g2.setColor(Color.WHITE);
-		//g2.setFont(GuiScreen.font);
-		//int length = (int)g2.getFontMetrics(GuiScreen.font).getStringBounds(name, g2).getWidth();
-		//int height = (int)g2.getFontMetrics(GuiScreen.font).getStringBounds(name, g2).getHeight();
-		//g2.drawString(name, (Main.getInstance().getWidth()/2)-(length/2), screenPos.y-(height/2));
+		g2.setFont(GuiScreen.font.deriveFont(18.0F));
+		int height = (int)g2.getFontMetrics().getStringBounds("cock", g2).getHeight();
+		int change = height + 20;
+		int offsetY = 0;
+		for(int i = messages.size(); i > 0; i--) {
+			int j = i - 1;
+			ChatMessage chatmessage = messages.get(j);
+			String msg = chatmessage.getMessage(); 
+
+			int width = (int)g2.getFontMetrics().getStringBounds(msg, g2).getWidth();
+			g2.setColor(Color.WHITE);
+			g2.fillRoundRect((Main.getInstance().getWidth()/2)-((width+15)/2), (int) (screenPos.y-height*2.5f)-offsetY, width+15, height+15, 15, 15);
+			g2.setColor(Color.BLACK);
+			g2.setStroke(new BasicStroke(3));
+			g2.drawRoundRect((Main.getInstance().getWidth()/2)-((width+15)/2), (int) (screenPos.y-height*2.5f)-offsetY, width+15, height+15, 5, 5);
+			g2.setColor(Color.BLACK);
+			g2.drawString(msg, (Main.getInstance().getWidth()/2)-((width)/2), screenPos.y-height-(offsetY));
+			offsetY += change;
+		}
 		g2.drawImage(sprites[spriteNum+getDirection().ordinal()*6], null, screenPos.x, screenPos.y);
-		
+
 	}
-	
+
 	/**
 	 * Returns {@link #screenPos}
 	 * @return {@link Vector2}

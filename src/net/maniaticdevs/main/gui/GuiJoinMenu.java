@@ -9,6 +9,7 @@ import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.network.client.NetworkHandler;
 import net.maniaticdevs.engine.util.Input;
+import net.maniaticdevs.engine.util.Input.InputType;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
 import net.maniaticdevs.main.entity.Player;
@@ -79,7 +80,7 @@ public class GuiJoinMenu extends GuiScreen {
 						try {
 							Main.theNetwork = new NetworkHandler(Input.getTextInput().trim());
 						} catch (Exception e) {
-							Main.disconnect(false, "");
+							Main.disconnect(false, "Server doesn't exist!");
 						}
 					}
 					break;
@@ -90,7 +91,7 @@ public class GuiJoinMenu extends GuiScreen {
 						try {
 							Main.theNetwork = new NetworkHandler(Input.getTextInput().trim());
 						} catch (Exception e) {
-							Main.disconnect(false, "");
+							Main.disconnect(false, "Server doesn't exist!");
 						}
 					}
 					break;
@@ -122,7 +123,7 @@ public class GuiJoinMenu extends GuiScreen {
 			Input.lengthInput = 30;
 		}
 		
-		Input.ipEnabled = true;
+		Input.inputType = InputType.IP;
 		
 		drawSelectNameScreen(g2);
 	}
@@ -164,7 +165,7 @@ public class GuiJoinMenu extends GuiScreen {
 		int height = (int) (Settings.tileSize*1.2f);
 		int subX = ((Main.getInstance().getWidth()/2)-width/2);
 		
-		g2.drawRoundRect(subX+5, (y-height+15), width-10, height-10, 25, 25);	
+		g2.drawRoundRect(subX+5, (y-height+20), width-10, height-10, 25, 25);	
 		if(optionSelected == 0) {
 			g2.drawString(">",subX+15, y);
 		}

@@ -7,6 +7,7 @@ import java.util.List;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
+import net.maniaticdevs.engine.network.ChatMessage;
 import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.network.packet.LoginResponse;
 import net.maniaticdevs.engine.network.packet.PacketAddObject;
@@ -27,15 +28,17 @@ import net.maniaticdevs.engine.objects.PickableObject;
 import net.maniaticdevs.engine.util.Logger;
 import net.maniaticdevs.engine.util.Logger.LogLevel;
 import net.maniaticdevs.main.Main;
+import net.maniaticdevs.main.gui.GuiChat;
+import net.maniaticdevs.main.gui.GuiInGame;
 import net.maniaticdevs.main.level.SampleLevel;
 
 public class PlayerClientListener extends Listener {
-	
+
 	public static List<OBJ> specialOBJs = new ArrayList<>();
-	
-	public void received(Connection connection, Object object){
-		//System.out.println(object);
-		
+
+	private static List<OBJ> needsToBeAddedObjs = new ArrayList<>(); 
+
+	public void received(Connection connection, Object object) {
 		if(!Thread.currentThread().getName().contentEquals("PlayerClientListener Thread")) {
 			Thread.currentThread().setName("PlayerClientListener Thread");
 		}
@@ -74,12 +77,11 @@ public class PlayerClientListener extends Listener {
 			if(Main.theNetwork == null) {
 				return;
 			}
-			
 			if(Main.theNetwork.client == null) {
 				return;
 			}
-			if(packet.id == Main.theNetwork.client.getID()) {
-				Main.theNetwork.disconnect();
+			if(packet.id == Main.theNetwork.client.getID() || packet.message.contentEquals("Server closed")) {
+				Main.theNetwork.stopUpdating = true;
 				Main.disconnect(packet.kick, packet.message);
 			} else {
 				if(Main.thePlayer != null) {
@@ -90,11 +92,9 @@ public class PlayerClientListener extends Listener {
 								((GuiChat)Main.currentScreen).updateMessages();
 							}*/
 						}
-
 					}
 				}
 				Main.theNetwork.players.remove(packet.id);
-
 			}
 		}
 		else if(object instanceof PacketUserName){
@@ -111,7 +111,7 @@ public class PlayerClientListener extends Listener {
 				OtherPlayer p = Main.theNetwork.players.get(packet.id);
 				p.userName = packet.userName;
 				p.id = connection.getID();
-				
+
 				if(Main.thePlayer != null) {
 					if(packet.userName != null) {
 						if(!Main.theNetwork.players.get(packet.id).userName.contentEquals(Main.theNetwork.player.userName)) {
@@ -130,7 +130,7 @@ public class PlayerClientListener extends Listener {
 			} else if(Main.theNetwork.players.containsKey(packet.id)) {
 				OtherPlayer p = Main.theNetwork.players.get(packet.id);
 				p.userName = packet.userName;
-				
+
 				if(Main.thePlayer != null) {
 					if(packet.userName != null) {
 						if(!Main.theNetwork.players.get(packet.id).userName.contentEquals(Main.theNetwork.player.userName)) {
@@ -164,19 +164,27 @@ public class PlayerClientListener extends Listener {
 		} 
 		else if(object instanceof PacketChatMessage) {
 			PacketChatMessage packet = (PacketChatMessage) object;
-			//Main.theNetwork.rawMessages.add(new ChatMessage(packet.message, false));
+			packet.message = packet.message.trim();
+			packet.message = packet.message.replace("\n", "");
+			GuiChat.originalMessages.add("<"+Main.theNetwork.players.get(packet.id).userName+"> "+packet.message);
+			
+			if(Main.theNetwork.players.get(packet.id) != null) {
+				new ChatMessage(Main.theNetwork.players.get(packet.id).messages, packet.message, false);
+			}
+			
 			if(!packet.message.startsWith(" [SERVER]")) {
 				if(Main.theNetwork.players.get(packet.id) != null) {
 					if(Main.theNetwork.players.get(packet.id).userName == null) {
 						Main.theNetwork.players.get(packet.id).userName =  packet.message.split(">")[0].replace("<", "").replace(">","").trim();
 					}
 				}
-				
 			}
-			
-			/*if(Main.currentScreen instanceof GuiChat) {
-				((GuiChat)Main.currentScreen).updateMessages();
-			}*/
+
+			if(Main.currentScreen instanceof GuiInGame) {
+				if(((GuiInGame)Main.currentScreen).chatScreen != null) {
+					((GuiInGame)Main.currentScreen).chatScreen.recompileMessages();
+				}
+			}
 		}
 		else if(object instanceof PacketUpdateAnimation) {
 			PacketUpdateAnimation packet = (PacketUpdateAnimation) object;
@@ -190,21 +198,33 @@ public class PlayerClientListener extends Listener {
 				Main.currentLevel = new SampleLevel(true);
 				break;
 			}
+
+			for(int i = 0; i < needsToBeAddedObjs.size(); i++) {
+				Main.currentLevel.addObject(needsToBeAddedObjs.get(i));
+				needsToBeAddedObjs.remove(needsToBeAddedObjs.get(i));
+			}
 		}
 		else if(object instanceof PacketAddObject) {
 			PacketAddObject packet = (PacketAddObject) object;
-			System.out.println(packet.networkID);
 			switch(packet.objClass) {
 			case "Door":
 				Door door = new Door((Key)addSpecialObject(packet.subNetworkID, packet.subObj, packet.subObjName), false, packet.x, packet.y);
 				door.setNetworkID(packet.networkID);
-				Main.currentLevel.addObject(door);
+				if(Main.currentLevel != null) {
+					Main.currentLevel.addObject(door);
+				} else {
+					needsToBeAddedObjs.add(door);
+				}
 				break;
 			case "PickableObject":
 				Key key = (Key)addSpecialObject(packet.subNetworkID, packet.subObj, packet.subObjName);
 				PickableObject pickable = new PickableObject(key, packet.x, packet.y);
 				pickable.setNetworkID(packet.networkID);
-				Main.currentLevel.addObject(pickable);
+				if(Main.currentLevel != null) {
+					Main.currentLevel.addObject(pickable);
+				} else {
+					needsToBeAddedObjs.add(pickable);
+				}
 				break;
 			}
 		}
@@ -217,7 +237,7 @@ public class PlayerClientListener extends Listener {
 					}
 				}
 			} catch(Exception e) {}
-			
+
 		}
 		else if(object instanceof PacketUpdateDirection) {
 			PacketUpdateDirection packet = (PacketUpdateDirection) object;
@@ -225,7 +245,7 @@ public class PlayerClientListener extends Listener {
 				Main.theNetwork.players.get(packet.id).direction = packet.dir;
 		}
 	}
-	
+
 	private OBJ addSpecialObject(String networkID, String classs, String name) {
 		boolean shouldadd = true;
 		for(OBJ obj : specialOBJs) {
@@ -234,7 +254,7 @@ public class PlayerClientListener extends Listener {
 				return obj;
 			}
 		}
-		
+
 		if(shouldadd) {
 			switch(classs) {
 			case "Key":
@@ -246,7 +266,7 @@ public class PlayerClientListener extends Listener {
 		}
 		return null;
 	}
-	
+
 	private void requestInfo(Connection connection) {
 		if(!Main.theNetwork.players.keySet().contains(connection.getID())) {
 			Main.theNetwork.players.put(connection.getID(), new OtherPlayer());

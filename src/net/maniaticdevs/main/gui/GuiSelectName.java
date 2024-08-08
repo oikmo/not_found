@@ -9,6 +9,7 @@ import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.save.SaveSystem;
 import net.maniaticdevs.engine.util.Input;
+import net.maniaticdevs.engine.util.Input.InputType;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
 import net.maniaticdevs.main.save.PlayerSaveData;
@@ -109,7 +110,7 @@ public class GuiSelectName extends GuiScreen {
 			Input.lengthInput = 15;
 		}
 		
-		Input.ipEnabled = false;
+		Input.inputType = InputType.Username;
 		
 		drawSelectNameScreen(g2);
 	}

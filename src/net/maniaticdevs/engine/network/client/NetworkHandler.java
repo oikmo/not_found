@@ -51,6 +51,8 @@ public class NetworkHandler {
 	private int tickTimer = 0;
 	public static final int NETWORK_PROTOCOL = 1;
 	
+	public boolean stopUpdating = false;
+	
 	private static void registerKryoClasses() {
 		kryo.register(LoginRequest.class);
 		kryo.register(LoginResponse.class);
@@ -135,6 +137,9 @@ public class NetworkHandler {
 	}
 	
 	public void update() {
+		if(stopUpdating) {
+			return;
+		}
 		if(!client.isConnected()) {
 			Main.disconnect(false, Main.lang.translateKey("network.disconnect.ux"));
 			return;
@@ -143,15 +148,15 @@ public class NetworkHandler {
 		try {
 			for(OtherPlayer p : players.values()) {
 				if(p.userName.contentEquals(Main.playerName)) {
-					players.remove(p.c.getID());
+					players.remove(p.id);
 				}
 			}
 		} catch(Exception e) {}
 		
 		
-		if(player.c != null) {
-			if(players.containsKey(player.c.getID())) {
-				players.remove(player.c.getID());
+		if(client != null) {
+			if(players.containsKey(client.getID())) {
+				players.remove(client.getID());
 			}
 		}
 		

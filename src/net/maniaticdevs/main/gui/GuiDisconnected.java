@@ -9,8 +9,6 @@ import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
-import net.maniaticdevs.main.entity.Player;
-import net.maniaticdevs.main.level.SampleLevel;
 
 /**
  * When the player first opens the game or ragequits they go here :P

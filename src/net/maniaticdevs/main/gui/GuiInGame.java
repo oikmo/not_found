@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.util.ImageUtils;
+import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.main.Main;
 
 /**
@@ -14,6 +15,8 @@ import net.maniaticdevs.main.Main;
  * @author Oikmo
  */
 public class GuiInGame extends GuiScreen {
+	
+	public GuiChat chatScreen;
 	
 	/**
 	 * Heart sprites. Loaded statically as to not reload the same image over and over again.
@@ -23,26 +26,30 @@ public class GuiInGame extends GuiScreen {
 	public static String message = null;
 	
 	public void draw(Graphics2D g2) {
-		//this.drawImage(g2, image, Main.getInstance().getWidth()/2, Main.getInstance().getHeight()/2, 128, 128);
 		
-		//this.drawImage(g2, sprites[0], 10, 10, 20, 20);
+		if(Input.isKeyDownExplicit(Input.KEY_T) && chatScreen == null) {
+			chatScreen = new GuiChat();
+		}
+		
+		if(chatScreen != null) {
+			chatScreen.draw(g2);
+		}
 		
 		int x = Settings.tileSize/2;
 		int y = Settings.tileSize/2;
-		int i = 0;
-		//draw max life
-		if(Main.thePlayer == null) { return; }
-		while(i < Main.thePlayer.maxHealth/2) {
+		
+		if(Main.thePlayer == null) {
+			return;
+		}
+		
+		for(int i = 0; i < Main.thePlayer.maxHealth/2; i++) {
 			g2.drawImage(sprites[2], x, y, null);
-			i++;
 			x += Settings.tileSize;
 		}
-		//reset
 		x = Settings.tileSize/2;
-		y = Settings.tileSize/2;
-		i = 0;
-		//draw current life
-		while(i<Main.thePlayer.health) {
+		
+		int i = 0;
+		while(i < Main.thePlayer.health) {
 			g2.drawImage(sprites[1], x, y, null);
 			i++;
 			if(i<Main.thePlayer.health) { g2.drawImage(sprites[0], x, y, null); }
@@ -58,7 +65,6 @@ public class GuiInGame extends GuiScreen {
 			int frameWidth = textWidth+Settings.tileSize;
 			
 			drawSubWindow(g2, frameX,frameY, frameWidth,frameHeight, 2);
-			
 			this.drawStringCentered(g2, font, Color.WHITE, message, this.getXforCenteredText(g2, message, frameX), frameY+(int)(Settings.tileSize/1.25));
 		}
 	}

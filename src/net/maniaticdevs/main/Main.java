@@ -211,7 +211,11 @@ public class Main extends JPanel implements Runnable  {
 		if(Input.isKeyDown(Input.KEY_ESC)) {
 			if(!lockEscapeToGame) {
 				if(currentScreen instanceof GuiInGame) {
-					currentScreen = new GuiPauseScreen();
+					if(((GuiInGame) currentScreen).chatScreen == null) {
+						currentScreen = new GuiPauseScreen();
+					} else {
+						((GuiInGame) currentScreen).chatScreen = null;
+					}
 				}
 			}
 			lockEscapeToGame = true;
@@ -235,8 +239,15 @@ public class Main extends JPanel implements Runnable  {
 		if(theNetwork != null && thePlayer != null) { 
 			theNetwork.tick();
 		}
-
-
+		
+		if(theNetwork != null && thePlayer != null) { 
+			theNetwork.update();
+			try {
+				for(OtherPlayer p : Main.theNetwork.players.values()) {
+					p.tick();
+				}
+			} catch(Exception e) {}
+		}
 	}
 
 	/**

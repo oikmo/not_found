@@ -35,7 +35,7 @@ public class GuiPauseScreen extends GuiScreen {
 	private int optionSelected = -1;
 	
 	/** Prevent action being done on the same frame as the last one to enter */
-	private int tickDelay = 30;
+	private int tickDelay = 5;
 
 	public void tick() {
 		if(tickDelay != 0) { 

@@ -9,6 +9,7 @@ import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.main.Main;
+import net.maniaticdevs.main.SoundSFXEnum;
 
 /**
  * So you can chat to whatever!
@@ -65,6 +66,7 @@ public class GuiDialogue extends GuiScreen {
 					charIndex = 0;
 					combinedText = "";
 					dialogueIndex++;
+					Main.sfxLib.play(SoundSFXEnum.hit);
 				}
 			} else {
 				if(dialogueIndex >= dialogues.size()) {

@@ -35,6 +35,7 @@ public class NPC extends Entity {
 	public void onInteract() {}
 
 	public void tick() {
+		
 		if((Main.theNetwork == null && Main.server == null) || Main.server != null) {
 			actionLockCounter++;
 			
@@ -75,8 +76,10 @@ public class NPC extends Entity {
 			
 			colliding = false;
 			CollisionChecker.checkTile(this);
+			CollisionChecker.checkObject(this);
+			CollisionChecker.checkEntity(this);
 			
-			if(!colliding) {
+			if(!colliding && !lock) {
 				/*if(getDirection() != EntityDirection.IDLE) {
 					if(footSteps.isStopped()) {
 						footSteps.play();

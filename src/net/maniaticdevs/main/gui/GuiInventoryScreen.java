@@ -32,6 +32,7 @@ public class GuiInventoryScreen extends GuiScreen {
 	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockEnter = false;
 	
+	/** To prevent key frames */
 	private int tickDelay = 30;
 
 	public void tick() {

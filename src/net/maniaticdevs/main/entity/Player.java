@@ -3,12 +3,14 @@ package net.maniaticdevs.main.entity;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.entity.EntityDirection;
+import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.network.ChatMessage;
 import net.maniaticdevs.engine.objects.Door;
@@ -18,9 +20,11 @@ import net.maniaticdevs.engine.objects.PickableObject;
 import net.maniaticdevs.engine.util.CollisionChecker;
 import net.maniaticdevs.engine.util.ImageUtils;
 import net.maniaticdevs.engine.util.Input;
+import net.maniaticdevs.engine.util.StringUtil;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
+import net.maniaticdevs.main.gui.GuiDialogue;
 import net.maniaticdevs.main.gui.GuiInGame;
 
 /**
@@ -97,7 +101,7 @@ public class Player extends Entity {
 		}
 
 		direction = EntityDirection.IDLE;
-		if(Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) {
+		if((Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) || Main.currentScreen instanceof GuiDialogue) {
 			if(Input.needsInput) {
 				Input.clearInput();
 			}
@@ -140,14 +144,23 @@ public class Player extends Entity {
 		if(Main.currentLevel != null) {
 			colliding = false;
 			CollisionChecker.checkTile(this);
-			//Entity ent = CollisionChecker.checkEntity(this);
+			Entity ent = CollisionChecker.checkEntity(this);
 			OBJ obj = CollisionChecker.checkObject(this);
 			if(Main.theNetwork != null) {
 				CollisionChecker.checkOtherPlayer(this);
 			}
 
+			
+			
 			OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
 			if(Input.isKeyDown(Input.KEY_ENTER)) {
+				
+				if(ent != null) {
+					if(ent instanceof NPC) {
+						((NPC)ent).onInteract();
+					}
+				}
+				
 				if(contactOBJ instanceof PickableObject) {
 					inventory.add(((PickableObject)contactOBJ).getItem());
 					ticks = 180;

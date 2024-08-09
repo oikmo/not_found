@@ -23,6 +23,7 @@ import net.maniaticdevs.engine.util.os.EnumOSMappingHelper;
 import net.maniaticdevs.engine.util.properties.LanguageHandler;
 import net.maniaticdevs.engine.util.sound.Sound;
 import net.maniaticdevs.main.entity.Player;
+import net.maniaticdevs.main.gui.GuiDialogue;
 import net.maniaticdevs.main.gui.GuiDisconnected;
 import net.maniaticdevs.main.gui.GuiInGame;
 import net.maniaticdevs.main.gui.GuiMainMenu;
@@ -67,14 +68,16 @@ public class Main extends JPanel implements Runnable  {
 
 	/** Playtime tracker */
 	public static long startedPlaying = System.currentTimeMillis();
-
+	
+	/** Name of player, for chatting and networking */
 	public static String playerName;
-
+	/** Sound library for Sound FX */
 	public static Sound sfxLib;
-
+	/** Network Client */
 	public static NetworkHandler theNetwork;
+	/** Network Server */
 	public static MainServer server;
-
+	/** Language Handler for universal texts */
 	public static LanguageHandler lang = LanguageHandler.getInstance();
 
 	/**
@@ -216,6 +219,11 @@ public class Main extends JPanel implements Runnable  {
 					} else {
 						((GuiInGame) currentScreen).chatScreen = null;
 					}
+				} else {
+					if(currentScreen instanceof GuiDialogue) {
+						((GuiDialogue)currentScreen).npc.lock = false;
+						currentScreen = new GuiInGame();
+					}
 				}
 			}
 			lockEscapeToGame = true;
@@ -227,12 +235,9 @@ public class Main extends JPanel implements Runnable  {
 		}
 		if(thePlayer != null) {
 			thePlayer.updateScreenPos();
-			if(currentScreen instanceof GuiInGame) {
-				thePlayer.tick();
-				if(currentLevel != null) {
-					currentLevel.tick();
-				}
-				
+			thePlayer.tick();
+			if(currentLevel != null) {
+				currentLevel.tick();
 			}
 		}
 

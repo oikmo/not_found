@@ -5,6 +5,8 @@ import net.maniaticdevs.engine.level.Level;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
 import net.maniaticdevs.engine.objects.PickableObject;
+import net.maniaticdevs.engine.util.math.Vector2;
+import net.maniaticdevs.main.entity.Test;
 
 /**
  * Sample level using {@link Level}
@@ -23,7 +25,7 @@ public class SampleLevel extends Level {
 		Key key1 = new Key("Room Key",Settings.tileSize*1,Settings.tileSize*1);
 		this.objects.add(new PickableObject(key1,Settings.tileSize*1,Settings.tileSize*1));
 		this.objects.add(new Door(key1, true, Settings.tileSize*24,Settings.tileSize*12));
-	
+		this.entities.add(new Test(new Vector2(Settings.tileSize*5, Settings.tileSize)));
 	}
 
 }

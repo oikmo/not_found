@@ -10,7 +10,7 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
 
 /**
- * Sound class! Plays WAVs D:<
+ * Sound class! Plays WAVs D:
  * @author Oikmo
  */
 public class Sound {

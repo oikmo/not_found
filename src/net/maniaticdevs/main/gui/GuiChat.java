@@ -15,15 +15,22 @@ import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.engine.util.Input.InputType;
 import net.maniaticdevs.main.Main;
 
+/**
+ * For send messages to others! (or yourself...)
+ * @author Oikmo
+ */
 public class GuiChat extends GuiScreen {
 	
 	/** Transparent Black **/
 	private Color transBlack = new Color(0,0,0, 210);
-	
+	/** Used to store all messages recieved as to sort and process */
 	public static List<String> originalMessages = new ArrayList<>();
+	/** Processed messages from {@link #recompileMessages()} */
 	private List<String> messages;
+	/** Reversed {@link #messages} from {@link #recompileMessages()} */
 	private List<String> sortedMessages = new ArrayList<>();
 	
+	/** Constructor */
 	public GuiChat() {
 		recompileMessages();
 	}
@@ -79,7 +86,7 @@ public class GuiChat extends GuiScreen {
 		if(Input.isKeyDownExplicit(Input.KEY_ENTER) && !input.isEmpty()) {
 			originalMessages.add("<"+Main.playerName+"> " + Input.getTextInput());
 			recompileMessages();
-			new ChatMessage(Main.thePlayer.messages, Input.getTextInput(), false);
+			new ChatMessage(Main.thePlayer.messages, Input.getTextInput());
 			if(Main.theNetwork != null) {
 				PacketChatMessage packet = new PacketChatMessage();
 				packet.id = Main.theNetwork.client.getID();
@@ -91,6 +98,9 @@ public class GuiChat extends GuiScreen {
 		}
 	}
 	
+	/**
+	 * Rebuilds visual messages from {@link #originalMessages} and uses {@link #messages} for processing and {@link #sortedMessages} for the final visual chats
+	 */
 	public void recompileMessages() {
 		messages = new ArrayList<>(originalMessages);
 		
@@ -125,6 +135,12 @@ public class GuiChat extends GuiScreen {
 		}
 	}
 	
+	/**
+	 * Partitions string to specific size
+	 * @param string String to partition
+	 * @param partitionSize Size of each partition
+	 * @return {@link List} {@link String}
+	 */
 	private List<String> getParts(String string, int partitionSize) {
         List<String> parts = new ArrayList<String>();
         int len = string.length();

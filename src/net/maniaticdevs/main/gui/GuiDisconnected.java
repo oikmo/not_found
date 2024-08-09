@@ -20,9 +20,15 @@ public class GuiDisconnected extends GuiScreen {
 
 	/** Prevent action being done on the same frame as the last one to enter */
 	private int tickDelay = 30;
-
+	
+	/** Message to show to player */
 	private String fullMessage;
 	
+	/**
+	 * Constructor, used for building the {@link #fullMessage}
+	 * @param kick <code>"Disconnected: "</code> if false,  <code>"Kicked: "</code> if true.
+	 * @param message Message for disconnect
+	 */
 	public GuiDisconnected(boolean kick, String message) {
 		if(!kick) {
 			fullMessage = "Disconnected: " + message;
@@ -50,14 +56,14 @@ public class GuiDisconnected extends GuiScreen {
 	}
 
 	public void draw(Graphics2D g2) {
-		drawPlayMenuScreen(g2);
+		drawDisconnectedScreen(g2);
 	}
 	
 	/**
-	 * Draws the title screen
+	 * Draws the disconnected screen
 	 * @param g2 Graphics
 	 */
-	public void drawPlayMenuScreen(Graphics2D g2) {
+	public void drawDisconnectedScreen(Graphics2D g2) {
 		g2.setColor(Color.black);
 		g2.fillRect(0, 0, Main.getInstance().getWidth(), Main.getInstance().getHeight());
 

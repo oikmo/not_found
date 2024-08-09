@@ -7,6 +7,7 @@ import java.util.List;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
+import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.level.MapLoader.LevelData;
 import net.maniaticdevs.engine.network.packet.PacketRemoveObject;
 import net.maniaticdevs.engine.objects.OBJ;
@@ -41,6 +42,7 @@ public class Level {
 	 * @param name Name of level
 	 * @param width Width of level
 	 * @param height Height of level
+	 * @param dontLoad For network reasons, this exists. If true then {@link #loadEverything()} is not called.
 	 */
 	public Level(String internalName, String name, int width, int height, boolean dontLoad) {
 		this.name = name;
@@ -76,10 +78,11 @@ public class Level {
 				obj.draw(g2, position, screenPosition);
 			}
 			
-			if(entities.size() != 0) {
-				for(Entity e : entities) {
-					e.draw(g2);
+			for(Entity e : entities) {
+				if(e instanceof NPC) {
+					((NPC)e).update(position, screenPosition);
 				}
+				e.draw(g2);
 			}
 		} catch(Exception e) {
 			System.err.println("[LEVEL] I am infact shitting myself");
@@ -94,14 +97,16 @@ public class Level {
 				obj.tick();
 			}
 			
-			if(entities.size() != 0) {
-				for(Entity e : entities) {
-					e.tick();
-				}
+			for(Entity e : entities) {
+				e.tick();
 			}
 		} catch(java.util.ConcurrentModificationException e) {}
 	}
 	
+	/**
+	 * Removes {@link OBJ} from {@link #objects} network edition
+	 * @param obj Object to be removed
+	 */
 	public void removeObject(OBJ obj) {
 		if(Main.theNetwork != null) {
 			PacketRemoveObject packet = new PacketRemoveObject();
@@ -112,6 +117,10 @@ public class Level {
 		removeObjectNoNet(obj);
 	}
 	
+	/**
+	 * To not cause stackoverflow on the network
+	 * @param obj Object to be removed
+	 */
 	public void removeObjectNoNet(OBJ obj) {
 		objects.remove(obj);
 	}
@@ -164,12 +173,19 @@ public class Level {
 		return objects;
 	}
 	
+	/**
+	 * Adds {@link OBJ} to {@link #objects}
+	 * @param obj Object to be added
+	 */
 	public void addObject(OBJ obj) {
 		objects.add(obj);
 	}
-
+	
+	/**
+	 * Returns the entities in memory
+	 * @return {@link List} {@link Entity}
+	 */
 	public List<Entity> getEntities() {
 		return entities;
 	}
-	
 }

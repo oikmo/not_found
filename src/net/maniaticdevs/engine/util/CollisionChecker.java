@@ -226,7 +226,7 @@ public class CollisionChecker {
 		return interactedEntity;
 	}
 	
-	/** Checks to see if entity is colliding with another player from {@link NetworkHandler}<br>
+	/** Checks to see if entity is colliding with another player from NetworkHandler<br>
 	 * If entity is player, then the collided player will be returned.
 	 * 
 	 * @param entity subject to collision testing
@@ -301,6 +301,7 @@ public class CollisionChecker {
 	
 	/**
 	 * Check if contact is made with object
+	 * @param entity Entity subject to collision
 	 * @return {@link OBJ}
 	 */
 	public static OBJ checkIfTouchingObj(Entity entity) {

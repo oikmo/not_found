@@ -57,20 +57,23 @@ public class Input implements KeyListener {
 	 *<pre>public static final int KEY_T</pre> */
 	public static final int KEY_T = KeyEvent.VK_T;
 	
-	public static int lastFuckingKey = -1;
-	
+	/** To limit the input text */
 	public static int lengthInput = 15;
-	
+	/** As to sort what type of input we are looking for */
 	public static enum InputType {
+		/** no spaces, only letters and numbers */
 		Username,
+		/** Same as username but instead has periods */
 		IP,
+		/** Any possible character... {@link #isValidCharacter(char)} */
 		Chat
 	}
-	
+	/** {@link InputType} */
 	public static InputType inputType = InputType.Username;
+	/** To enable text input */
 	public static boolean needsInput = false;
+	/** The actual text input */
 	private static String inputFull = "";
-	
 	
 	/**
 	 * Adds defined Keys to keyMap.
@@ -118,18 +121,14 @@ public class Input implements KeyListener {
 				}
 			}	
 		}
-		
-		lastFuckingKey = code;
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		
 		int code = e.getKeyCode();
 		if(keyMap.get(code) != null) {
 			keyMap.replace(code, false);
-		}
-		
+		}	
 	}
 	
 	@Override
@@ -156,19 +155,27 @@ public class Input implements KeyListener {
 		return key;
 	}
 	
-	public static int getLastKeyPressed() {
-		return lastFuckingKey;
-	}
-
+	/**
+	 * Returns {@link #inputFull}
+	 * @return {@link #inputFull}
+	 */
 	public static String getTextInput() {
 		return inputFull;
 	}
-
+	
+	/**
+	 * Clears and disables input
+	 */
 	public static void clearInput() {
 		inputFull = "";
 		needsInput = false;
 	}
 	
+	/**
+	 * Any fucking character in existence.
+	 * @param c Character to check for
+	 * @return {@link Boolean}
+	 */
 	private boolean isValidCharacter(char c) {
 		return " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'abcdefghijklmnopqrstuvwxyz{|}~\u2302\307\374\351\342\344\340\345\347\352\353\350\357\356\354\304\305\311\346\306\364\366\362\373\371\377\326\334\370\243\330\327\u0192\341\355\363\372\361\321\252\272\277\256\254\275\274\241\253\273".indexOf(c) >= 0;
 	}

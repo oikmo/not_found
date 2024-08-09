@@ -17,7 +17,9 @@ public class GuiStatsScreen extends GuiScreen {
 	/** Inventory slot column position */
 	public int slotRow = 0;
 	
+	/** Sprite counter */
 	private int spriteCounter;
+	/** Sprite frame */
 	private int spriteNum;
 
 	public void tick() {

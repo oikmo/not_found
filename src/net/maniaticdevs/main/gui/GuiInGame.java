@@ -16,13 +16,14 @@ import net.maniaticdevs.main.Main;
  */
 public class GuiInGame extends GuiScreen {
 	
+	/** Chat screen to show during game */
 	public GuiChat chatScreen;
 	
 	/**
 	 * Heart sprites. Loaded statically as to not reload the same image over and over again.
 	 */
 	private static BufferedImage[] sprites = ImageUtils.setupSheet("player/heartSheet", 3, 1);
-	
+	/** Pick up alerts */
 	public static String message = null;
 	
 	public void draw(Graphics2D g2) {

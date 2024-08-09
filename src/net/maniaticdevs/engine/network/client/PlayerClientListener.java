@@ -169,7 +169,7 @@ public class PlayerClientListener extends Listener {
 			GuiChat.originalMessages.add("<"+Main.theNetwork.players.get(packet.id).userName+"> "+packet.message);
 			
 			if(Main.theNetwork.players.get(packet.id) != null) {
-				new ChatMessage(Main.theNetwork.players.get(packet.id).messages, packet.message, false);
+				new ChatMessage(Main.theNetwork.players.get(packet.id).messages, packet.message);
 			}
 			
 			if(!packet.message.startsWith(" [SERVER]")) {

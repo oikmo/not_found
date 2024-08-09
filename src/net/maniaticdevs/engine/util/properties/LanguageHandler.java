@@ -6,11 +6,21 @@ import java.util.Properties;
 
 import net.maniaticdevs.main.Main;
 
+/**
+ * Universal language handler. Incase I get bored.
+ * @author Oikmo
+ */
 public class LanguageHandler {
+	/** Instance :D */
 	private static LanguageHandler instance = new LanguageHandler();
+	/** Where all keys and values are stored */
 	private Properties properties = new Properties();
+	/** Where to load?? <code>"/en_GB.lang"</code>*/
 	private InputStream filePath;
 	
+	/**
+	 * Loads  <code>"/en_GB.lang"</code> into {@link #properties}
+	 */
 	protected LanguageHandler() {
 		try {
 			this.filePath = Main.class.getResourceAsStream("/en_GB.lang");
@@ -20,20 +30,20 @@ public class LanguageHandler {
 		}
 	}
 	
+	/** 
+	 * Returns active instance :D 
+	 * @return {@link #instance} 
+	 */
 	public static LanguageHandler getInstance() {
 		return instance;
 	}
 	
+	/**
+	 * Returns value from key
+	 * @param key To get value from
+	 * @return Value
+	 */
 	public String translateKey(String key) {
 		return this.properties.getProperty(key, key);
-	}
-	
-	public String translateKeyFormat(String key, Object toFormat) {
-		String property = this.properties.getProperty(key, key);
-		return String.format(property, toFormat);
-	}
-
-	public String translateNamedKey(String key) {
-		return this.properties.getProperty(key + ".name", "");
 	}
 }

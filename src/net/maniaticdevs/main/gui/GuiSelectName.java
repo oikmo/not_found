@@ -26,7 +26,7 @@ public class GuiSelectName extends GuiScreen {
 	private boolean lockDown = false;
 	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockEnter = false;
-	
+	/** To prevent action to be done repeatedly in a short period of time for {@link Input}*/
 	private boolean hasSet = false;
 
 	/** Hovering option */

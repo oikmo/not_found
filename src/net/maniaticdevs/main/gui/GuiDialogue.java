@@ -7,6 +7,7 @@ import java.util.List;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.gui.GuiScreen;
+import net.maniaticdevs.engine.network.packet.PacketNPCLock;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
@@ -38,7 +39,14 @@ public class GuiDialogue extends GuiScreen {
 	public GuiDialogue(List<String> dialogue, NPC npc) {
 		this.dialogues = dialogue;
 		this.npc = npc;
-		this.npc.lock = true;
+		if(Main.theNetwork != null) {
+			PacketNPCLock packet = new PacketNPCLock();
+			packet.networkID = npc.networkID;
+			packet.lock = true;
+			Main.theNetwork.client.sendTCP(packet);
+		} else {
+			this.npc.lock = true;
+		}
 	}
 	
 	public void draw(Graphics2D g2) {
@@ -56,7 +64,7 @@ public class GuiDialogue extends GuiScreen {
 				char[] diaChars = dialogue.toCharArray();
 				
 				ticks++;
-				if(ticks % 3 == 0 && charIndex < diaChars.length) {
+				if(ticks % 1 == 0 && charIndex < diaChars.length) {
 					combinedText += diaChars[charIndex];
 					charIndex++;
 				}
@@ -71,6 +79,14 @@ public class GuiDialogue extends GuiScreen {
 			} else {
 				if(dialogueIndex >= dialogues.size()) {
 					Main.currentScreen = new GuiInGame();
+					if(Main.theNetwork != null) {
+						PacketNPCLock packet = new PacketNPCLock();
+						packet.networkID = npc.networkID;
+						packet.lock = false;
+						Main.theNetwork.client.sendTCP(packet);
+					} else {
+						this.npc.lock = false;
+					}
 				}
 			}
 		}

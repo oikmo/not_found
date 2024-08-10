@@ -1,8 +1,8 @@
 package net.maniaticdevs.engine.network.packet;
 
-public class PacketUpdateY {
+public class PacketEntityUpdateY {
 
-	public int id;
+	public String networkID;
 	public int y;
 	
 }

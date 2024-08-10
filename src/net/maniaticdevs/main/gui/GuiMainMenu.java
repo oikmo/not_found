@@ -31,6 +31,10 @@ public class GuiMainMenu extends GuiScreen {
 	private int tickDelay = 60;
 
 	public void tick() {
+		if(GuiChat.originalMessages.size() != 0) {
+			GuiChat.originalMessages.clear();
+		}
+		
 		if(tickDelay != 0) { 
 			tickDelay--;
 		}
@@ -74,6 +78,8 @@ public class GuiMainMenu extends GuiScreen {
 					} else {
 						Main.currentScreen = new GuiSelectName();
 					}
+					
+					//Main.currentScreen = new GuiSelectName();
 					break;
 				case 2:
 					System.exit(0);

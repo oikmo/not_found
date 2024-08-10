@@ -16,6 +16,7 @@ import net.maniaticdevs.engine.level.Level;
 import net.maniaticdevs.engine.level.MapLoader;
 import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.network.client.NetworkHandler;
+import net.maniaticdevs.engine.network.packet.PacketNPCLock;
 import net.maniaticdevs.engine.network.server.MainServer;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.engine.util.os.EnumOS;
@@ -221,7 +222,14 @@ public class Main extends JPanel implements Runnable  {
 					}
 				} else {
 					if(currentScreen instanceof GuiDialogue) {
-						((GuiDialogue)currentScreen).npc.lock = false;
+						if(Main.theNetwork != null) {
+							PacketNPCLock packet = new PacketNPCLock();
+							packet.networkID = ((GuiDialogue)currentScreen).npc.networkID;
+							packet.lock = false;
+							Main.theNetwork.client.sendTCP(packet);
+						} else {
+							((GuiDialogue)currentScreen).npc.lock = false;
+						}
 						currentScreen = new GuiInGame();
 					}
 				}
@@ -233,20 +241,21 @@ public class Main extends JPanel implements Runnable  {
 		if(currentScreen != null) {
 			currentScreen.tick();
 		}
+		
+		if(Main.server != null) {
+			Main.server.tick();
+		}
+		
 		if(thePlayer != null) {
 			thePlayer.updateScreenPos();
 			thePlayer.tick();
 			if(currentLevel != null) {
-				currentLevel.tick();
+				currentLevel.tick(false);
 			}
 		}
 
 		if(theNetwork != null && thePlayer != null) { 
 			theNetwork.tick();
-		}
-		
-		if(theNetwork != null && thePlayer != null) { 
-			theNetwork.update();
 			try {
 				for(OtherPlayer p : Main.theNetwork.players.values()) {
 					p.tick();
@@ -262,28 +271,25 @@ public class Main extends JPanel implements Runnable  {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 
-		// Fast rendering
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
 		g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
 		g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 		g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-
-		if(thePlayer != null) {
+		
+		if(thePlayer != null) { 
 			if(currentLevel != null) {
 				currentLevel.draw(g2, thePlayer.getPosition(), thePlayer.getScreenPosition());
 			}
-			
-			//draw entities
 			thePlayer.draw(g2);
-		}
-
-		if(theNetwork != null && thePlayer != null) { 
-			theNetwork.update();
-			try {
-				for(OtherPlayer p : Main.theNetwork.players.values()) {
-					p.draw(g2, thePlayer.getPosition(), thePlayer.getScreenPosition());
-				}
-			} catch(Exception e) {}
+			
+			if(theNetwork != null) {
+				theNetwork.update();
+				try {
+					for(OtherPlayer p : Main.theNetwork.players.values()) {
+						p.draw(g2, thePlayer.getPosition(), thePlayer.getScreenPosition());
+					}
+				} catch(Exception e) {}
+			}
 		}
 
 		if(currentScreen != null) {

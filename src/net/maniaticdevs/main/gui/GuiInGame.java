@@ -1,5 +1,6 @@
 package net.maniaticdevs.main.gui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -25,6 +26,8 @@ public class GuiInGame extends GuiScreen {
 	private static BufferedImage[] sprites = ImageUtils.setupSheet("player/heartSheet", 3, 1);
 	/** Pick up alerts */
 	public static String message = null;
+	
+	private Color selectedColor = new Color(100,100,100, 200);
 	
 	public void draw(Graphics2D g2) {
 		
@@ -58,15 +61,29 @@ public class GuiInGame extends GuiScreen {
 			x += Settings.tileSize;
 		}
 		
+		int rectX = Main.getInstance().getWidth()-(Settings.tileSize*3);
+		int rectY = (Settings.tileSize);
+		
+		g2.setColor(selectedColor);
+		g2.fillRect(rectX, rectY, Settings.tileSize*2, Settings.tileSize*2);
+		g2.setColor(Color.WHITE);
+		g2.setStroke(new BasicStroke(3));
+		g2.drawRect(rectX, rectY, (Settings.tileSize*2), (Settings.tileSize*2));
+		if(Main.thePlayer.holdingItem != null) {
+			g2.drawImage(Main.thePlayer.holdingItem.image, rectX, rectY, Settings.tileSize*2, Settings.tileSize*2, null);
+		}
+		
 		if(message != null) {
 			int frameHeight = Settings.tileSize;
 			int frameY = 10;
 			int textWidth = (int) g2.getFontMetrics(font).getStringBounds(message, g2).getWidth();
-			int frameX = (Main.getInstance().getWidth()/2)-(textWidth+Settings.tileSize)/2;
 			int frameWidth = textWidth+Settings.tileSize;
+			int frameX = (Main.getInstance().getWidth()/2)-(frameWidth/2);
 			
 			drawSubWindow(g2, frameX,frameY, frameWidth,frameHeight, 2);
-			this.drawStringCentered(g2, font, Color.WHITE, message, this.getXforCenteredText(g2, message, frameX), frameY+(int)(Settings.tileSize/1.25));
+			g2.setFont(font);
+			g2.setColor(Color.white);
+			g2.drawString(message,(Main.getInstance().getWidth()/2)-(textWidth/2), frameY+(int)(Settings.tileSize/1.5));
 		}
 	}
 

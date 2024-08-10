@@ -15,6 +15,7 @@ import net.maniaticdevs.engine.tile.Tile;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.entity.Player;
+import net.maniaticdevs.main.entity.Test;
 
 /**
  * Stores tile data, entities and name of map
@@ -78,12 +79,14 @@ public class Level {
 				obj.draw(g2, position, screenPosition);
 			}
 			
+			
 			for(Entity e : entities) {
 				if(e instanceof NPC) {
 					((NPC)e).update(position, screenPosition);
 				}
 				e.draw(g2);
 			}
+			
 		} catch(Exception e) {
 			System.err.println("[LEVEL] I am infact shitting myself");
 		}
@@ -91,14 +94,16 @@ public class Level {
 	}
 	
 	/** Logic function */
-	public void tick() {
+	public void tick(boolean server) {
 		try {
 			for(OBJ obj : objects) {
 				obj.tick();
 			}
 			
-			for(Entity e : entities) {
-				e.tick();
+			if(Main.theNetwork == null || server) {
+				for(Entity e : entities) {
+					e.tick();
+				}
 			}
 		} catch(java.util.ConcurrentModificationException e) {}
 	}
@@ -187,5 +192,9 @@ public class Level {
 	 */
 	public List<Entity> getEntities() {
 		return entities;
+	}
+
+	public void addEntity(Entity ent) {
+		entities.add(ent);
 	}
 }

@@ -7,19 +7,27 @@ import java.util.List;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
+import net.maniaticdevs.engine.entity.Entity;
+import net.maniaticdevs.engine.entity.EntityDirection;
 import net.maniaticdevs.engine.network.ChatMessage;
 import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.network.packet.LoginResponse;
+import net.maniaticdevs.engine.network.packet.PacketAddEntity;
 import net.maniaticdevs.engine.network.packet.PacketAddObject;
 import net.maniaticdevs.engine.network.packet.PacketAddPlayer;
 import net.maniaticdevs.engine.network.packet.PacketChatMessage;
+import net.maniaticdevs.engine.network.packet.PacketEntityUpdateX;
+import net.maniaticdevs.engine.network.packet.PacketEntityUpdateY;
 import net.maniaticdevs.engine.network.packet.PacketGameJoin;
+import net.maniaticdevs.engine.network.packet.PacketPlayerUpdateX;
+import net.maniaticdevs.engine.network.packet.PacketPlayerUpdateY;
+import net.maniaticdevs.engine.network.packet.PacketRemoveEntity;
 import net.maniaticdevs.engine.network.packet.PacketRemoveObject;
 import net.maniaticdevs.engine.network.packet.PacketRemovePlayer;
-import net.maniaticdevs.engine.network.packet.PacketUpdateAnimation;
-import net.maniaticdevs.engine.network.packet.PacketUpdateDirection;
-import net.maniaticdevs.engine.network.packet.PacketUpdateX;
-import net.maniaticdevs.engine.network.packet.PacketUpdateY;
+import net.maniaticdevs.engine.network.packet.PacketUpdateEntityAnimation;
+import net.maniaticdevs.engine.network.packet.PacketUpdateEntityDirection;
+import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAnimation;
+import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerDirection;
 import net.maniaticdevs.engine.network.packet.PacketUserName;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
@@ -27,8 +35,11 @@ import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.objects.PickableObject;
 import net.maniaticdevs.engine.util.Logger;
 import net.maniaticdevs.engine.util.Logger.LogLevel;
+import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
+import net.maniaticdevs.main.entity.Test;
 import net.maniaticdevs.main.gui.GuiChat;
+import net.maniaticdevs.main.gui.GuiDialogue;
 import net.maniaticdevs.main.gui.GuiInGame;
 import net.maniaticdevs.main.level.SampleLevel;
 
@@ -37,6 +48,7 @@ public class PlayerClientListener extends Listener {
 	public static List<OBJ> specialOBJs = new ArrayList<>();
 
 	private static List<OBJ> needsToBeAddedObjs = new ArrayList<>(); 
+	private static List<Entity> needsToBeAddedEntities = new ArrayList<>(); 
 
 	public void received(Connection connection, Object object) {
 		if(!Thread.currentThread().getName().contentEquals("PlayerClientListener Thread")) {
@@ -87,10 +99,12 @@ public class PlayerClientListener extends Listener {
 				if(Main.thePlayer != null) {
 					if(Main.theNetwork.players.get(packet.id) != null && Main.theNetwork.players.get(packet.id).userName != null) {
 						if(!Main.theNetwork.players.get(packet.id).userName.contentEquals(Main.theNetwork.player.userName)) {
-							/*Main.theNetwork.rawMessages.add(new ChatMessage(Main.theNetwork.players.get(packet.id).userName + " left the game", true));
-							if(Main.currentScreen instanceof GuiChat) {
-								((GuiChat)Main.currentScreen).updateMessages();
-							}*/
+							GuiChat.originalMessages.add(Main.theNetwork.players.get(packet.id).userName + " left the game");
+							if(Main.currentScreen instanceof GuiInGame) {
+								if(((GuiInGame)Main.currentScreen).chatScreen != null) {
+									((GuiInGame)Main.currentScreen).chatScreen.recompileMessages();
+								}
+							}
 						}
 					}
 				}
@@ -115,11 +129,15 @@ public class PlayerClientListener extends Listener {
 				if(Main.thePlayer != null) {
 					if(packet.userName != null) {
 						if(!Main.theNetwork.players.get(packet.id).userName.contentEquals(Main.theNetwork.player.userName)) {
-							//Main.theNetwork.rawMessages.add(new ChatMessage(packet.userName + " joined the game", true));
+							if(packet.firstJoin) {
+								GuiChat.originalMessages.add(packet.userName + " joined the game");
+								if(Main.currentScreen instanceof GuiInGame) {
+									if(((GuiInGame)Main.currentScreen).chatScreen != null) {
+										((GuiInGame)Main.currentScreen).chatScreen.recompileMessages();
+									}
+								}
+							}
 
-							/*if(Main.currentScreen instanceof GuiChat) {
-								((GuiChat)Main.currentScreen).updateMessages();
-							}*/
 							if(Main.theNetwork.players.get(packet.id).userName == null) {
 								Main.theNetwork.players.get(packet.id).userName =  packet.userName;
 							}
@@ -134,10 +152,14 @@ public class PlayerClientListener extends Listener {
 				if(Main.thePlayer != null) {
 					if(packet.userName != null) {
 						if(!Main.theNetwork.players.get(packet.id).userName.contentEquals(Main.theNetwork.player.userName)) {
-							/*Main.theNetwork.rawMessages.add(new ChatMessage(packet.userName + " joined the game", true));
-							if(Main.currentScreen instanceof GuiChat) {
-								((GuiChat)Main.currentScreen).updateMessages();
-							}*/
+							if(packet.firstJoin) {
+								GuiChat.originalMessages.add(packet.userName + " joined the game");
+								if(Main.currentScreen instanceof GuiInGame) {
+									if(((GuiInGame)Main.currentScreen).chatScreen != null) {
+										((GuiInGame)Main.currentScreen).chatScreen.recompileMessages();
+									}
+								}
+							}
 							if(Main.theNetwork.players.get(packet.id).userName == null) {
 								Main.theNetwork.players.get(packet.id).userName =  packet.userName;	
 							}
@@ -146,16 +168,16 @@ public class PlayerClientListener extends Listener {
 				}
 			}
 		}
-		else if(object instanceof PacketUpdateX){
-			PacketUpdateX packet = (PacketUpdateX) object;
+		else if(object instanceof PacketPlayerUpdateX){
+			PacketPlayerUpdateX packet = (PacketPlayerUpdateX) object;
 			if(Main.theNetwork.players.get(packet.id) != null) {
 				Main.theNetwork.players.get(packet.id).x = packet.x;
 			} else {
 				requestInfo(connection);
 			}
 		} 
-		else if(object instanceof PacketUpdateY){
-			PacketUpdateY packet = (PacketUpdateY) object;
+		else if(object instanceof PacketPlayerUpdateY){
+			PacketPlayerUpdateY packet = (PacketPlayerUpdateY) object;
 			if(Main.theNetwork.players.get(packet.id) != null) {
 				Main.theNetwork.players.get(packet.id).y = packet.y;
 			} else {
@@ -186,10 +208,15 @@ public class PlayerClientListener extends Listener {
 				}
 			}
 		}
-		else if(object instanceof PacketUpdateAnimation) {
-			PacketUpdateAnimation packet = (PacketUpdateAnimation) object;
+		else if(object instanceof PacketUpdatePlayerAnimation) {
+			PacketUpdatePlayerAnimation packet = (PacketUpdatePlayerAnimation) object;
 			if(Main.theNetwork.players.get(packet.id) != null)
 				Main.theNetwork.players.get(packet.id).anim = packet.anim;
+		}
+		else if(object instanceof PacketUpdatePlayerDirection) {
+			PacketUpdatePlayerDirection packet = (PacketUpdatePlayerDirection) object;
+			if(Main.theNetwork.players.get(packet.id) != null)
+				Main.theNetwork.players.get(packet.id).direction = packet.dir;
 		}
 		else if(object instanceof PacketGameJoin) {
 			PacketGameJoin packet = (PacketGameJoin) object;
@@ -202,6 +229,11 @@ public class PlayerClientListener extends Listener {
 			for(int i = 0; i < needsToBeAddedObjs.size(); i++) {
 				Main.currentLevel.addObject(needsToBeAddedObjs.get(i));
 				needsToBeAddedObjs.remove(needsToBeAddedObjs.get(i));
+			}
+			
+			for(int i = 0; i < needsToBeAddedEntities.size(); i++) {
+				Main.currentLevel.addEntity(needsToBeAddedEntities.get(i));
+				needsToBeAddedEntities.remove(needsToBeAddedEntities.get(i));
 			}
 		}
 		else if(object instanceof PacketAddObject) {
@@ -234,15 +266,83 @@ public class PlayerClientListener extends Listener {
 				for(OBJ obj : Main.currentLevel.getObjects()) {
 					if(obj.networkID.contentEquals(packet.networkID)) {
 						Main.currentLevel.removeObjectNoNet(obj);
+						break;
 					}
 				}
 			} catch(Exception e) {}
-
 		}
-		else if(object instanceof PacketUpdateDirection) {
-			PacketUpdateDirection packet = (PacketUpdateDirection) object;
-			if(Main.theNetwork.players.get(packet.id) != null)
-				Main.theNetwork.players.get(packet.id).direction = packet.dir;
+		else if(object instanceof PacketAddEntity) {
+			PacketAddEntity packet = (PacketAddEntity) object;
+			switch(packet.entityClass) {
+			case "Test":
+				Test npc = new Test(new Vector2(packet.x, packet.y));
+				npc.setNetworkID(packet.networkID);
+				if(Main.currentLevel != null) {
+					Main.currentLevel.addEntity(npc);
+				} else {
+					needsToBeAddedEntities.add(npc);
+				}
+				break;
+			}
+		}
+		else if(object instanceof PacketRemoveEntity) {
+			PacketRemoveObject packet = (PacketRemoveObject) object;
+			try {
+				for(OBJ obj : Main.currentLevel.getObjects()) {
+					if(obj.networkID.contentEquals(packet.networkID)) {
+						Main.currentLevel.removeObjectNoNet(obj);
+						break;
+					}
+				}
+			} catch(Exception e) {}
+		}
+		else if(object instanceof PacketEntityUpdateX){
+			PacketEntityUpdateX packet = (PacketEntityUpdateX) object;
+			if(Main.currentLevel == null) {
+				return;
+			}
+			for(Entity ent : Main.currentLevel.getEntities()) {
+				if(ent.networkID.contentEquals(packet.networkID)) {
+					ent.getPosition().x = packet.x;
+					break;
+				}
+			}
+		} 
+		else if(object instanceof PacketEntityUpdateY){
+			PacketEntityUpdateY packet = (PacketEntityUpdateY) object;
+			if(Main.currentLevel == null) {
+				return;
+			}
+			for(Entity ent : Main.currentLevel.getEntities()) {
+				if(ent.networkID.contentEquals(packet.networkID)) {
+					ent.getPosition().y = packet.y;
+					break;
+				}
+			}
+		} 
+		else if(object instanceof PacketUpdateEntityAnimation) {
+			PacketUpdateEntityAnimation packet = (PacketUpdateEntityAnimation) object;
+			if(Main.currentLevel == null) {
+				return;
+			}
+			for(Entity ent : Main.currentLevel.getEntities()) {
+				if(ent.networkID.contentEquals(packet.networkID)) {
+					ent.spriteNum = packet.anim;
+					break;
+				}
+			}
+		}
+		else if(object instanceof PacketUpdateEntityDirection) {
+			PacketUpdateEntityDirection packet = (PacketUpdateEntityDirection) object;
+			if(Main.currentLevel == null) {
+				return;
+			}
+			for(Entity ent : Main.currentLevel.getEntities()) {
+				if(ent.networkID.contentEquals(packet.networkID)) {
+					ent.setDirection(EntityDirection.values()[packet.dir]);
+					break;
+				}
+			}
 		}
 	}
 

@@ -3,6 +3,7 @@ package net.maniaticdevs.engine.entity;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.UUID;
 
 import net.maniaticdevs.engine.util.math.Vector2;
 
@@ -11,6 +12,8 @@ import net.maniaticdevs.engine.util.math.Vector2;
  * @author Oikmo
  */
 public abstract class Entity {
+	
+	public String networkID = UUID.randomUUID().toString();
 	
 	/** Entity name for like easier tracking and nameplates */
 	public String name;
@@ -136,5 +139,13 @@ public abstract class Entity {
 	 */
 	public int getSpeed() {
 		return speed;
+	}
+	
+	public void setNetworkID(String ID) {
+		this.networkID = ID;
+	}
+
+	public void setDirection(EntityDirection entityDirection) {
+		this.direction = entityDirection;
 	}
 }

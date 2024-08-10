@@ -101,7 +101,7 @@ public class Player extends Entity {
 		}
 
 		direction = EntityDirection.IDLE;
-		if((Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) || Main.currentScreen instanceof GuiDialogue) {
+		if((Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) && ((GuiInGame)Main.currentScreen).chatScreen == null) {
 			if(Input.needsInput) {
 				Input.clearInput();
 			}
@@ -116,7 +116,7 @@ public class Player extends Entity {
 				direction = EntityDirection.WEST;
 			}
 		}
-
+		
 		if(Input.isKeyDown(Input.KEY_MINUS)) {
 			if(!lockTakeLife) {
 				health--;
@@ -157,7 +157,9 @@ public class Player extends Entity {
 				
 				if(ent != null) {
 					if(ent instanceof NPC) {
-						((NPC)ent).onInteract();
+						if(!((NPC)ent).lock) {
+							((NPC)ent).onInteract();
+						}
 					}
 				}
 				
@@ -239,7 +241,10 @@ public class Player extends Entity {
 		if(index+1 <= inventory.size()) {
 			holdingItem = inventory.get(index);
 		} else {
-			holdingItem = null;
+			if(holdingItem != null) {
+				Main.sfxLib.play(SoundSFXEnum.hit);
+				holdingItem = null;
+			}
 		}
 	}
 

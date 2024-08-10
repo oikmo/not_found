@@ -130,6 +130,9 @@ public class GuiChat extends GuiScreen {
 			if(sortedMessages.get(i).startsWith("<")) {
 				break;
 			} else {
+				if(!sortedMessages.get(i).contains(" left the game")) {
+					break;
+				}
 				sortedMessages.remove(i);
 			}
 		}

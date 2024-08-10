@@ -1,8 +1,6 @@
 package net.maniaticdevs.engine.network.packet;
 
-public class PacketUpdateAnimation {
-
+public class PacketRemoveEntity {
 	public int id;
-	public int anim;
-	
+	public String networkID;
 }

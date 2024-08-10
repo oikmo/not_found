@@ -13,17 +13,24 @@ import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.network.packet.LoginRequest;
 import net.maniaticdevs.engine.network.packet.LoginResponse;
 import net.maniaticdevs.engine.network.packet.Message;
+import net.maniaticdevs.engine.network.packet.PacketAddEntity;
 import net.maniaticdevs.engine.network.packet.PacketAddObject;
 import net.maniaticdevs.engine.network.packet.PacketAddPlayer;
 import net.maniaticdevs.engine.network.packet.PacketChatMessage;
+import net.maniaticdevs.engine.network.packet.PacketEntityUpdateX;
+import net.maniaticdevs.engine.network.packet.PacketEntityUpdateY;
 import net.maniaticdevs.engine.network.packet.PacketGameJoin;
+import net.maniaticdevs.engine.network.packet.PacketNPCLock;
+import net.maniaticdevs.engine.network.packet.PacketPlayerUpdateX;
+import net.maniaticdevs.engine.network.packet.PacketPlayerUpdateY;
+import net.maniaticdevs.engine.network.packet.PacketRemoveEntity;
 import net.maniaticdevs.engine.network.packet.PacketRemoveObject;
 import net.maniaticdevs.engine.network.packet.PacketRemovePlayer;
 import net.maniaticdevs.engine.network.packet.PacketSavePlayerPosition;
-import net.maniaticdevs.engine.network.packet.PacketUpdateAnimation;
-import net.maniaticdevs.engine.network.packet.PacketUpdateDirection;
-import net.maniaticdevs.engine.network.packet.PacketUpdateX;
-import net.maniaticdevs.engine.network.packet.PacketUpdateY;
+import net.maniaticdevs.engine.network.packet.PacketUpdateEntityAnimation;
+import net.maniaticdevs.engine.network.packet.PacketUpdateEntityDirection;
+import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAnimation;
+import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerDirection;
 import net.maniaticdevs.engine.network.packet.PacketUserName;
 import net.maniaticdevs.engine.network.packet.RandomNumber;
 import net.maniaticdevs.engine.util.Logger;
@@ -53,25 +60,6 @@ public class NetworkHandler {
 	
 	public boolean stopUpdating = false;
 	
-	private static void registerKryoClasses() {
-		kryo.register(LoginRequest.class);
-		kryo.register(LoginResponse.class);
-		kryo.register(Message.class);
-		kryo.register(PacketAddPlayer.class);
-		kryo.register(PacketChatMessage.class);
-		kryo.register(PacketRemovePlayer.class);
-		kryo.register(PacketSavePlayerPosition.class);
-		kryo.register(PacketUpdateX.class);
-		kryo.register(PacketUpdateY.class);
-		kryo.register(PacketUserName.class);
-		kryo.register(PacketUpdateAnimation.class);
-		kryo.register(PacketUpdateDirection.class);
-		kryo.register(PacketAddObject.class);
-		kryo.register(PacketRemoveObject.class);
-		kryo.register(PacketGameJoin.class);
-		kryo.register(RandomNumber.class);
-	}
-	
 	public NetworkHandler(String ipAddress) throws Exception {
 		this.ip = ipAddress;
 		players = new HashMap<Integer, OtherPlayer>();
@@ -83,30 +71,38 @@ public class NetworkHandler {
 		connect(ip);
 	}
 	
-	public static void testNetwork(String ipAddress) throws Exception {
-		String ip = ipAddress;
-		int port = 25565;
-		int timeout = 500000;
-		Client client = new Client();
-		kryo = client.getKryo();
-		registerKryoClasses();
-		
-		Logger.log(LogLevel.INFO, "Test connecting...");
-		client.start();
-		client.connect(timeout, ip, port, port);
-		Logger.log(LogLevel.INFO, "Test connected!");
-		Logger.log(LogLevel.INFO, "Test disconnecting...");
-		client.stop();
-		Logger.log(LogLevel.INFO, "Test disconnected.");
+	private void registerKryoClasses() {
+		kryo.register(LoginRequest.class);
+		kryo.register(LoginResponse.class);
+		kryo.register(Message.class);
+		kryo.register(PacketAddPlayer.class);
+		kryo.register(PacketChatMessage.class);
+		kryo.register(PacketRemovePlayer.class);
+		kryo.register(PacketSavePlayerPosition.class);
+		kryo.register(PacketPlayerUpdateX.class);
+		kryo.register(PacketPlayerUpdateY.class);
+		kryo.register(PacketUserName.class);
+		kryo.register(PacketUpdatePlayerAnimation.class);
+		kryo.register(PacketUpdatePlayerDirection.class);
+		kryo.register(PacketAddObject.class);
+		kryo.register(PacketRemoveObject.class);
+		kryo.register(PacketGameJoin.class);
+		kryo.register(PacketAddEntity.class);
+		kryo.register(PacketRemoveEntity.class);
+		kryo.register(PacketUpdateEntityAnimation.class);
+		kryo.register(PacketUpdateEntityDirection.class);
+		kryo.register(PacketEntityUpdateX.class);
+		kryo.register(PacketEntityUpdateY.class);
+		kryo.register(PacketNPCLock.class);
+		kryo.register(RandomNumber.class);
 	}
 	
 	public void tick() {
-		
 		int lastAnimTick = player.anim;
 		player.anim = Main.thePlayer.spriteNum;
 		
 		if(lastAnimTick != player.anim) {
-			PacketUpdateAnimation packet = new PacketUpdateAnimation();
+			PacketUpdatePlayerAnimation packet = new PacketUpdatePlayerAnimation();
 			packet.anim = player.anim;
 			client.sendUDP(packet);
 		}
@@ -115,7 +111,7 @@ public class NetworkHandler {
 		player.direction = Main.thePlayer.getDirection().ordinal();
 		
 		if(lastDirection != player.direction) {
-			PacketUpdateDirection packet = new PacketUpdateDirection();
+			PacketUpdatePlayerDirection packet = new PacketUpdatePlayerDirection();
 			packet.dir = player.direction;
 			client.sendUDP(packet);
 		}
@@ -126,13 +122,12 @@ public class NetworkHandler {
 			tickTimer = 0;
 			Vector2 pos = Main.thePlayer.getPosition();
 			player.updatePosition(pos.x, pos.y);
-			PacketUpdateX packetX = new PacketUpdateX();
+			PacketPlayerUpdateX packetX = new PacketPlayerUpdateX();
 			packetX.x = player.x;
 			client.sendUDP(packetX);
-			PacketUpdateY packetY = new PacketUpdateY();
+			PacketPlayerUpdateY packetY = new PacketPlayerUpdateY();
 			packetY.y = player.y;
 			client.sendUDP(packetY);
-			
 		}
 	}
 	
@@ -166,13 +161,13 @@ public class NetworkHandler {
 		player.updatePosition(pos.x, pos.y);
 		
 		if(x != player.x) {
-			PacketUpdateX packetX = new PacketUpdateX();
+			PacketPlayerUpdateX packetX = new PacketPlayerUpdateX();
 			packetX.x = player.x;
 			client.sendUDP(packetX);
 		}
 		
 		if(y != player.y) {	
-			PacketUpdateY packetY = new PacketUpdateY();
+			PacketPlayerUpdateY packetY = new PacketPlayerUpdateY();
 			packetY.y = player.y;
 			client.sendUDP(packetY);
 		}

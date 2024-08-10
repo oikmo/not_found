@@ -1,7 +1,6 @@
 package net.maniaticdevs.main.entity;
 
 import java.io.IOException;
-import java.util.List;
 
 import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.util.ImageUtils;

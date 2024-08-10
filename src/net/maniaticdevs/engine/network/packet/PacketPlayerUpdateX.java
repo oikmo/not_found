@@ -1,6 +1,6 @@
 package net.maniaticdevs.engine.network.packet;
 
-public class PacketUpdateX {
+public class PacketPlayerUpdateX {
 	
 	public int id;
 	public int x;

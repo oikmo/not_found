@@ -76,13 +76,15 @@ public class OtherPlayer {
 				String msg = chatmessage.getMessage().trim().replace("\n", ""); 
 
 				int width = (int)g2.getFontMetrics().getStringBounds(msg, g2).getWidth();
+				int bubbleWidth = width+15;
+				int x = screenX+(hitBox.x/2)+15;
 				g2.setColor(Color.WHITE);
-				g2.fillRoundRect((screenX), (int) (screenY-height*2.5f)-offsetY, width+15, height+15, 15, 15);
+				g2.fillRoundRect((x)-(bubbleWidth/2), (int) (screenY-height*2.5f)-offsetY, bubbleWidth, height+15, 15, 15);
 				g2.setColor(Color.BLACK);
 				g2.setStroke(new BasicStroke(3));
-				g2.drawRoundRect((screenX), (int) (screenY-height*2.5f)-offsetY, width+15, height+15, 5, 5);
+				g2.drawRoundRect((x)-(bubbleWidth/2), (int) (screenY-height*2.5f)-offsetY, bubbleWidth, height+15, 5, 5);
 				g2.setColor(Color.BLACK);
-				g2.drawString(msg, (screenX+(15/2)), screenY-height-(offsetY));
+				g2.drawString(msg, (x-((bubbleWidth)/2)+(15/2)), screenY-height-(offsetY));
 				offsetY += change;
 			}
 		}

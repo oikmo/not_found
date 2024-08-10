@@ -2,7 +2,12 @@ package net.maniaticdevs.main.gui;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
+import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.network.OtherPlayer;
@@ -19,7 +24,9 @@ public class GuiPauseScreen extends GuiScreen {
 	
 	/** Sub {@link GuiScreen} to be rendered */
 	private GuiScreen subScreen;
-
+	
+	private BufferedImage potato;
+	
 	/** To prevent action to be done repeatedly in a short period of time */
 	private boolean lockUp = false;
 	/** To prevent action to be done repeatedly in a short period of time */
@@ -37,6 +44,14 @@ public class GuiPauseScreen extends GuiScreen {
 	/** Prevent action being done on the same frame as the last one to enter */
 	private int tickDelay = 5;
 
+	public GuiPauseScreen() {
+		try {
+			potato = ImageIO.read(ResourceLoader.class.getResourceAsStream("/textures/object/thinking-potato.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void tick() {
 		if(tickDelay != 0) { 
 			tickDelay--;
@@ -205,8 +220,8 @@ public class GuiPauseScreen extends GuiScreen {
 		textY += lineHeight;
 
 		g2.drawString("*", textXStart, textYStart+(optionSelection*lineHeight));
-
-		//g2.drawImage(Main.thePlayer.currentWeapon.image, tailX - Settings.tileSize, textY-14, null);
+		int tailX = (frameX + frameWidth) - 30;
+		g2.drawImage(potato, (int) (tailX-potato.getWidth()-Settings.tileSize/1.5), (int) (frameY+frameHeight-potato.getHeight()-Settings.tileSize*1.5), Settings.tileSize*3, Settings.tileSize*3, null);
 		//textY += gp.tileSize;
 		//g2.drawImage(Main.thePlayer.currentShield.image, tailX - Settings.tileSize, textY-14, null);
 	}

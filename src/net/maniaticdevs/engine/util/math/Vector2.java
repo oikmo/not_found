@@ -31,6 +31,11 @@ public class Vector2 {
 		this.y = y;
 	}
 	
+	public Vector2(Vector2 position) {
+		this.x = position.x;
+		this.y = position.y;
+	}
+
 	/**
 	 * Offsets from currently set values
 	 * @param x amount of X to change

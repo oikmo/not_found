@@ -6,24 +6,31 @@ import java.util.Map;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
+import net.maniaticdevs.engine.entity.Entity;
+import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.network.packet.LoginRequest;
 import net.maniaticdevs.engine.network.packet.LoginResponse;
+import net.maniaticdevs.engine.network.packet.PacketAddEntity;
 import net.maniaticdevs.engine.network.packet.PacketAddObject;
 import net.maniaticdevs.engine.network.packet.PacketAddPlayer;
 import net.maniaticdevs.engine.network.packet.PacketChatMessage;
 import net.maniaticdevs.engine.network.packet.PacketGameJoin;
+import net.maniaticdevs.engine.network.packet.PacketNPCLock;
+import net.maniaticdevs.engine.network.packet.PacketPlayerUpdateX;
+import net.maniaticdevs.engine.network.packet.PacketPlayerUpdateY;
 import net.maniaticdevs.engine.network.packet.PacketRemoveObject;
 import net.maniaticdevs.engine.network.packet.PacketRemovePlayer;
-import net.maniaticdevs.engine.network.packet.PacketUpdateAnimation;
-import net.maniaticdevs.engine.network.packet.PacketUpdateDirection;
-import net.maniaticdevs.engine.network.packet.PacketUpdateX;
-import net.maniaticdevs.engine.network.packet.PacketUpdateY;
+import net.maniaticdevs.engine.network.packet.PacketUpdateEntityAnimation;
+import net.maniaticdevs.engine.network.packet.PacketUpdateEntityDirection;
+import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAnimation;
+import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerDirection;
 import net.maniaticdevs.engine.network.packet.PacketUserName;
 import net.maniaticdevs.engine.network.packet.RandomNumber;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.objects.PickableObject;
+import net.maniaticdevs.main.Main;
 
 public class MainServerListener extends Listener {
 
@@ -63,7 +70,7 @@ public class MainServerListener extends Listener {
 		
 		MainServer.server.sendToAllUDP(removePacket);
 		if(username != null && !username.isEmpty()) {
-			MainServer.append(username + " left the server\n");
+			Main.server.append(username + " left the server");
 		}
 	}
 	
@@ -77,7 +84,7 @@ public class MainServerListener extends Listener {
 				response.setResponseText("ok");
 				connection.sendTCP(response);
 				
-				for(OtherPlayer p : players.values()) {
+				/*for(OtherPlayer p : players.values()) {
 					if(p.userName != null) {
 						if(p.userName.contentEquals(request.getUserName())) {
 							PacketRemovePlayer packetKick = new PacketRemovePlayer();
@@ -87,15 +94,16 @@ public class MainServerListener extends Listener {
 							MainServer.server.sendToAllTCP(packetKick);
 							players.remove(connection.getID());
 							
-							MainServer.append("Kicked " + packetKick.id + " from the server. (Already exists)\n");
+							Main.server.append("Kicked " + packetKick.id + " from the server. (Already exists)");
 							return;
 						}
 					}
 					
-				}
+				}*/
 				
 				PacketUserName packetUserName = new PacketUserName();
 				packetUserName.id = connection.getID();
+				packetUserName.firstJoin = true;
 				packetUserName.userName = request.getUserName();
 				
 				MainServer.server.sendToAllExceptUDP(connection.getID(), packetUserName);
@@ -106,7 +114,7 @@ public class MainServerListener extends Listener {
 				players.get(connection.getID()).userName = request.getUserName();
 				
 				if(request.getUserName() != null && !request.getUserName().isEmpty()) {
-					MainServer.append(request.getUserName() + " joined the server\n");
+					Main.server.append(request.getUserName() + " joined the server");
 				}
 				
 				PacketGameJoin packetGameJoin = new PacketGameJoin();
@@ -139,6 +147,15 @@ public class MainServerListener extends Listener {
 					connection.sendUDP(packetaddobj);
 				}
 				
+				for(Entity ent : MainServer.currentLevel.getEntities()) {
+					PacketAddEntity packetaddentity = new PacketAddEntity();
+					packetaddentity.networkID = ent.networkID;
+					packetaddentity.entityClass = ent.getClass().getSimpleName();
+					packetaddentity.x = ent.getPosition().x;
+					packetaddentity.y = ent.getPosition().y;
+					connection.sendUDP(packetaddentity);
+				}
+				
 				for (OtherPlayer p : players.values()) {
 					PacketUserName packetUserName2 = new PacketUserName();
 					if(p.c == null) {
@@ -147,15 +164,14 @@ public class MainServerListener extends Listener {
 					}
 					packetUserName2.id = p.c.getID();
 					packetUserName2.userName = p.userName;
-					System.out.println(p.userName + " " + p.c.getID());
-					// connection.sendTCP(packetUserName2);
+					packetUserName2.firstJoin = false;
 					connection.sendUDP(packetUserName2);
 				}
 			} else {
 				response.PROTOCOL = -1;
 				response.setResponseText("not ok!");
 				connection.sendTCP(response);
-				MainServer.append("Player \" "+ request.getUserName() + " \"  could not join\nas they had a protocol version of " + request.PROTOCOL +" whilst server is " + MainServer.NETWORK_PROTOCOL + "\n");
+				Main.server.append("Player \" "+ request.getUserName() + " \"  could not join\nas they had a protocol version of " + request.PROTOCOL +" whilst server is " + MainServer.NETWORK_PROTOCOL);
 			}
 			
 		}
@@ -165,32 +181,32 @@ public class MainServerListener extends Listener {
 		packetRandom.randomFloat = 0.254f;
 		MainServer.server.sendToTCP(connection.getID(),packetRandom);
 
-		if(object instanceof PacketUpdateX) {
-			PacketUpdateX packet = (PacketUpdateX) object;
+		if(object instanceof PacketPlayerUpdateX) {
+			PacketPlayerUpdateX packet = (PacketPlayerUpdateX) object;
 			if(players.get(connection.getID()) != null)
 				players.get(connection.getID()).x = packet.x;
 
 			packet.id = connection.getID();
 			MainServer.server.sendToAllExceptUDP(connection.getID(), packet);
 		}
-		else if(object instanceof PacketUpdateY) {
-			PacketUpdateY packet = (PacketUpdateY) object;
+		else if(object instanceof PacketPlayerUpdateY) {
+			PacketPlayerUpdateY packet = (PacketPlayerUpdateY) object;
 			if(players.get(connection.getID()) != null)
 				players.get(connection.getID()).y = packet.y;
 
 			packet.id = connection.getID();
 			MainServer.server.sendToAllExceptUDP(connection.getID(), packet);
 		}
-		else if(object instanceof PacketUpdateAnimation) {
-			PacketUpdateAnimation packet = (PacketUpdateAnimation) object;
+		else if(object instanceof PacketUpdatePlayerAnimation) {
+			PacketUpdatePlayerAnimation packet = (PacketUpdatePlayerAnimation) object;
 			if(players.get(connection.getID()) != null)
 				players.get(connection.getID()).anim = packet.anim;
 
 			packet.id = connection.getID();
 			MainServer.server.sendToAllExceptUDP(connection.getID(), packet);
 		}
-		else if(object instanceof PacketUpdateDirection) {
-			PacketUpdateDirection packet = (PacketUpdateDirection) object;
+		else if(object instanceof PacketUpdatePlayerDirection) {
+			PacketUpdatePlayerDirection packet = (PacketUpdatePlayerDirection) object;
 			if(players.get(connection.getID()) != null)
 				players.get(connection.getID()).direction = packet.dir;
 
@@ -200,13 +216,29 @@ public class MainServerListener extends Listener {
 		else if(object instanceof PacketChatMessage) {
 			PacketChatMessage packet = (PacketChatMessage) object;
 			packet.id = connection.getID();
-			MainServer.append(packet.message+"\n");
+			Main.server.append("Recieved message: " + packet.message);
 			MainServer.server.sendToAllExceptTCP(connection.getID(), packet);
 		}
 		else if(object instanceof PacketRemoveObject) {
 			PacketRemoveObject packet = (PacketRemoveObject) object;
 			packet.id = connection.getID();
 			MainServer.server.sendToAllExceptTCP(connection.getID(), packet);
+		}
+		else if(object instanceof PacketUpdateEntityAnimation) {
+			MainServer.server.sendToAllTCP((PacketUpdateEntityAnimation) object);
+		}
+		else if(object instanceof PacketUpdateEntityDirection) {
+			MainServer.server.sendToAllTCP((PacketUpdateEntityDirection) object);
+		}
+		else if(object instanceof PacketNPCLock) {
+			PacketNPCLock packet = (PacketNPCLock) object;
+			
+			for(Entity ent : MainServer.currentLevel.getEntities()) {
+				if(ent.networkID.contentEquals(packet.networkID)) {
+					((NPC)ent).lock = packet.lock;
+					break;
+				}
+			}
 		}
 	}
 }

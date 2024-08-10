@@ -12,17 +12,24 @@ import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.network.packet.LoginRequest;
 import net.maniaticdevs.engine.network.packet.LoginResponse;
 import net.maniaticdevs.engine.network.packet.Message;
+import net.maniaticdevs.engine.network.packet.PacketAddEntity;
 import net.maniaticdevs.engine.network.packet.PacketAddObject;
 import net.maniaticdevs.engine.network.packet.PacketAddPlayer;
 import net.maniaticdevs.engine.network.packet.PacketChatMessage;
+import net.maniaticdevs.engine.network.packet.PacketEntityUpdateX;
+import net.maniaticdevs.engine.network.packet.PacketEntityUpdateY;
 import net.maniaticdevs.engine.network.packet.PacketGameJoin;
+import net.maniaticdevs.engine.network.packet.PacketNPCLock;
+import net.maniaticdevs.engine.network.packet.PacketPlayerUpdateX;
+import net.maniaticdevs.engine.network.packet.PacketPlayerUpdateY;
+import net.maniaticdevs.engine.network.packet.PacketRemoveEntity;
 import net.maniaticdevs.engine.network.packet.PacketRemoveObject;
 import net.maniaticdevs.engine.network.packet.PacketRemovePlayer;
 import net.maniaticdevs.engine.network.packet.PacketSavePlayerPosition;
-import net.maniaticdevs.engine.network.packet.PacketUpdateAnimation;
-import net.maniaticdevs.engine.network.packet.PacketUpdateDirection;
-import net.maniaticdevs.engine.network.packet.PacketUpdateX;
-import net.maniaticdevs.engine.network.packet.PacketUpdateY;
+import net.maniaticdevs.engine.network.packet.PacketUpdateEntityAnimation;
+import net.maniaticdevs.engine.network.packet.PacketUpdateEntityDirection;
+import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAnimation;
+import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerDirection;
 import net.maniaticdevs.engine.network.packet.PacketUserName;
 import net.maniaticdevs.engine.network.packet.RandomNumber;
 import net.maniaticdevs.engine.util.Logger;
@@ -38,14 +45,9 @@ public class MainServer {
 	public static float randomFloatNumber;
 
 	static MainServerListener listener = new MainServerListener();
-	public static int xSpawn = 0,zSpawn = 0;
-
-	private static String[] splashes;
 
 	private static String version = "S1.0.0";
 	public static final int NETWORK_PROTOCOL = 1;
-
-	private static Thread saveThread;
 	
 	public static String map;
 	public static Level currentLevel;
@@ -61,15 +63,38 @@ public class MainServer {
 		}
 		append("----------------------------");
 		server = new Server();
-		splashes = new String[1];
-		splashes[0] = "fuck you";
 		//append(splashes[new Random().nextInt(splashes.length)]);
 		kryo = server.getKryo();
 		registerKryoClasses();
 		Random rand = new Random();
 		randomFloatNumber = rand.nextFloat();
 		startServer();
-		
+	}
+	
+	private void registerKryoClasses() {
+		kryo.register(LoginRequest.class);
+		kryo.register(LoginResponse.class);
+		kryo.register(Message.class);
+		kryo.register(PacketAddPlayer.class);
+		kryo.register(PacketChatMessage.class);
+		kryo.register(PacketRemovePlayer.class);
+		kryo.register(PacketSavePlayerPosition.class);
+		kryo.register(PacketPlayerUpdateX.class);
+		kryo.register(PacketPlayerUpdateY.class);
+		kryo.register(PacketUserName.class);
+		kryo.register(PacketUpdatePlayerAnimation.class);
+		kryo.register(PacketUpdatePlayerDirection.class);
+		kryo.register(PacketAddObject.class);
+		kryo.register(PacketRemoveObject.class);
+		kryo.register(PacketGameJoin.class);
+		kryo.register(PacketAddEntity.class);
+		kryo.register(PacketRemoveEntity.class);
+		kryo.register(PacketUpdateEntityAnimation.class);
+		kryo.register(PacketUpdateEntityDirection.class);
+		kryo.register(PacketEntityUpdateX.class);
+		kryo.register(PacketEntityUpdateY.class);
+		kryo.register(PacketNPCLock.class);
+		kryo.register(RandomNumber.class);
 	}
 
 	public void startServer() {
@@ -80,30 +105,17 @@ public class MainServer {
 			server.addListener(listener);
 			append("Server online! (PORT="+ tcpPort +")");
 			append("----------------------------");
-			saveThread = new Thread(new Runnable() {
-				public void run() {
-					while(true) {
-						try {
-							Thread.sleep(6000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				}
-			});
-			saveThread.setName("World Save Thread");
-			//saveThread.start();
-
 		} catch (IOException e) {
-			Logger.log(LogLevel.INFO,"Port already used");
 			append("Port already in use");
 			e.printStackTrace();
 		}
 	}
+	
+	public void tick() {
+		currentLevel.tick(true);
+	}
 
 	public void stopServer() {
-		Logger.log(LogLevel.INFO,"Server stopped");
 		append("Server stopped.");
 		PacketRemovePlayer packetDisconnect = new PacketRemovePlayer();
 		packetDisconnect.message = "Server closed";
@@ -111,31 +123,8 @@ public class MainServer {
 		server.stop();
 	}
 
-	private void registerKryoClasses() {
-		kryo.register(LoginRequest.class);
-		kryo.register(LoginResponse.class);
-		kryo.register(Message.class);
-		kryo.register(PacketAddPlayer.class);
-		kryo.register(PacketChatMessage.class);
-		kryo.register(PacketRemovePlayer.class);
-		kryo.register(PacketSavePlayerPosition.class);
-		kryo.register(PacketUpdateX.class);
-		kryo.register(PacketUpdateY.class);
-		kryo.register(PacketUserName.class);
-		kryo.register(PacketUpdateAnimation.class);
-		kryo.register(PacketUpdateDirection.class);
-		kryo.register(PacketAddObject.class);
-		kryo.register(PacketRemoveObject.class);
-		kryo.register(PacketGameJoin.class);
-		kryo.register(RandomNumber.class);
-	}
-
-	public static String getRandomSplash() {
-		return splashes[new Random().nextInt(splashes.length)];
-	}
-
 	@SuppressWarnings("unused")
-	private static void handleCommand(String cmd) {
+	public void handleCommand(String cmd) {
 		String command = cmd.replace("/", "");
 
 		if(command.contentEquals("help")) {
@@ -168,11 +157,11 @@ public class MainServer {
 			}
 
 			if(continueToDoStuff) {
-				xSpawn = tempX;
-				zSpawn = tempZ;
+				//xSpawn = tempX;
+				//zSpawn = tempZ;
 				//SaveSystem.saveWorldPosition("server-level", new WorldPositionData(xSpawn, zSpawn));
 
-				append("Successfully set spawn position to: [X="+xSpawn+", Z="+zSpawn+"]!");
+				//append("Successfully set spawn position to: [X="+xSpawn+", Z="+zSpawn+"]!");
 			} else {
 				append("Unable to set spawn position as inputted values were invalid.");
 			}
@@ -253,7 +242,7 @@ public class MainServer {
 		}
 	}
 	
-	public static void append(String toAppend) {
+	public void append(String toAppend) {
 		Logger.log(LogLevel.INFO, toAppend);
 	}
 }

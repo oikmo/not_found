@@ -96,7 +96,7 @@ public class GuiJoinMenu extends GuiScreen {
 					}
 					break;
 				case 2:
-					Main.currentScreen = new GuiMainMenu();
+					Main.currentScreen = new GuiPlayMenu();
 					break;
 				}
 				Main.sfxLib.play(SoundSFXEnum.hit);

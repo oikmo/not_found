@@ -1,9 +1,8 @@
 package net.maniaticdevs.engine.network.packet;
 
-public class PacketUserName {
+public class PacketJoinMessage {
 
 	public int id;
-	public boolean firstJoin;
 	public String userName;
 	
 }

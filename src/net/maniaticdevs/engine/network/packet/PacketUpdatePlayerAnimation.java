@@ -1,8 +1,8 @@
 package net.maniaticdevs.engine.network.packet;
 
-public class PacketUpdateDirection {
+public class PacketUpdatePlayerAnimation {
 
 	public int id;
-	public int dir;
+	public int anim;
 	
 }

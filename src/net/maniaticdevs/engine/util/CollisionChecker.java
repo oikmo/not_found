@@ -1,10 +1,13 @@
 package net.maniaticdevs.engine.util;
 
 import java.awt.Rectangle;
+import java.util.ConcurrentModificationException;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.network.OtherPlayer;
+import net.maniaticdevs.engine.network.server.MainServer;
+import net.maniaticdevs.engine.network.server.MainServerListener;
 import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.tile.Tile;
 import net.maniaticdevs.main.Main;
@@ -20,7 +23,6 @@ public class CollisionChecker {
 	 * @param entity subject to collision testing
 	 */
 	public static void checkTile(Entity entity) {
-		entity.colliding = false;
 		int entityLeftWorldX = entity.getPosition().x + entity.getHitBox().x;
 		int entityRightWorldX = entity.getPosition().x + entity.getHitBox().x + entity.getHitBox().width;
 		int entityTopWorldY = entity.getPosition().y + entity.getHitBox().y;
@@ -166,64 +168,130 @@ public class CollisionChecker {
 		
 		Rectangle selfEntityChecker = new Rectangle();
 		Rectangle entityChecker = new Rectangle();
+		Iterable<Entity> entities = Main.currentLevel.getEntities();
 		
-		for(Entity ent : Main.currentLevel.getEntities()) {
-			int solidSelfEntityX = entity.getPosition().x + entity.getHitBox().x;
-			int solidSelfEntityY = entity.getPosition().y + entity.getHitBox().y;
-			selfEntityChecker.x = solidSelfEntityX;
-			selfEntityChecker.y = solidSelfEntityY;
-			selfEntityChecker.width = entity.getHitBox().width;
-			selfEntityChecker.height = entity.getHitBox().height;
-			
-			int solidEntityX = ent.getPosition().x + ent.getHitBox().x;
-			int solidEntityY = ent.getPosition().y + ent.getHitBox().y;
-			
-			entityChecker.x = solidEntityX;
-			entityChecker.y = solidEntityY;
-			entityChecker.width = ent.getHitBox().width;
-			entityChecker.height = ent.getHitBox().height;
-			switch(entity.getDirection()) {
-			case EAST:
-				selfEntityChecker.x += entity.getSpeed();
-				if(selfEntityChecker.intersects(entityChecker)) {
-					entity.colliding = true;
-					if(player) {
-						interactedEntity = ent;
+		if(Main.server != null) {
+			entities = MainServer.currentLevel.getEntities();
+		}
+		
+		for(Entity ent : entities) {
+			if(ent != entity) {
+				int solidSelfEntityX = entity.getPosition().x + entity.getHitBox().x;
+				int solidSelfEntityY = entity.getPosition().y + entity.getHitBox().y;
+				selfEntityChecker.x = solidSelfEntityX;
+				selfEntityChecker.y = solidSelfEntityY;
+				selfEntityChecker.width = entity.getHitBox().width;
+				selfEntityChecker.height = entity.getHitBox().height;
+				
+				int solidEntityX = ent.getPosition().x + ent.getHitBox().x;
+				int solidEntityY = ent.getPosition().y + ent.getHitBox().y;
+				
+				entityChecker.x = solidEntityX;
+				entityChecker.y = solidEntityY;
+				entityChecker.width = ent.getHitBox().width;
+				entityChecker.height = ent.getHitBox().height;
+				switch(entity.getDirection()) {
+				case EAST:
+					selfEntityChecker.x += entity.getSpeed();
+					if(selfEntityChecker.intersects(entityChecker)) {
+						entity.colliding = true;
+						if(player) {
+							interactedEntity = ent;
+						}
 					}
-				}
-				break;
-			case NORTH:
-				selfEntityChecker.y -= entity.getSpeed();
-				if(selfEntityChecker.intersects(entityChecker)) {
-					entity.colliding = true;
-					if(player) {
-						interactedEntity = ent;
+					break;
+				case NORTH:
+					selfEntityChecker.y -= entity.getSpeed();
+					if(selfEntityChecker.intersects(entityChecker)) {
+						entity.colliding = true;
+						if(player) {
+							interactedEntity = ent;
+						}
 					}
-				}
-				break;
-			case SOUTH:
-				selfEntityChecker.y += entity.getSpeed();
-				if(selfEntityChecker.intersects(entityChecker)) {
-					entity.colliding = true;
-					if(player) {
-						interactedEntity = ent;
+					break;
+				case SOUTH:
+					selfEntityChecker.y += entity.getSpeed();
+					if(selfEntityChecker.intersects(entityChecker)) {
+						entity.colliding = true;
+						if(player) {
+							interactedEntity = ent;
+						}
 					}
-				}
-				break;
-			case WEST:
-				selfEntityChecker.x -= entity.getSpeed();
-				if(selfEntityChecker.intersects(entityChecker)) {
-					entity.colliding = true;
-					if(player) {
-						interactedEntity = ent;
+					break;
+				case WEST:
+					selfEntityChecker.x -= entity.getSpeed();
+					if(selfEntityChecker.intersects(entityChecker)) {
+						entity.colliding = true;
+						if(player) {
+							interactedEntity = ent;
+						}
 					}
+					break;
+				default:
+					break;
 				}
-				break;
-			default:
-				break;
 			}
+			
 		}
 		return interactedEntity;
+	}
+	
+	/**
+	 * Checks to see if entity is colliding with an entity from {@link Main#currentLevel}<br>
+	 * If entity is player, then the collided entity will be returned.
+	 * 
+	 * @param entity subject to collision testing
+	 * @return {@link Entity}
+	 */
+	public static void checkPlayer(Entity entity) {
+		
+		Rectangle selfEntityChecker = new Rectangle();
+		Rectangle entityChecker = new Rectangle();
+		
+		Entity ent = Main.thePlayer;
+		
+		int solidSelfEntityX = entity.getPosition().x + entity.getHitBox().x;
+		int solidSelfEntityY = entity.getPosition().y + entity.getHitBox().y;
+		selfEntityChecker.x = solidSelfEntityX;
+		selfEntityChecker.y = solidSelfEntityY;
+		selfEntityChecker.width = entity.getHitBox().width;
+		selfEntityChecker.height = entity.getHitBox().height;
+		
+		int solidEntityX = ent.getPosition().x + ent.getHitBox().x;
+		int solidEntityY = ent.getPosition().y + ent.getHitBox().y;
+		
+		entityChecker.x = solidEntityX;
+		entityChecker.y = solidEntityY;
+		entityChecker.width = ent.getHitBox().width;
+		entityChecker.height = ent.getHitBox().height;
+		switch(entity.getDirection()) {
+		case EAST:
+			selfEntityChecker.x += entity.getSpeed();
+			if(selfEntityChecker.intersects(entityChecker)) {
+				entity.colliding = true;
+			}
+			break;
+		case NORTH:
+			selfEntityChecker.y -= entity.getSpeed();
+			if(selfEntityChecker.intersects(entityChecker)) {
+				entity.colliding = true;
+			}
+			break;
+		case SOUTH:
+			selfEntityChecker.y += entity.getSpeed();
+			if(selfEntityChecker.intersects(entityChecker)) {
+				entity.colliding = true;
+			}
+			break;
+		case WEST:
+			selfEntityChecker.x -= entity.getSpeed();
+			if(selfEntityChecker.intersects(entityChecker)) {
+				entity.colliding = true;
+			}
+			break;
+		default:
+			break;
+		}
 	}
 	
 	/** Checks to see if entity is colliding with another player from NetworkHandler<br>
@@ -240,7 +308,7 @@ public class CollisionChecker {
 		Rectangle selfEntityChecker = new Rectangle();
 		Rectangle entityChecker = new Rectangle();
 		
-		for(OtherPlayer otherplayer : Main.theNetwork.players.values()) {
+		for(OtherPlayer otherplayer : player ? Main.theNetwork.players.values() : MainServerListener.players.values()) {
 			int solidSelfEntityX = entity.getPosition().x + entity.getHitBox().x;
 			int solidSelfEntityY = entity.getPosition().y + entity.getHitBox().y;
 			selfEntityChecker.x = solidSelfEntityX;
@@ -308,33 +376,37 @@ public class CollisionChecker {
 		Rectangle entityChecker = new Rectangle();
 		Rectangle objChecker = new Rectangle();
 		
-		for(OBJ obj : Main.currentLevel.getObjects()) {
-			int solidEntityX = entity.getPosition().x + entity.getHitBox().x;
-			int solidEntityY = entity.getPosition().y + entity.getHitBox().y;
-			entityChecker.x = solidEntityX;
-			entityChecker.y = solidEntityY;
-			entityChecker.width = entity.getHitBox().width;
-			entityChecker.height = entity.getHitBox().height;
-			
-			int solidObjX = obj.position.x + obj.getHitBox().x;
-			int solidObjY = obj.position.y + obj.getHitBox().y;
-			
-			objChecker.x = solidObjX;
-			objChecker.y = solidObjY;
-			objChecker.width = obj.getHitBox().width;
-			objChecker.height = obj.getHitBox().height;
-			
-			int xDist = Math.abs(entityChecker.x - objChecker.x);
-			int yDist = Math.abs(entityChecker.y - objChecker.y);
-			int dist = Math.max(xDist, yDist);
-			
-			if(dist < Settings.tileSize) {
-				if(entityChecker.intersects(objChecker)) {
-					return obj;
-				}
+		try {
+			for(OBJ obj : Main.currentLevel.getObjects()) {
+				int solidEntityX = entity.getPosition().x + entity.getHitBox().x;
+				int solidEntityY = entity.getPosition().y + entity.getHitBox().y;
+				entityChecker.x = solidEntityX;
+				entityChecker.y = solidEntityY;
+				entityChecker.width = entity.getHitBox().width;
+				entityChecker.height = entity.getHitBox().height;
 				
+				int solidObjX = obj.position.x + obj.getHitBox().x;
+				int solidObjY = obj.position.y + obj.getHitBox().y;
+				
+				objChecker.x = solidObjX;
+				objChecker.y = solidObjY;
+				objChecker.width = obj.getHitBox().width;
+				objChecker.height = obj.getHitBox().height;
+				
+				int xDist = Math.abs(entityChecker.x - objChecker.x);
+				int yDist = Math.abs(entityChecker.y - objChecker.y);
+				int dist = Math.max(xDist, yDist);
+				
+				if(dist < Settings.tileSize) {
+					if(entityChecker.intersects(objChecker)) {
+						return obj;
+					}
+				}
 			}
+		} catch(ConcurrentModificationException e) {
+			
 		}
+		
 		return null;
 	}
 }

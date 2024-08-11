@@ -26,7 +26,7 @@ public class Test extends NPC {
 	}
 	
 	public void onInteract() {
-		Main.currentScreen = new GuiDialogue(dialogueToBeLoaded, this);
+		Main.currentScreen = new GuiDialogue(false, dialogueToBeLoaded, this);
 	}
 
 }

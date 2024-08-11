@@ -1,5 +1,6 @@
 package net.maniaticdevs.engine.objects;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -49,6 +50,8 @@ public abstract class OBJ {
 			} else {
 				g2.drawImage(image, screenX, screenY, Settings.tileSize, Settings.tileSize, null);
 			}
+			g2.setColor(Color.white);
+			g2.drawRect(screenX+getHitBox().x, screenY+getHitBox().y, getHitBox().width, getHitBox().height);
 		}
 	}
 

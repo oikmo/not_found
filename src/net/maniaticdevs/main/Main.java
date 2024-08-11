@@ -154,8 +154,7 @@ public class Main extends JPanel implements Runnable  {
 		instance = this;
 		GuiScreen.init();
 		MapLoader.init();
-
-		sfxLib = new Sound("sfx/cursor","sfx/door","sfx/hitmonster","sfx/key","sfx/powerup","sfx/receivedamage","sfx/swingweapon");
+		sfxLib = new Sound("sfx/00cursor","sfx/01door","sfx/02hitmonster","sfx/03key","sfx/04powerup","sfx/05receivedamage","sfx/06swingweapon");
 
 		currentScreen = new GuiMainMenu();
 	}
@@ -222,14 +221,8 @@ public class Main extends JPanel implements Runnable  {
 					}
 				} else {
 					if(currentScreen instanceof GuiDialogue) {
-						if(Main.theNetwork != null) {
-							PacketNPCLock packet = new PacketNPCLock();
-							packet.networkID = ((GuiDialogue)currentScreen).npc.networkID;
-							packet.lock = false;
-							Main.theNetwork.client.sendTCP(packet);
-						} else {
-							((GuiDialogue)currentScreen).npc.lock = false;
-						}
+						((GuiDialogue)currentScreen).cancelDialogue();
+						
 						currentScreen = new GuiInGame();
 					}
 				}

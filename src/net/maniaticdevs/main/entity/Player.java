@@ -3,7 +3,6 @@ package net.maniaticdevs.main.entity;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +12,7 @@ import net.maniaticdevs.engine.entity.EntityDirection;
 import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.network.ChatMessage;
+import net.maniaticdevs.engine.objects.DataBuffer;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
 import net.maniaticdevs.engine.objects.OBJ;
@@ -20,7 +20,6 @@ import net.maniaticdevs.engine.objects.PickableObject;
 import net.maniaticdevs.engine.util.CollisionChecker;
 import net.maniaticdevs.engine.util.ImageUtils;
 import net.maniaticdevs.engine.util.Input;
-import net.maniaticdevs.engine.util.StringUtil;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
@@ -172,7 +171,7 @@ public class Player extends Entity {
 					}
 					Main.currentLevel.removeObject(contactOBJ);
 				}
-
+				
 				if(obj instanceof Door) {
 					if(holdingItem != null) {
 						if(holdingItem.networkID.contentEquals(((Door)obj).getRequiredKey().networkID)) {
@@ -184,6 +183,8 @@ public class Player extends Entity {
 							Main.sfxLib.play(SoundSFXEnum.door);
 						}
 					}
+				} else if(obj instanceof DataBuffer) {
+					Main.currentScreen = new GuiDialogue(true, ((DataBuffer)obj).getBuffer(), null);
 				}
 			}
 		}

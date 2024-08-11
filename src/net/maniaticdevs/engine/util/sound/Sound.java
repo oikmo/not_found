@@ -1,5 +1,9 @@
 package net.maniaticdevs.engine.util.sound;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.sound.sampled.AudioFormat;
@@ -29,7 +33,18 @@ public class Sound {
 	public Sound(String... urls) {
 		soundURL = new URL[urls.length];
 		for(int i = 0; i < urls.length; i++) {
-			soundURL[i] = Sound.class.getResource("/sounds/"+urls[i]+".wav");
+			try {
+				soundURL[i] = new URL("https://oikmo.github.io/resources/not_found/sounds/"+urls[i]+".wav");
+				try {
+					soundURL[i].openConnection();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -40,7 +55,9 @@ public class Sound {
 	public void setFile(int i) {
 		try {
 			selectedTrack = i;
-			AudioInputStream soundIn = AudioSystem.getAudioInputStream(soundURL[selectedTrack]);
+			InputStream is = soundURL[selectedTrack].openStream();
+	        BufferedInputStream bis = new BufferedInputStream( is );
+			AudioInputStream soundIn = AudioSystem.getAudioInputStream(bis);
 			AudioFormat format = soundIn.getFormat();
 			DataLine.Info info = new DataLine.Info(Clip.class, format);
 			clip = (Clip)AudioSystem.getLine(info);
@@ -102,7 +119,8 @@ public class Sound {
 	}
 	
 	public void checkVolume(int scale) {
-		switch(scale) {
+		this.volumeScale = scale;
+		switch(volumeScale) {
 		case 0: volume = -80f; break;
 		case 1: volume = -20f; break;
 		case 2: volume = -12f; break;

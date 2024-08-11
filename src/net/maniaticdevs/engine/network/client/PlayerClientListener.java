@@ -39,7 +39,6 @@ import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.entity.Test;
 import net.maniaticdevs.main.gui.GuiChat;
-import net.maniaticdevs.main.gui.GuiDialogue;
 import net.maniaticdevs.main.gui.GuiInGame;
 import net.maniaticdevs.main.level.SampleLevel;
 

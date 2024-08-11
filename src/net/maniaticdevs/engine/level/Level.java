@@ -15,7 +15,6 @@ import net.maniaticdevs.engine.tile.Tile;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.entity.Player;
-import net.maniaticdevs.main.entity.Test;
 
 /**
  * Stores tile data, entities and name of map

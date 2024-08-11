@@ -16,7 +16,6 @@ import net.maniaticdevs.engine.level.Level;
 import net.maniaticdevs.engine.level.MapLoader;
 import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.network.client.NetworkHandler;
-import net.maniaticdevs.engine.network.packet.PacketNPCLock;
 import net.maniaticdevs.engine.network.server.MainServer;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.engine.util.os.EnumOS;

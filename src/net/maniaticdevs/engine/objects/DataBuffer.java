@@ -17,7 +17,6 @@ import net.maniaticdevs.main.gui.GuiDialogue;
 public class DataBuffer extends OBJ {
 	
 	private List<String> buffer;
-	private int direction;
 	
 	/**
 	 * Door constructor
@@ -49,7 +48,6 @@ public class DataBuffer extends OBJ {
 			hitBox = new Rectangle(0,0,12,48);
 			break;
 		}
-		this.direction = direction;
 		collision = true;
 		position.set(x,y);
 	}

@@ -4,8 +4,11 @@ import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.List;
 
+import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.util.ImageUtils;
 import net.maniaticdevs.engine.util.StringUtil;
+import net.maniaticdevs.main.Main;
+import net.maniaticdevs.main.gui.GuiDialogue;
 
 /**
  * A barrier to the player (unless they have a key :P)
@@ -14,6 +17,7 @@ import net.maniaticdevs.engine.util.StringUtil;
 public class DataBuffer extends OBJ {
 	
 	private List<String> buffer;
+	private int direction;
 	
 	/**
 	 * Door constructor
@@ -45,13 +49,16 @@ public class DataBuffer extends OBJ {
 			hitBox = new Rectangle(0,0,12,48);
 			break;
 		}
-		
+		this.direction = direction;
 		collision = true;
 		position.set(x,y);
 	}
 	
+	public void interact(Entity entity) {
+		Main.currentScreen = new GuiDialogue(true, getBuffer(), null);
+	}
+	
 	public List<String> getBuffer() {
 		return buffer;
-		
 	}
 }

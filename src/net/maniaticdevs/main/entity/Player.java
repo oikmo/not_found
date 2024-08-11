@@ -89,7 +89,7 @@ public class Player extends Entity {
 			}
 		}
 
-		animate();
+		
 
 		for(int i = 0; i < messages.size(); i++) {
 			if(messages.size() > 5) {
@@ -98,13 +98,16 @@ public class Player extends Entity {
 
 			messages.get(i).tick();
 		}
-
-		direction = EntityDirection.IDLE;
+		
+		
 		if((Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) && ((GuiInGame)Main.currentScreen).chatScreen == null) {
+			animate();
+			
+			
 			if(Input.needsInput) {
 				Input.clearInput();
 			}
-			
+			direction = EntityDirection.IDLE;
 			if(Input.isKeyDown(Input.KEY_S)) {
 				direction = EntityDirection.SOUTH;
 			} else if(Input.isKeyDown(Input.KEY_W)) {
@@ -114,6 +117,9 @@ public class Player extends Entity {
 			} else if(Input.isKeyDown(Input.KEY_A)) {
 				direction = EntityDirection.WEST;
 			}
+			
+		} else if(Main.currentScreen instanceof GuiDialogue) {
+			spriteNum = 0;
 		}
 		
 		if(Input.isKeyDown(Input.KEY_MINUS)) {
@@ -148,8 +154,6 @@ public class Player extends Entity {
 			if(Main.theNetwork != null) {
 				CollisionChecker.checkOtherPlayer(this);
 			}
-
-			
 			
 			OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
 			if(Input.isKeyDown(Input.KEY_ENTER)) {
@@ -184,9 +188,10 @@ public class Player extends Entity {
 						}
 					}
 				} else if(obj instanceof DataBuffer) {
-					Main.currentScreen = new GuiDialogue(true, ((DataBuffer)obj).getBuffer(), null);
+					 ((DataBuffer)obj).interact(this);
 				}
 			}
+			
 		}
 
 

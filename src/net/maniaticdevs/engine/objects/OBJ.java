@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.UUID;
 
 import net.maniaticdevs.engine.Settings;
+import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 
@@ -50,10 +51,12 @@ public abstract class OBJ {
 			} else {
 				g2.drawImage(image, screenX, screenY, Settings.tileSize, Settings.tileSize, null);
 			}
-			g2.setColor(Color.white);
-			g2.drawRect(screenX+getHitBox().x, screenY+getHitBox().y, getHitBox().width, getHitBox().height);
+			//g2.setColor(Color.white);
+			//g2.drawRect(screenX+getHitBox().x, screenY+getHitBox().y, getHitBox().width, getHitBox().height);
 		}
 	}
+	
+	public void interact(Entity entity) {}
 
 	/** Called by {@link Main} */
 	public void tick() {}

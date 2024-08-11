@@ -114,7 +114,8 @@ public class GuiDialogue extends GuiScreen {
 				currentDialogue = combinedText;
 				
 				if(Input.isKeyDownExplicit(Input.KEY_ENTER)) {
-					if(dialogue.contentEquals("... ACCESSING DATA BUFFER ...")) {
+					//wait for blackbox start to end
+					if(dialogue.contentEquals("... ACCESSING DATA BUFFER ...") && playBG) {
 						if(combinedText.contentEquals("... ACCESSING DATA BUFFER ...")) {
 							charIndex = 0;
 							combinedText = "";

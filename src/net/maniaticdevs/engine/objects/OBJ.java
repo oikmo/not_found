@@ -55,6 +55,11 @@ public abstract class OBJ {
 		}
 	}
 	
+	/**
+	 * 
+	 * Method to handle entity interactions with objects
+	 * @param entity Entity that interacts with object
+	 */
 	public void interact(Entity entity) {}
 
 	/** Called by {@link Main} */

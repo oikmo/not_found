@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 
 import net.maniaticdevs.engine.entity.Entity;
+import net.maniaticdevs.engine.entity.EntityDirection;
 import net.maniaticdevs.engine.util.ImageUtils;
 import net.maniaticdevs.engine.util.StringUtil;
 import net.maniaticdevs.main.Main;
@@ -17,16 +18,18 @@ import net.maniaticdevs.main.gui.GuiDialogue;
 public class DataBuffer extends OBJ {
 	
 	private List<String> buffer;
+	private int direction;
 	
 	/**
 	 * Door constructor
 	 * @param bufferText Text file to load
-	 * @param direction 0 = down, 1 = up, 2 = left, 3 = right
+	 * @param direction 0 = down, 1 = up, 2 = right, 3 = left
 	 * @param x X coordinate
 	 * @param y X coordinate
 	 */
 	public DataBuffer(String bufferText, int direction, int x, int y) {
 		name = "Data Buffer";
+		this.direction = direction;
 		try {
 			buffer = StringUtil.loadTextFile("dialogues/buffer_"+bufferText+".txt");
 		} catch (IOException e) {
@@ -53,7 +56,21 @@ public class DataBuffer extends OBJ {
 	}
 	
 	public void interact(Entity entity) {
-		Main.currentScreen = new GuiDialogue(true, getBuffer(), null);
+		boolean interact = false;
+		if(entity.getDirection() == EntityDirection.NORTH && direction == 0) {
+			interact = true;
+		} else if(entity.getDirection() == EntityDirection.SOUTH && direction == 1) {
+			interact = true;
+		} else if(entity.getDirection() == EntityDirection.EAST && direction == 2) {
+			interact = true;
+		}  else if(entity.getDirection() == EntityDirection.WEST && direction == 3) {
+			interact = true;
+		}
+		
+		if(interact) {
+			Main.currentScreen = new GuiDialogue(true, getBuffer(), null);
+		}
+		
 	}
 	
 	public List<String> getBuffer() {

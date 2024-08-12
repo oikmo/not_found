@@ -120,6 +120,12 @@ public class GuiDialogue extends GuiScreen {
 					}
 				}
 				
+				if(Input.isKeyDownExplicit(Input.KEY_ESC)) {
+					cancelDialogue();
+					
+					Main.currentScreen = new GuiInGame();
+				}
+				
 				if(Input.isKeyDownExplicit(Input.KEY_ENTER)) {
 					if(dialogue.contentEquals(combinedText)) {
 						//wait for blackbox start to end
@@ -137,8 +143,6 @@ public class GuiDialogue extends GuiScreen {
 							Main.sfxLib.play(SoundSFXEnum.hit);
 						}
 					}
-					
-					
 				}
 			} else {
 				if(dialogueIndex >= dialogues.size()) {
@@ -189,8 +193,11 @@ public class GuiDialogue extends GuiScreen {
 	}
 	
 	public void cancelDialogue() {
-		blackbox.stop();
-		blackbox.play(1);
+		if(dataBuffer) {
+			blackbox.stop();
+			blackbox.play(1);
+		}
+		
 		if(npc != null) {
 			if(Main.theNetwork != null) {
 				PacketNPCLock packet = new PacketNPCLock();

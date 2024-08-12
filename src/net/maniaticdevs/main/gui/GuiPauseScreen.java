@@ -56,7 +56,6 @@ public class GuiPauseScreen extends GuiScreen {
 		if(tickDelay != 0) { 
 			tickDelay--;
 		}
-
 		if(Input.isKeyDownExplicit(Input.KEY_ESC)) {
 			if(!lockEscape) {
 				if(optionSelected != -1) {

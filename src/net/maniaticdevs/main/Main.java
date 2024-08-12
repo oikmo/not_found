@@ -22,12 +22,19 @@ import net.maniaticdevs.engine.util.os.EnumOS;
 import net.maniaticdevs.engine.util.os.EnumOSMappingHelper;
 import net.maniaticdevs.engine.util.properties.LanguageHandler;
 import net.maniaticdevs.engine.util.sound.Sound;
+import net.maniaticdevs.engine.util.sound.Sound;
 import net.maniaticdevs.main.entity.Player;
 import net.maniaticdevs.main.gui.GuiDialogue;
 import net.maniaticdevs.main.gui.GuiDisconnected;
 import net.maniaticdevs.main.gui.GuiInGame;
 import net.maniaticdevs.main.gui.GuiMainMenu;
 import net.maniaticdevs.main.gui.GuiPauseScreen;
+import paulscode.sound.SoundSystem;
+import paulscode.sound.SoundSystemConfig;
+import paulscode.sound.SoundSystemException;
+import paulscode.sound.codecs.CodecJOrbis;
+import paulscode.sound.codecs.CodecWav;
+import paulscode.sound.libraries.LibraryJavaSound;
 
 /**
  * Main class, enters thread, is thread.
@@ -147,10 +154,20 @@ public class Main extends JPanel implements Runnable  {
 		this.addKeyListener(new Input());
 		this.setFocusable(true); // so that the input class can actually work
 
+		try {
+			SoundSystemConfig.addLibrary(LibraryJavaSound.class);
+			SoundSystemConfig.setCodec("ogg", CodecJOrbis.class);
+			SoundSystemConfig.setCodec("wav", CodecWav.class);
+		} catch( SoundSystemException e ) {
+			System.err.println("error linking with the plug-ins");
+		}
+
+		
 		gameThread = new Thread(this);
 		gameThread.setName("Main thread");
 
 		instance = this;
+		Sound.init();
 		GuiScreen.init();
 		MapLoader.init();
 		sfxLib = new Sound("sfx/00cursor","sfx/01door","sfx/02hitmonster","sfx/03key","sfx/04powerup","sfx/05receivedamage","sfx/06swingweapon");

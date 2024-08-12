@@ -1,137 +1,72 @@
 package net.maniaticdevs.engine.util.sound;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.FloatControl;
+import net.maniaticdevs.main.Main;
+import paulscode.sound.SoundSystem;
+import paulscode.sound.SoundSystemConfig;
+import paulscode.sound.SoundSystemException;
+import paulscode.sound.codecs.CodecJOrbis;
+import paulscode.sound.libraries.LibraryJavaSound;
 
-/**
- * Sound class! Plays WAVs D:
- * @author Oikmo
- */
 public class Sound {
 	
-	private Clip clip;
-	private URL soundURL[];
-	public int selectedTrack;
-	private FloatControl control;
-	private int volumeScale = 3;
-	private float volume;
+	private SoundSystem soundSystem;
+	
+	public static void init() {
+		try {
+			SoundSystemConfig.addLibrary(LibraryJavaSound.class);
+			SoundSystemConfig.setCodec("ogg", CodecJOrbis.class);
+		} catch( SoundSystemException e ) {
+			System.err.println("error linking with the plug-ins");
+		}
+	}
+	
+	private String soundURL[];
+	private List<String> loopers = new ArrayList<>();
 	
 	/**
 	 * Expects a URL list as to load into itself
 	 * @param urls URL list expected to be loaded
 	 */
 	public Sound(String... urls) {
-		soundURL = new URL[urls.length];
+		soundSystem = new SoundSystem();
+		soundURL = new String[urls.length];
 		for(int i = 0; i < urls.length; i++) {
-			try {
-				soundURL[i] = new URL("https://oikmo.github.io/resources/not_found/sounds/"+urls[i]+".wav");
-				try {
-					soundURL[i].openConnection();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	/**
-	 * Loads URL as an audio clip and selects to {@link #selectedTrack} and {@link #clip}
-	 * @param i Index of URL
-	 */
-	public void setFile(int i) {
-		try {
-			selectedTrack = i;
-			InputStream is = soundURL[selectedTrack].openStream();
-	        BufferedInputStream bis = new BufferedInputStream( is );
-			AudioInputStream soundIn = AudioSystem.getAudioInputStream(bis);
-			AudioFormat format = soundIn.getFormat();
-			DataLine.Info info = new DataLine.Info(Clip.class, format);
-			clip = (Clip)AudioSystem.getLine(info);
-			clip.open(soundIn);
-			control = (FloatControl)clip.getControl(FloatControl.Type.MASTER_GAIN);
-			checkVolume();
-			control.setValue(volume);
-		} catch(Exception e) {}
-	}
-	
-	public void play() {
-		if(clip != null) {
-			if(clip.isOpen()) {
-				clip.start();
-			}
-		}	
-	}
-	
-	public void loop() {
-		if(clip != null) {
-			if(clip.isOpen()) {
-				clip.loop(Clip.LOOP_CONTINUOUSLY);
-			}
-		}
-	}
-	
-	public void stop() {
-		if(clip != null) {
-			if(clip.isOpen()) {
-				clip.stop();
-			}
-		}
-	}
-	
-	public boolean isPlaying() {
-		boolean playing = false;
-		if(clip != null) {
-			if(clip.isOpen()) {
-				playing = clip.isRunning();
-			}
-		}
-		
-		return playing;
-	}
-	
-	public int getCurrentFile() {
-		return selectedTrack;
-	}
-	
-	public void checkVolume() {
-		switch(volumeScale) {
-		case 0: volume = -80f; break;
-		case 1: volume = -20f; break;
-		case 2: volume = -12f; break;
-		case 3: volume = -5f; break;
-		case 4: volume = 1f; break;
-		case 5: volume = 6f; break;
-		}
-	}
-	
-	public void checkVolume(int scale) {
-		this.volumeScale = scale;
-		switch(volumeScale) {
-		case 0: volume = -80f; break;
-		case 1: volume = -20f; break;
-		case 2: volume = -12f; break;
-		case 3: volume = -5f; break;
-		case 4: volume = 1f; break;
-		case 5: volume = 6f; break;
+			soundURL[i] = "/sounds/"+urls[i]+".ogg";
 		}
 	}
 	
 	public void play(int i) {
-		this.setFile(i);
-		this.play();
+		play(i, false);
+	}
+	
+	public void play(int i, boolean loop) {
+		String name = soundURL[i].split("/")[soundURL[i].split("/").length-1].replace(".ogg", "") + "" + new Random().nextInt();
+		if(loop) {
+			System.out.println(name);
+			loopers.add(name);
+		}
+		soundSystem.newSource(false, name, Main.class.getResource(soundURL[i]), soundURL[i].split("/")[soundURL[i].split("/").length-1], loop, 0, 0, 0, 0, 0);
+		soundSystem.setTemporary(name, !loop);
+		soundSystem.setVolume(name, 1f);
+		soundSystem.play(name);
+	}
+	
+	public boolean isPlaying() {
+		return soundSystem.playing();
+	}
+	
+	public void stop() {
+		for(int i = 0; i < loopers.size(); i++) {
+			String l = loopers.get(i);
+			System.out.println(l);
+			soundSystem.stop(l);
+			soundSystem.removeSource(l);
+			loopers.remove(i);
+		}
+		soundSystem.removeTemporarySources();
 	}
 }

@@ -62,12 +62,11 @@ public class GuiDialogue extends GuiScreen {
 			}
 		}
 		if(blackbox == null) {
-			blackbox = new Sound("sfx/blackbox/00blackbox_start", "sfx/blackbox/01blackbox_loop", "sfx/blackbox/02blackbox_static");
+			blackbox = new Sound("sfx/blackbox/00blackbox_start", "sfx/blackbox/01blackbox_end", "sfx/blackbox/02blackbox_loop", "sfx/blackbox/03blackbox_static");
 		}
 		this.dialogues = new ArrayList<>(dialogue);
 		this.dataBuffer = dataBuffer;
 		if(this.dataBuffer) {
-			blackbox.checkVolume(3);
 			blackbox.play(0);
 			this.dialogues.add(0, "... ACCESSING DATA BUFFER ...");
 		}
@@ -113,21 +112,32 @@ public class GuiDialogue extends GuiScreen {
 				}
 				currentDialogue = combinedText;
 				
+				if(combinedText.contentEquals("... ACCESSING DATA BUFFER ...")) {
+					if(!playBG && dataBuffer) {
+						blackbox.play(2, true);
+						//blackbox.play(3, true);
+						playBG = true;
+					}
+				}
+				
 				if(Input.isKeyDownExplicit(Input.KEY_ENTER)) {
-					//wait for blackbox start to end
-					if(dialogue.contentEquals("... ACCESSING DATA BUFFER ...") && playBG) {
-						if(combinedText.contentEquals("... ACCESSING DATA BUFFER ...")) {
+					if(dialogue.contentEquals(combinedText)) {
+						//wait for blackbox start to end
+						if(dialogue.contentEquals("... ACCESSING DATA BUFFER ...") && playBG) {
+							if(combinedText.contentEquals("... ACCESSING DATA BUFFER ...")) {
+								charIndex = 0;
+								combinedText = "";
+								dialogueIndex++;
+								Main.sfxLib.play(SoundSFXEnum.hit);
+							}
+						} else {
 							charIndex = 0;
 							combinedText = "";
 							dialogueIndex++;
 							Main.sfxLib.play(SoundSFXEnum.hit);
 						}
-					} else {
-						charIndex = 0;
-						combinedText = "";
-						dialogueIndex++;
-						Main.sfxLib.play(SoundSFXEnum.hit);
 					}
+					
 					
 				}
 			} else {
@@ -136,13 +146,6 @@ public class GuiDialogue extends GuiScreen {
 					cancelDialogue();
 				}
 			}
-		}
-		if(!playBG && !blackbox.isPlaying() && dataBuffer) {
-			blackbox.checkVolume(1);
-			blackbox.setFile(1);
-			blackbox.play();
-			blackbox.loop();
-			playBG = true;
 		}
 	}
 	
@@ -187,6 +190,7 @@ public class GuiDialogue extends GuiScreen {
 	
 	public void cancelDialogue() {
 		blackbox.stop();
+		blackbox.play(1);
 		if(npc != null) {
 			if(Main.theNetwork != null) {
 				PacketNPCLock packet = new PacketNPCLock();

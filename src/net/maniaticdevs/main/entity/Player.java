@@ -3,9 +3,13 @@ package net.maniaticdevs.main.entity;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
+import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.entity.EntityDirection;
@@ -65,6 +69,8 @@ public class Player extends Entity {
 	private int ticks = 0;
 
 	public List<ChatMessage> messages = new ArrayList<>();
+	
+	private BufferedImage deadSprite;
 
 	@Override
 	protected void setDefaultValues() {
@@ -74,6 +80,7 @@ public class Player extends Entity {
 		screenPos = new Vector2((Main.getInstance().getWidth() / 2 - (Settings.tileSize / 2)), Main.getInstance().getHeight() / 2 - (Settings.tileSize / 2));
 		position.set(Settings.tileSize*4, Settings.tileSize*4);
 		sprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
+		deadSprite = ImageUtils.scaleImage(ResourceLoader.loadImage("/textures/player/player_dead.png"), Settings.tileSize, Settings.tileSize);
 	}
 
 	public void updateScreenPos() {
@@ -89,20 +96,15 @@ public class Player extends Entity {
 			}
 		}
 
-		
-
 		for(int i = 0; i < messages.size(); i++) {
 			if(messages.size() > 5) {
 				messages.remove(0);
 			}
-
 			messages.get(i).tick();
 		}
 		
-		
-		if((Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) && ((GuiInGame)Main.currentScreen).chatScreen == null) {
+		if((Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) && ((GuiInGame)Main.currentScreen).chatScreen == null && health != 0) {
 			animate();
-			
 			
 			if(Input.needsInput) {
 				Input.clearInput();
@@ -124,9 +126,8 @@ public class Player extends Entity {
 		
 		if(Input.isKeyDown(Input.KEY_MINUS)) {
 			if(!lockTakeLife) {
-				health--;
-				if(health <= 0) {
-					System.exit(0);
+				if(health != 0) {
+					health--;
 				}
 			}
 			lockTakeLife = true;
@@ -136,10 +137,13 @@ public class Player extends Entity {
 
 		if(Input.isKeyDown(Input.KEY_EQUALS)) {
 			if(!lockGiveLife) {
-				health++;
-				if(health > maxHealth) {
-					maxHealth = ((maxHealth/2)+1)*2;
+				if(health != 0) {
+					health++;
+					if(health > maxHealth) {
+						maxHealth = ((maxHealth/2)+1)*2;
+					}
 				}
+				
 			}
 			lockGiveLife = true;
 		} else {
@@ -288,7 +292,12 @@ public class Player extends Entity {
 			g2.drawString(msg, (Main.getInstance().getWidth()/2)-((width)/2), screenPos.y-height-(offsetY));
 			offsetY += change;
 		}
-		g2.drawImage(sprites[spriteNum+getDirection().ordinal()*6], null, screenPos.x, screenPos.y);
+		if(health != 0) {
+			g2.drawImage(sprites[spriteNum+getDirection().ordinal()*6], null, screenPos.x, screenPos.y);
+		} else {
+			g2.drawImage(deadSprite, null, screenPos.x, screenPos.y);
+		}
+		
 
 	}
 

@@ -4,5 +4,9 @@
 	<classpathentry kind="src" path="res"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="lib" path="lib/kryonet-all-2.21.jar"/>
+	<classpathentry kind="lib" path="lib/soundsystem.jar"/>
+	<classpathentry kind="lib" path="lib/ss-codecs.jar"/>
+	<classpathentry kind="lib" path="lib/ss-libraryjavasound.jar"/>
+	<classpathentry kind="lib" path="lib/ss-codecwav.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -29,7 +29,7 @@ public abstract class OBJ {
 	/** World position */
 	public Vector2 position = new Vector2();
 	/** Used for collision checking */
-	protected Rectangle hitBox = new Rectangle(0, 0, Settings.tileSize, Settings.tileSize);
+	protected Rectangle hitBox = new Rectangle(0, 0, Settings.worldTileSize, Settings.worldTileSize);
 	
 	/**
 	 * Draws object, if is not seen by player then it is not drawn
@@ -41,14 +41,14 @@ public abstract class OBJ {
 		int screenX = position.x - playerPos.x + playerScreenPos.x;
 		int screenY = position.y - playerPos.y + playerScreenPos.y;
 
-		if(position.x + Settings.tileSize > playerPos.x - playerScreenPos.x &&
-				position.x - Settings.tileSize < playerPos.x + playerScreenPos.x &&
-				position.y +Settings.tileSize > playerPos.y - playerScreenPos.y &&
-				position.y - Settings.tileSize < playerPos.y + playerScreenPos.y) {
+		if(position.x + Settings.worldTileSize > playerPos.x - playerScreenPos.x &&
+				position.x - Settings.worldTileSize < playerPos.x + playerScreenPos.x &&
+				position.y +Settings.worldTileSize > playerPos.y - playerScreenPos.y &&
+				position.y - Settings.worldTileSize < playerPos.y + playerScreenPos.y) {
 			if(this instanceof PickableObject) {
-				g2.drawImage(image, screenX, screenY, Settings.tileSize/2, Settings.tileSize/2, null);
+				g2.drawImage(image, screenX, screenY, Settings.worldTileSize/2, Settings.worldTileSize/2, null);
 			} else {
-				g2.drawImage(image, screenX, screenY, Settings.tileSize, Settings.tileSize, null);
+				g2.drawImage(image, screenX, screenY, Settings.worldTileSize, Settings.worldTileSize, null);
 			}
 			//g2.setColor(Color.white);
 			//g2.drawRect(screenX+getHitBox().x, screenY+getHitBox().y, getHitBox().width, getHitBox().height);

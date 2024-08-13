@@ -70,7 +70,7 @@ public class MapLoader  {
 			tiles[index] = new Tile();
 			tiles[index].index = index;
 			tiles[index].image = images[index];
-			tiles[index].image = ImageUtils.scaleImage(tiles[index].image, Settings.tileSize, Settings.tileSize);
+			tiles[index].image = ImageUtils.scaleImage(tiles[index].image, Settings.worldTileSize, Settings.worldTileSize);
 			tiles[index].collision = collision;
 	}
 	

@@ -3,7 +3,11 @@ package net.maniaticdevs.main.gui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
@@ -29,7 +33,36 @@ public class GuiInGame extends GuiScreen {
 	
 	private Color selectedColor = new Color(100,100,100, 200);
 	
+	private List<Rectangle> glitchBoxes = new ArrayList<Rectangle>();
+	private Random random = new Random();
+	
+	public static int sizeGlitches = 0;
+	
+	public void tick() {
+		if(sizeGlitches != glitchBoxes.size()) {
+			if(sizeGlitches == 0) {
+				glitchBoxes.clear();
+			} else if(sizeGlitches > glitchBoxes.size()) {
+				glitchBoxes.add(new Rectangle());
+			} else if(sizeGlitches < glitchBoxes.size()) {
+				glitchBoxes.remove(0);
+			}
+		}
+		
+		for(Rectangle glitchBox : glitchBoxes) {
+			glitchBox.x = random.ints(0, Main.getInstance().getWidth()).iterator().nextInt();
+			glitchBox.y = random.ints(0, Main.getInstance().getHeight()).iterator().nextInt();
+			glitchBox.width = random.ints(0, 150).iterator().nextInt();
+			glitchBox.height = random.ints(0, 150).iterator().nextInt();
+		}
+	}
+	
 	public void draw(Graphics2D g2) {
+		for(Rectangle glitchBox : glitchBoxes) {
+			g2.setColor(Color.WHITE);
+			g2.fillRect(glitchBox.x, glitchBox.y, glitchBox.width, glitchBox.height);
+		}
+		
 		
 		if(Input.isKeyDownExplicit(Input.KEY_T) && chatScreen == null) {
 			chatScreen = new GuiChat();

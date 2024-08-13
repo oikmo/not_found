@@ -23,11 +23,11 @@ public class SampleLevel extends Level {
 	}
 	
 	protected void loadEverything() {
-		Key key1 = new Key("Room Key",Settings.tileSize*1,Settings.tileSize*1);
-		this.objects.add(new PickableObject(key1,Settings.tileSize*1,Settings.tileSize*1));
-		this.objects.add(new Door(key1, true, Settings.tileSize*24,Settings.tileSize*12));
-		this.objects.add(new DataBuffer("test", 2, Settings.tileSize*14,Settings.tileSize));
-		this.entities.add(new Test(new Vector2(Settings.tileSize*5, Settings.tileSize*7)));
+		Key key1 = new Key("Room Key",Settings.worldTileSize*1,Settings.worldTileSize*1);
+		this.objects.add(new PickableObject(key1,Settings.worldTileSize*1,Settings.worldTileSize*1));
+		this.objects.add(new Door(key1, true, Settings.worldTileSize*24,Settings.worldTileSize*12));
+		this.objects.add(new DataBuffer("test", 2, Settings.worldTileSize*14,Settings.worldTileSize));
+		this.entities.add(new Test(new Vector2(Settings.worldTileSize*5, Settings.worldTileSize*7)));
 	}
 
 }

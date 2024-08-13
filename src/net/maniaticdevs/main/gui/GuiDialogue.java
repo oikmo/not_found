@@ -10,8 +10,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.sun.xml.internal.ws.api.ResourceLoader;
-
+import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.gui.GuiScreen;

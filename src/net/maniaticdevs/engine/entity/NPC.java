@@ -184,11 +184,11 @@ public class NPC extends Entity {
 		int screenX = getPosition().x - playerPos.x + playerScreenPos.x;
 		int screenY = getPosition().y - playerPos.y + playerScreenPos.y;
 
-		if(getPosition().x + Settings.tileSize > playerPos.x - playerScreenPos.x &&
-				getPosition().x - Settings.tileSize < playerPos.x + playerScreenPos.x &&
-				getPosition().y + Settings.tileSize > playerPos.y - playerScreenPos.y &&
-				getPosition().y - Settings.tileSize < playerPos.y + playerScreenPos.y) {
-			g2.drawImage(sprites[spriteNum+direction.ordinal()*6], screenX, screenY, Settings.tileSize, Settings.tileSize, null);
+		if(getPosition().x + Settings.worldTileSize > playerPos.x - playerScreenPos.x &&
+				getPosition().x - Settings.worldTileSize < playerPos.x + playerScreenPos.x &&
+				getPosition().y + Settings.worldTileSize > playerPos.y - playerScreenPos.y &&
+				getPosition().y - Settings.worldTileSize < playerPos.y + playerScreenPos.y) {
+			g2.drawImage(sprites[spriteNum+direction.ordinal()*6], screenX, screenY, Settings.worldTileSize, Settings.worldTileSize, null);
 		}
 	}
 }

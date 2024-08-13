@@ -71,7 +71,7 @@ public class Level {
 	public void draw(Graphics2D g2, Vector2 position, Vector2 screenPosition) {
 		int screenX = 0 - position.x + screenPosition.x;
 		int screenY = 0 - position.y + screenPosition.y;
-		g2.drawImage(mapImage, screenX, screenY, width*Settings.tileSize, height*Settings.tileSize, null);
+		g2.drawImage(mapImage, screenX, screenY, width*Settings.worldTileSize, height*Settings.worldTileSize, null);
 		
 		try {
 			for(OBJ obj : objects) {

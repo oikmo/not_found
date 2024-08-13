@@ -12,6 +12,7 @@ public class Settings {
 	private static final int scale = 3;
 	
 	/** Calculated tileSize from the {@link #originalTileSize} multiplied by the {@link #scale } */
+	public static final int worldTileSize = originalTileSize * scale;
 	public static final int tileSize = originalTileSize * scale;
 	/** Maximum tiles that can be shown at once on the screen horizontally */
 	public static final int maxScreenCol = 17;

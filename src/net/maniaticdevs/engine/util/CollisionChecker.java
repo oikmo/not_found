@@ -28,16 +28,16 @@ public class CollisionChecker {
 		int entityTopWorldY = entity.getPosition().y + entity.getHitBox().y;
 		int entityBottomWorldY = entity.getPosition().y + entity.getHitBox().y + entity.getHitBox().height;
 		
-		int entityLeftCol = entityLeftWorldX/Settings.tileSize;
-		int entityRightCol = entityRightWorldX/Settings.tileSize;
-		int entityTopRow = entityTopWorldY/Settings.tileSize;
-		int entityBottomRow = entityBottomWorldY/Settings.tileSize;
+		int entityLeftCol = entityLeftWorldX/Settings.worldTileSize;
+		int entityRightCol = entityRightWorldX/Settings.worldTileSize;
+		int entityTopRow = entityTopWorldY/Settings.worldTileSize;
+		int entityBottomRow = entityBottomWorldY/Settings.worldTileSize;
 		
 		Tile tileNum1, tileNum2;
 		
 		switch(entity.getDirection()) {
 		case NORTH:
-			entityTopRow = (entityTopWorldY - entity.getSpeed())/Settings.tileSize;
+			entityTopRow = (entityTopWorldY - entity.getSpeed())/Settings.worldTileSize;
 			tileNum1 = Main.currentLevel.getTileAt(entityLeftCol,entityTopRow);
 			tileNum2 = Main.currentLevel.getTileAt(entityRightCol,entityTopRow);
 			if(tileNum1.collision || tileNum2.collision) {
@@ -45,7 +45,7 @@ public class CollisionChecker {
 			}
 			break;
 		case SOUTH:
-			entityBottomRow = (entityBottomWorldY + entity.getSpeed())/Settings.tileSize;
+			entityBottomRow = (entityBottomWorldY + entity.getSpeed())/Settings.worldTileSize;
 			tileNum1 = Main.currentLevel.getTileAt(entityLeftCol,entityBottomRow);
 			tileNum2 = Main.currentLevel.getTileAt(entityRightCol,entityBottomRow);
 			if(tileNum1.collision || tileNum2.collision) {
@@ -53,7 +53,7 @@ public class CollisionChecker {
 			}
 			break;
 		case WEST:
-			entityLeftCol = (entityLeftWorldX - entity.getSpeed())/Settings.tileSize;
+			entityLeftCol = (entityLeftWorldX - entity.getSpeed())/Settings.worldTileSize;
 			tileNum1 = Main.currentLevel.getTileAt(entityLeftCol,entityTopRow);
 			tileNum2 = Main.currentLevel.getTileAt(entityLeftCol,entityBottomRow);
 			if(tileNum1.collision || tileNum2.collision) {
@@ -61,7 +61,7 @@ public class CollisionChecker {
 			}
 			break;
 		case EAST:
-			entityRightCol = (entityRightWorldX + entity.getSpeed())/Settings.tileSize;
+			entityRightCol = (entityRightWorldX + entity.getSpeed())/Settings.worldTileSize;
 			tileNum1 = Main.currentLevel.getTileAt(entityRightCol,entityTopRow);
 			tileNum2 = Main.currentLevel.getTileAt(entityRightCol,entityBottomRow);
 			if(tileNum1.collision || tileNum2.collision) {
@@ -397,7 +397,7 @@ public class CollisionChecker {
 				int yDist = Math.abs(entityChecker.y - objChecker.y);
 				int dist = Math.max(xDist, yDist);
 				
-				if(dist < Settings.tileSize) {
+				if(dist < Settings.worldTileSize) {
 					if(entityChecker.intersects(objChecker)) {
 						return obj;
 					}

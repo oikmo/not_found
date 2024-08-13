@@ -83,4 +83,8 @@ public class Vector2 {
 	public String toString() {
 		return "Vector2[x="+x+",y="+y+"]";
 	}
+	
+	public double magnitude() {
+		return Math.sqrt((x*x)+(y*y));
+	}
 }

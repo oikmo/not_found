@@ -25,26 +25,28 @@ public class Watcher extends Monster {
 	}
 	
 	public void altTick() {
-		float distance = (float) (Math.abs(Main.thePlayer.getPosition().magnitude() - this.position.magnitude())/Settings.tileSize);
-		if(distance <= 2) {
-			if(distance <= 1) {
-				if(distance <= 0.5f) {
-					GuiInGame.sizeGlitches = 20;
+		try {
+			float distance = (float) (Math.abs(Main.thePlayer.getPosition().magnitude() - this.position.magnitude())/Settings.tileSize);
+			if(distance <= 2) {
+				if(distance <= 1) {
+					if(distance <= 0.5f) {
+						GuiInGame.sizeGlitches = 20;
+					} else {
+						GuiInGame.sizeGlitches = 10;
+					}
+					
 				} else {
-					GuiInGame.sizeGlitches = 10;
+					GuiInGame.sizeGlitches = 5;
+				}
+			} else {
+				if(distance <= 4) {
+					GuiInGame.sizeGlitches = 1;
+				} else {
+					GuiInGame.sizeGlitches = 0;
 				}
 				
-			} else {
-				GuiInGame.sizeGlitches = 5;
 			}
-		} else {
-			if(distance <= 4) {
-				GuiInGame.sizeGlitches = 1;
-			} else {
-				GuiInGame.sizeGlitches = 0;
-			}
-			
-		}
+		} catch(NullPointerException e) {}
 	}
 	
 	public void react() {

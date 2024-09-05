@@ -38,6 +38,7 @@ import net.maniaticdevs.engine.util.Logger.LogLevel;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.entity.Test;
+import net.maniaticdevs.main.entity.Watcher;
 import net.maniaticdevs.main.gui.GuiChat;
 import net.maniaticdevs.main.gui.GuiInGame;
 import net.maniaticdevs.main.level.SampleLevel;
@@ -280,6 +281,15 @@ public class PlayerClientListener extends Listener {
 					Main.currentLevel.addEntity(npc);
 				} else {
 					needsToBeAddedEntities.add(npc);
+				}
+				break;
+			case "Watcher":
+				Watcher watcher = new Watcher(new Vector2(packet.x, packet.y));
+				watcher.setNetworkID(packet.networkID);
+				if(Main.currentLevel != null) {
+					Main.currentLevel.addEntity(watcher);
+				} else {
+					needsToBeAddedEntities.add(watcher);
 				}
 				break;
 			}

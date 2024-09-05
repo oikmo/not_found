@@ -283,25 +283,27 @@ public class Main extends JPanel implements Runnable  {
 		g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 		g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 		
-		if(thePlayer != null) { 
-			if(currentLevel != null) {
-				currentLevel.draw(g2, thePlayer.getPosition(), thePlayer.getScreenPosition());
+		try {
+			if(thePlayer != null) { 
+				if(currentLevel != null) {
+					currentLevel.draw(g2, thePlayer.getPosition(), thePlayer.getScreenPosition());
+				}
+				thePlayer.draw(g2);
+				
+				if(theNetwork != null) {
+					theNetwork.update();
+					try {
+						for(OtherPlayer p : Main.theNetwork.players.values()) {
+							p.draw(g2, thePlayer.getPosition(), thePlayer.getScreenPosition());
+						}
+					} catch(Exception e) {}
+				}
 			}
-			thePlayer.draw(g2);
-			
-			if(theNetwork != null) {
-				theNetwork.update();
-				try {
-					for(OtherPlayer p : Main.theNetwork.players.values()) {
-						p.draw(g2, thePlayer.getPosition(), thePlayer.getScreenPosition());
-					}
-				} catch(Exception e) {}
-			}
-		}
 
-		if(currentScreen != null) {
-			currentScreen.draw(g2);
-		}
+			if(currentScreen != null) {
+				currentScreen.draw(g2);
+			}
+		} catch(Exception e) {}
 
 		g2.setColor(Color.WHITE);
 		g2.setFont(GuiScreen.font.deriveFont(18.0F));

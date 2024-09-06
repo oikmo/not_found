@@ -25,6 +25,7 @@ public class GuiPauseScreen extends GuiScreen {
 	/** Sub {@link GuiScreen} to be rendered */
 	private GuiScreen subScreen;
 	
+	/** Funny image at the bottom of the screen */
 	private BufferedImage potato;
 	
 	/** To prevent action to be done repeatedly in a short period of time */
@@ -43,7 +44,8 @@ public class GuiPauseScreen extends GuiScreen {
 	
 	/** Prevent action being done on the same frame as the last one to enter */
 	private int tickDelay = 5;
-
+	
+	/** Loads the {@link #potato} image */
 	public GuiPauseScreen() {
 		try {
 			potato = ImageIO.read(ResourceLoader.class.getResourceAsStream("/textures/object/thinking-potato.png"));

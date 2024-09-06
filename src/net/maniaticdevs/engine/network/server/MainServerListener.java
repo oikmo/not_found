@@ -231,7 +231,6 @@ public class MainServerListener extends Listener {
 		}
 		else if(object instanceof PacketRemoveObject) {
 			PacketRemoveObject packet = (PacketRemoveObject) object;
-			packet.id = connection.getID();
 			MainServer.server.sendToAllExceptTCP(connection.getID(), packet);
 		}
 		else if(object instanceof PacketUpdateEntityAnimation) {

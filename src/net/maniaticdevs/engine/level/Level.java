@@ -117,7 +117,6 @@ public class Level {
 	public void removeObject(OBJ obj) {
 		if(Main.theNetwork != null) {
 			PacketRemoveObject packet = new PacketRemoveObject();
-			packet.id = Main.theNetwork.client.getID();
 			packet.networkID = obj.networkID;
 			Main.theNetwork.client.sendTCP(packet);
 		}

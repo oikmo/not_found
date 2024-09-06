@@ -29,6 +29,7 @@ import net.maniaticdevs.engine.network.packet.PacketUpdateEntityDirection;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerDirection;
 import net.maniaticdevs.engine.network.packet.PacketUserName;
+import net.maniaticdevs.engine.objects.DataBuffer;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
 import net.maniaticdevs.engine.objects.OBJ;
@@ -256,6 +257,15 @@ public class PlayerClientListener extends Listener {
 					Main.currentLevel.addObject(pickable);
 				} else {
 					needsToBeAddedObjs.add(pickable);
+				}
+				break;
+			case "DataBuffer":
+				DataBuffer buffer = new DataBuffer(packet.subObj, Integer.parseInt(packet.subNetworkID), packet.x, packet.y);
+				buffer.setNetworkID(packet.networkID);
+				if(Main.currentLevel != null) {
+					Main.currentLevel.addObject(buffer);
+				} else {
+					needsToBeAddedObjs.add(buffer);
 				}
 				break;
 			}

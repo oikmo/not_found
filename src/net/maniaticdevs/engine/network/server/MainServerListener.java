@@ -27,6 +27,7 @@ import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerDirection;
 import net.maniaticdevs.engine.network.packet.PacketUserName;
 import net.maniaticdevs.engine.network.packet.RandomNumber;
+import net.maniaticdevs.engine.objects.DataBuffer;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.objects.PickableObject;
@@ -143,6 +144,10 @@ public class MainServerListener extends Listener {
 						packetaddobj.subObj = pickable.getItem().getClass().getSimpleName();
 						packetaddobj.subObjName = pickable.getItem().name;
 						packetaddobj.subNetworkID = pickable.getItem().networkID;
+					} else if(obj instanceof DataBuffer) {
+						DataBuffer buffer = (DataBuffer) obj;
+						packetaddobj.subObj = buffer.bufferName;
+						packetaddobj.subNetworkID = Integer.toString(buffer.direction);
 					}
 					connection.sendUDP(packetaddobj);
 				}

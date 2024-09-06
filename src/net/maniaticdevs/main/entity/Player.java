@@ -89,6 +89,7 @@ public class Player extends Entity {
 		deadSprite = ImageUtils.scaleImage(ResourceLoader.loadImage("/textures/player/player_dead.png"), Settings.tileSize, Settings.tileSize);
 	}
 	
+	@SuppressWarnings("unused")
 	private void checkLevelUp() {
 		if(exp >= nextLevelExp) {
 			Main.sfxLib.play(SoundSFXEnum.powerUp);

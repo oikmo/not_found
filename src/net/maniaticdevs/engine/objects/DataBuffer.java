@@ -18,7 +18,8 @@ import net.maniaticdevs.main.gui.GuiDialogue;
 public class DataBuffer extends OBJ {
 	
 	private List<String> buffer;
-	private int direction;
+	public String bufferName;
+	public int direction;
 	
 	/**
 	 * Door constructor
@@ -29,6 +30,7 @@ public class DataBuffer extends OBJ {
 	 */
 	public DataBuffer(String bufferText, int direction, int x, int y) {
 		name = "Data Buffer";
+		this.bufferName = bufferText;
 		this.direction = direction;
 		try {
 			buffer = StringUtil.loadTextFile("dialogues/buffer_"+bufferText+".txt");

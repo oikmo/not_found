@@ -241,7 +241,6 @@ public class CollisionChecker {
 	 * If entity is player, then the collided entity will be returned.
 	 * 
 	 * @param entity subject to collision testing
-	 * @return {@link Entity}
 	 */
 	public static void checkPlayer(Entity entity) {
 		

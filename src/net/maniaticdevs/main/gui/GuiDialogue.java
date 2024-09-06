@@ -28,28 +28,41 @@ public class GuiDialogue extends GuiScreen {
 	
 	/** Dialogue list to go through */
 	private List<String> dialogues;
+	/** currently displaying character */
 	private String currentDialogue;
+	/** To keep track of current dialogue in array */
 	private int dialogueIndex = 0;
+	/** To create that scrolling text effect */
 	private int charIndex = 0;
+	/** Result of scrolling text */
 	private String combinedText = "";
 	
+	/** name supplied from dialogue file */
 	private String name = null;
 	
+	/** Ticks */
 	private int tickDelay = 15, ticks;
+	/** loaded from {@link  net.maniaticdevs.engine.objects.DataBuffer} or nah */
 	private boolean dataBuffer;
 	
+	/** Info for NPC that uses dialogues */
 	public NPC npc;
 	
+	/** Background */
 	private static Color color = new Color(0,0,0,180);
+	/** DataBuffer image */
 	private static BufferedImage bufferImage;
+	/** Cool background audio for DataBuffer */
 	private static Sound blackbox;
 	
+	/** Lock to prevent sounds to play all at once */
 	private boolean playBG = false;
 	
 	/** 
 	 * Constructor 
+	 * @param dataBuffer was this called from {@link net.maniaticdevs.engine.objects.DataBuffer}
 	 * @param dialogue Dialogues to be loaded
-	 * @param npc To re-enable...
+	 * @param npc To lock and unlock when done
 	 */
 	public GuiDialogue(boolean dataBuffer, List<String> dialogue, NPC npc) {
 		if(bufferImage == null) {
@@ -86,8 +99,6 @@ public class GuiDialogue extends GuiScreen {
 	public void draw(Graphics2D g2) {
 		drawDialogueScreen(g2);
 	}
-	
-	int musicTicks = 0;
 	
 	public void tick() {
 		if(tickDelay != 0) {
@@ -152,6 +163,10 @@ public class GuiDialogue extends GuiScreen {
 		}
 	}
 	
+	/**
+	 * Draws the dialogue screen
+	 * @param g2 Graphics
+	 */
 	public void drawDialogueScreen(Graphics2D g2) {
 		int width = (Settings.tileSize*14);
 		int x = (Main.getInstance().getWidth()/2)-(width/2);
@@ -191,6 +206,7 @@ public class GuiDialogue extends GuiScreen {
 		}
 	}
 	
+	/** To properly unlock the NPC in use (or stop all sounds from {@link net.maniaticdevs.engine.objects.DataBuffer} */
 	public void cancelDialogue() {
 		if(dataBuffer) {
 			blackbox.stop();

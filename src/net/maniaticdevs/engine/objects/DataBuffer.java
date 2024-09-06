@@ -12,17 +12,20 @@ import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.gui.GuiDialogue;
 
 /**
- * A barrier to the player (unless they have a key :P)
+ * A source of information for the player...
  * @author Oikmo
  */
 public class DataBuffer extends OBJ {
 	
+	/** All pieces of dialogue to be loaded */
 	private List<String> buffer;
+	/** For networking, to load buffer file on all clients */
 	public String bufferName;
+	/** Which way is it facing? */
 	public int direction;
 	
 	/**
-	 * Door constructor
+	 * Buffer constructor
 	 * @param bufferText Text file to load
 	 * @param direction 0 = down, 1 = up, 2 = right, 3 = left
 	 * @param x X coordinate
@@ -75,6 +78,10 @@ public class DataBuffer extends OBJ {
 		
 	}
 	
+	/**
+	 * Returns buffer dialogues
+	 * @return {@link List}	&#60;{@link String}&#62;	
+	 */
 	public List<String> getBuffer() {
 		return buffer;
 	}

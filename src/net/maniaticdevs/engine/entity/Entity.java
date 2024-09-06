@@ -13,6 +13,7 @@ import net.maniaticdevs.engine.util.math.Vector2;
  */
 public abstract class Entity {
 	
+	/** To keep track of entities for network synchronisation */
 	public String networkID = UUID.randomUUID().toString();
 	
 	/** Entity name for like easier tracking and nameplates */
@@ -64,7 +65,9 @@ public abstract class Entity {
 	/** Moolas... */
 	public int coin;
 	
+	/** Should entity be allowed to attack? */
 	public boolean isInvince;
+	/** How long the invincibility lasts for */
 	public int invinceCounter;
 	
 	/** Calls {@link #setDefaultValues()} */
@@ -144,10 +147,18 @@ public abstract class Entity {
 		return speed;
 	}
 	
+	/** 
+	 * Sets the {@link #networkID}
+	 * @param ID ID to be set to
+	 */
 	public void setNetworkID(String ID) {
 		this.networkID = ID;
 	}
-
+	
+	/**
+	 * Sets the {@link EntityDirection} of Entity (networking reasons)
+	 * @param entityDirection direction to be set
+	 */
 	public void setDirection(EntityDirection entityDirection) {
 		this.direction = entityDirection;
 	}

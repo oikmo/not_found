@@ -9,8 +9,16 @@ import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.gui.GuiDialogue;
 
+/**
+ * Test NPC (it just has that name now canonically)
+ * @author Oikmo
+ */
 public class Test extends NPC {
 	
+	/**
+	 * Test NPC constructor
+	 * @param position Where to spawn at
+	 */
 	public Test(Vector2 position) {
 		super(position);
 		//player/playerSheet
@@ -20,10 +28,6 @@ public class Test extends NPC {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public void tickers() {
-		
 	}
 	
 	public void setDefaultValues() {

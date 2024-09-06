@@ -92,7 +92,10 @@ public class Level {
 		
 	}
 	
-	/** Logic function */
+	/** 
+	 * Logic function
+	 * @param server So that no entities tick on client side, only server.
+	 */
 	public void tick(boolean server) {
 		try {
 			for(OBJ obj : objects) {
@@ -192,7 +195,11 @@ public class Level {
 	public List<Entity> getEntities() {
 		return entities;
 	}
-
+	
+	/**
+	 * Adds entity to {@link #entities}
+	 * @param ent Entity to be added
+	 */
 	public void addEntity(Entity ent) {
 		entities.add(ent);
 	}

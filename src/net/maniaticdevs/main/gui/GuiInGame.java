@@ -24,18 +24,20 @@ public class GuiInGame extends GuiScreen {
 	/** Chat screen to show during game */
 	public GuiChat chatScreen;
 	
-	/**
-	 * Heart sprites. Loaded statically as to not reload the same image over and over again.
-	 */
+	/** Heart sprites. Loaded statically as to not reload the same image over and over again. */
 	private static BufferedImage[] sprites = ImageUtils.setupSheet("player/heartSheet", 3, 1);
 	/** Pick up alerts */
 	public static String message = null;
 	
+	/** For the holding item box in the top right */
 	private Color selectedColor = new Color(100,100,100, 200);
 	
+	/** The glitch box list */
 	private List<Rectangle> glitchBoxes = new ArrayList<Rectangle>();
+	/** To determine size and position of each glitch box */
 	private Random random = new Random();
 	
+	/** How many glitch boxes at once? (Dynamic) */
 	public static int sizeGlitches = 0;
 	
 	public void tick() {

@@ -15,7 +15,7 @@ import net.maniaticdevs.main.Main;
  * @author Oikmo
  */
 public abstract class OBJ {
-	
+	/** To keep track of objects for network synchronisation */
 	public String networkID = UUID.randomUUID().toString();
 	
 	/** Sprite */
@@ -73,6 +73,10 @@ public abstract class OBJ {
 		return hitBox;
 	}
 	
+	/** 
+	 * Sets the {@link #networkID}
+	 * @param netID ID to be set to
+	 */
 	public void setNetworkID(String netID) {
 		this.networkID = netID;
 	}

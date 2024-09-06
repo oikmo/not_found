@@ -17,6 +17,11 @@ import net.maniaticdevs.main.Main;
  */
 public class SaveSystem {
 	
+	/**
+	 * Saves object to file (.dat)
+	 * @param name Name (and location) of file
+	 * @param data Object to save
+	 */
 	public static void save(String name, Object data) {
 	    try {
 	    	FileOutputStream fos = new FileOutputStream(Main.getWorkingDirectory() + "/" + name + ".dat");
@@ -31,6 +36,11 @@ public class SaveSystem {
 		}   
 	}
 	
+	/**
+	 * Loads object from file (.dat)
+	 * @param name Name (and location) of file
+	 * @return {@link Object}
+	 */
 	public static Object load(String name) {	
 		File save = new File(Main.getWorkingDirectory() + "/" + name + ".dat");
 		if(save.exists()) {

@@ -18,6 +18,7 @@ public class SampleLevel extends Level {
 	
 	/**
 	 * Loads sample map
+	 * @param dontLoad if true then don't call {@link #loadEverything()}
 	 */
 	public SampleLevel(boolean dontLoad) {
 		super("sample", "Sample", 32, 32, dontLoad);

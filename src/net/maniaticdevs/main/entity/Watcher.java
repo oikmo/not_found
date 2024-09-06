@@ -10,7 +10,16 @@ import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.gui.GuiInGame;
 
+/**
+ * A monster that may or may not interfere with time and space.
+ * @author Oikmo
+ */
 public class Watcher extends Monster {
+	
+	/**
+	 * Watcher Monster Constructor
+	 * @param position Where to spawn at
+	 */
 	public Watcher(Vector2 position) {
 		super(position);
 		
@@ -54,12 +63,19 @@ public class Watcher extends Monster {
 		direction = Main.thePlayer.getDirection();
 	}
 	
+	/**
+	 * Drops item at entity position
+	 * @param droppedItem Item to set position to
+	 */
 	public void dropItem(OBJ droppedItem) {
 		droppedItem.position.x = position.x;
 		droppedItem.position.y = position.y;
 		Main.currentLevel.addObject(droppedItem);
 	}
 	
+	/**
+	 * Checks what object to drop when killed
+	 */
 	public void checkDrop() {
 		//cast a die
 		int i = new Random().nextInt(100)+1;

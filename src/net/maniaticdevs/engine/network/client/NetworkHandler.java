@@ -2,9 +2,6 @@ package net.maniaticdevs.engine.network.client;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-
-import javax.swing.JFrame;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
@@ -12,7 +9,6 @@ import com.esotericsoftware.kryonet.Client;
 import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.network.packet.LoginRequest;
 import net.maniaticdevs.engine.network.packet.LoginResponse;
-import net.maniaticdevs.engine.network.packet.Message;
 import net.maniaticdevs.engine.network.packet.PacketAddEntity;
 import net.maniaticdevs.engine.network.packet.PacketAddObject;
 import net.maniaticdevs.engine.network.packet.PacketAddPlayer;
@@ -38,43 +34,55 @@ import net.maniaticdevs.engine.util.Logger.LogLevel;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 
+/**
+ * Client side program
+ * @author Oikmo
+ */
 public class NetworkHandler {
-	
-	public static float rand;
-
-	public static JFrame frame;
-	public Random random = new Random();
-	
-	private int port = 25565;
-	private int timeout = 500000;
-	private String ip;
-	
-	public Client client;
-	private static Kryo kryo;
-	
-	public OtherPlayer player;
-	public Map<Integer, OtherPlayer> players = new HashMap<Integer, OtherPlayer>();
-	
-	private int tickTimer = 0;
+	/** For Version sakes, to make sure players are on the right version when joining */
 	public static final int NETWORK_PROTOCOL = 1;
 	
-	public boolean stopUpdating = false;
+	/** Kryo Client */
+	public Client client;
+	/** Kryo Networking :D */
+	private Kryo kryo;
 	
+	/** Port to connect to server with */
+	private int port = 25565;
+	/** Packet timeouts, too long? Disconnect. */
+	private int timeout = 5000;
+	
+	/** Other connected players from server */
+	public Map<Integer, OtherPlayer> players = new HashMap<Integer, OtherPlayer>();
+	/** Player data */
+	public OtherPlayer player;
+	
+	/** To show the "Server closed" message */
+	public boolean stopUpdating = false;
+	/** Updates the position of the player */
+	private int tickUpdatePositionTimer = 0;
+	
+	/**
+	 * Connects to server on creation
+	 * @param ipAddress IP to connect to server with
+	 * @throws Exception if it can't connect, make something up!
+	 */
 	public NetworkHandler(String ipAddress) throws Exception {
-		this.ip = ipAddress;
 		players = new HashMap<Integer, OtherPlayer>();
 		player = new OtherPlayer();
 		player.userName = Main.playerName;
 		client = new Client();
 		kryo = client.getKryo();
 		registerKryoClasses();
-		connect(ip);
+		connect(ipAddress);
 	}
 	
+	/**
+	 * Registers all classes in {@link net.maniaticdevs.engine.network.packet}
+	 */
 	private void registerKryoClasses() {
 		kryo.register(LoginRequest.class);
 		kryo.register(LoginResponse.class);
-		kryo.register(Message.class);
 		kryo.register(PacketAddPlayer.class);
 		kryo.register(PacketChatMessage.class);
 		kryo.register(PacketRemovePlayer.class);
@@ -97,6 +105,11 @@ public class NetworkHandler {
 		kryo.register(RandomNumber.class);
 	}
 	
+	/** 
+	 * Logic function (called by {@link net.maniaticdevs.main.Main})
+	 * 
+	 * Handles player animation and direction.
+	 */
 	public void tick() {
 		int lastAnimTick = player.anim;
 		player.anim = Main.thePlayer.spriteNum;
@@ -116,10 +129,10 @@ public class NetworkHandler {
 			client.sendUDP(packet);
 		}
 		
-		if(tickTimer <= 5) {
-			tickTimer++;
+		if(tickUpdatePositionTimer <= 20) {
+			tickUpdatePositionTimer++;
 		} else {
-			tickTimer = 0;
+			tickUpdatePositionTimer = 0;
 			Vector2 pos = Main.thePlayer.getPosition();
 			player.updatePosition(pos.x, pos.y);
 			PacketPlayerUpdateX packetX = new PacketPlayerUpdateX();
@@ -131,6 +144,9 @@ public class NetworkHandler {
 		}
 	}
 	
+	/**
+	 * Runs freely, handles positioning.
+	 */
 	public void update() {
 		if(stopUpdating) {
 			return;
@@ -147,7 +163,6 @@ public class NetworkHandler {
 				}
 			}
 		} catch(Exception e) {}
-		
 		
 		if(client != null) {
 			if(players.containsKey(client.getID())) {
@@ -173,6 +188,11 @@ public class NetworkHandler {
 		}
 	}
 	
+	/**
+	 * Connects to server
+	 * @param ip IP to connect to server with
+	 * @throws Exception if it can't connect, make something up!
+	 */
 	public void connect(String ip) throws Exception {
 		Logger.log(LogLevel.INFO, "Connecting...");
 		client.start();
@@ -187,6 +207,9 @@ public class NetworkHandler {
 		Logger.log(LogLevel.INFO, "Connected.");
 	}
 	
+	/**
+	 * Sends a {@link PacketSavePlayerPosition} packet before disconnecting (100ms wait before doing so as to send packet)
+	 */
 	public void disconnect()  {
 		if(Main.thePlayer != null) {
 			PacketSavePlayerPosition data = new PacketSavePlayerPosition();

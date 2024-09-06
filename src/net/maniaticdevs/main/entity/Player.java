@@ -34,7 +34,6 @@ import net.maniaticdevs.main.gui.GuiInGame;
  * Player class! Does player things...
  * 
  * @author Oikmo, LYCNK
- *
  */
 public class Player extends Entity {
 
@@ -65,11 +64,14 @@ public class Player extends Entity {
 	boolean lockTakeLife = false;
 	/** To prevent action to be done repeatedly in a short period of time */
 	boolean lockGiveLife = false;
-
-	private int ticks = 0;
-
+	
+	/** If set, it will count down to 0 in which it removes the active notification from {@link GuiInGame} */
+	private int notficationTicks = 0;
+	
+	/** Chat bubbles for player */
 	public List<ChatMessage> messages = new ArrayList<>();
 	
+	/** When the player dies, this shows up */
 	private BufferedImage deadSprite;
 
 	@Override
@@ -89,6 +91,10 @@ public class Player extends Entity {
 		deadSprite = ImageUtils.scaleImage(ResourceLoader.loadImage("/textures/player/player_dead.png"), Settings.tileSize, Settings.tileSize);
 	}
 	
+	/**
+	 * If the player kills a monster, this is ran.
+	 * If {@link #exp} is higher than (or equal to) {@link #nextLevelExp} then level up.
+	 */
 	@SuppressWarnings("unused")
 	private void checkLevelUp() {
 		if(exp >= nextLevelExp) {
@@ -103,7 +109,8 @@ public class Player extends Entity {
 		}
 		
 	}
-
+	
+	/** Updates the player center of screen */
 	public void updateScreenPos() {
 		screenPos.set((Main.getInstance().getWidth() / 2 - (Settings.tileSize / 2)), Main.getInstance().getHeight() / 2 - (Settings.tileSize / 2));
 	}
@@ -112,9 +119,9 @@ public class Player extends Entity {
 	public void tick() {
 		if (isInvince) { invinceCounter++; if (invinceCounter > 40) { isInvince = false; invinceCounter = 0; } }
 		
-		if(ticks != 0 && GuiInGame.message != null) {
-			ticks--;
-			if(ticks <= 0 && GuiInGame.message != null) {
+		if(notficationTicks != 0 && GuiInGame.message != null) {
+			notficationTicks--;
+			if(notficationTicks <= 0 && GuiInGame.message != null) {
 				GuiInGame.message = null;
 			}
 		}
@@ -206,7 +213,7 @@ public class Player extends Entity {
 				
 				if(contactOBJ instanceof PickableObject) {
 					inventory.add(((PickableObject)contactOBJ).getItem());
-					ticks = 180;
+					notficationTicks = 180;
 					GuiInGame.message = "You picked up: "+((PickableObject)contactOBJ).getItem().name;
 					if(((PickableObject)contactOBJ).getItem() instanceof Key) {
 						Main.sfxLib.play(SoundSFXEnum.key);
@@ -263,6 +270,10 @@ public class Player extends Entity {
 		}
 	}
 	
+	/**
+	 * Changes the player health
+	 * @param amount Amount to change health by
+	 */
 	public void changePlayerHealth(int amount) {
 		health += amount;
 		if(health > maxHealth) {

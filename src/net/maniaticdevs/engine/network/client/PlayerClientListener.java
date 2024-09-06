@@ -44,11 +44,17 @@ import net.maniaticdevs.main.gui.GuiChat;
 import net.maniaticdevs.main.gui.GuiInGame;
 import net.maniaticdevs.main.level.SampleLevel;
 
+/**
+ * Packet listener for client
+ * @author Oikmo
+ */
 public class PlayerClientListener extends Listener {
 
+	/** Special objs to be added to the level */
 	public static List<OBJ> specialOBJs = new ArrayList<>();
-
-	private static List<OBJ> needsToBeAddedObjs = new ArrayList<>(); 
+	/** Objs to be added to the level */
+	private static List<OBJ> needsToBeAddedObjs = new ArrayList<>();
+	/** Entities to be added to the level */
 	private static List<Entity> needsToBeAddedEntities = new ArrayList<>(); 
 
 	public void received(Connection connection, Object object) {
@@ -173,16 +179,12 @@ public class PlayerClientListener extends Listener {
 			PacketPlayerUpdateX packet = (PacketPlayerUpdateX) object;
 			if(Main.theNetwork.players.get(packet.id) != null) {
 				Main.theNetwork.players.get(packet.id).x = packet.x;
-			} else {
-				requestInfo(connection);
 			}
 		} 
 		else if(object instanceof PacketPlayerUpdateY){
 			PacketPlayerUpdateY packet = (PacketPlayerUpdateY) object;
 			if(Main.theNetwork.players.get(packet.id) != null) {
 				Main.theNetwork.players.get(packet.id).y = packet.y;
-			} else {
-				requestInfo(connection);
 			}
 		} 
 		else if(object instanceof PacketChatMessage) {
@@ -364,7 +366,14 @@ public class PlayerClientListener extends Listener {
 			}
 		}
 	}
-
+	
+	/**
+	 * Any important objects get processed here as to only appear once EVER.
+	 * @param networkID ID of special object
+	 * @param classs Class of special object
+	 * @param name Name of special object
+	 * @return {@link OBJ}
+	 */
 	private OBJ addSpecialObject(String networkID, String classs, String name) {
 		boolean shouldadd = true;
 		for(OBJ obj : specialOBJs) {
@@ -384,11 +393,5 @@ public class PlayerClientListener extends Listener {
 			}
 		}
 		return null;
-	}
-
-	private void requestInfo(Connection connection) {
-		if(!Main.theNetwork.players.keySet().contains(connection.getID())) {
-			Main.theNetwork.players.put(connection.getID(), new OtherPlayer());
-		}
 	}
 }

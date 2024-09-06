@@ -33,8 +33,13 @@ import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.objects.PickableObject;
 import net.maniaticdevs.main.Main;
 
+/**
+ * Listens and handles packets
+ * @author Oikmo
+ */
 public class MainServerListener extends Listener {
-
+	
+	/** Connected players */
 	public static Map<Integer, OtherPlayer> players = new HashMap<Integer, OtherPlayer>();
 
 	public void connected(Connection connection) {
@@ -119,7 +124,7 @@ public class MainServerListener extends Listener {
 				}
 				
 				PacketGameJoin packetGameJoin = new PacketGameJoin();
-				packetGameJoin.map = MainServer.map;
+				packetGameJoin.map = MainServer.currentLevel.getName().toLowerCase();
 				connection.sendTCP(packetGameJoin);
 				
 				if(request.getUserName().length() > 20) {

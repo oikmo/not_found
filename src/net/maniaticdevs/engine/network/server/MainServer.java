@@ -2,7 +2,6 @@ package net.maniaticdevs.engine.network.server;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Random;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Server;
@@ -11,7 +10,6 @@ import net.maniaticdevs.engine.level.Level;
 import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.network.packet.LoginRequest;
 import net.maniaticdevs.engine.network.packet.LoginResponse;
-import net.maniaticdevs.engine.network.packet.Message;
 import net.maniaticdevs.engine.network.packet.PacketAddEntity;
 import net.maniaticdevs.engine.network.packet.PacketAddObject;
 import net.maniaticdevs.engine.network.packet.PacketAddPlayer;
@@ -36,45 +34,58 @@ import net.maniaticdevs.engine.util.Logger;
 import net.maniaticdevs.engine.util.Logger.LogLevel;
 import net.maniaticdevs.main.level.SampleLevel;
 
+/**
+ * Server program
+ * @author Oikmo
+ */
 public class MainServer {
-
-	private int tcpPort;
-	private int udpPort;
-	public static Server server;
-	private Kryo kryo;
-	public static float randomFloatNumber;
-
-	static MainServerListener listener = new MainServerListener();
-
-	private static String version = "S1.0.0";
-	public static final int NETWORK_PROTOCOL = 1;
 	
-	public static String map;
+	/** For Version sakes, to make sure players are on the right version when joining */
+	public static final int NETWORK_PROTOCOL = 1;
+	/** Server Version (Debug reasons or something) */
+	private static String version = "S1.0.0";
+	
+	/** Kryo Server */
+	public static Server server;
+	/** Kryo Networking :D */
+	private Kryo kryo;
+	
+	/** Port that server is running on... */
+	private int port;
+	
+	/** Packet Listener */
+	private static MainServerListener listener = new MainServerListener();
+	
+	/** Currently Loaded map */
 	public static Level currentLevel;
 
-	public MainServer(int tcpPort, String mapToLoad) {
-		this.tcpPort = tcpPort;
-		this.udpPort = tcpPort;
-		map = mapToLoad;
+	/** 
+	 * Creates and starts server
+	 * @param port What port the server should run on
+	 * @param mapToLoad What map the server should load
+	 */
+	public MainServer(int port, String mapToLoad) {
+		this.port = port;
+		
 		switch(mapToLoad) {
-		case "sample":
-			currentLevel = new SampleLevel(false);
-			break;
+			case "sample":
+				currentLevel = new SampleLevel(false);
+				break;
 		}
 		append("----------------------------");
+		
 		server = new Server();
-		//append(splashes[new Random().nextInt(splashes.length)]);
 		kryo = server.getKryo();
 		registerKryoClasses();
-		Random rand = new Random();
-		randomFloatNumber = rand.nextFloat();
 		startServer();
 	}
 	
+	/**
+	 * Registers all classes in {@link net.maniaticdevs.engine.network.packet}
+	 */
 	private void registerKryoClasses() {
 		kryo.register(LoginRequest.class);
 		kryo.register(LoginResponse.class);
-		kryo.register(Message.class);
 		kryo.register(PacketAddPlayer.class);
 		kryo.register(PacketChatMessage.class);
 		kryo.register(PacketRemovePlayer.class);
@@ -96,14 +107,17 @@ public class MainServer {
 		kryo.register(PacketNPCLock.class);
 		kryo.register(RandomNumber.class);
 	}
-
+	
+	/**
+	 * Starts server
+	 */
 	public void startServer() {
 		append("Starting Server ("+version+") ...");
 		server.start();
 		try {
-			server.bind(tcpPort, udpPort);
+			server.bind(port, port);
 			server.addListener(listener);
-			append("Server online! (PORT="+ tcpPort +")");
+			append("Server online! (PORT="+ port +")");
 			append("----------------------------");
 		} catch (IOException e) {
 			append("Port already in use");
@@ -111,10 +125,16 @@ public class MainServer {
 		}
 	}
 	
+	/** 
+	 * Logic function (called by {@link net.maniaticdevs.main.Main})
+	 */
 	public void tick() {
 		currentLevel.tick(true);
 	}
-
+	
+	/**
+	 * Stops server, disconnects all players before doing so.
+	 */
 	public void stopServer() {
 		append("Server stopped.");
 		PacketRemovePlayer packetDisconnect = new PacketRemovePlayer();
@@ -123,16 +143,19 @@ public class MainServer {
 		server.stop();
 	}
 
+	
+	/**
+	 * Runs commands
+	 * @param cmd Command to be parsed
+	 */
 	@SuppressWarnings("unused")
 	public void handleCommand(String cmd) {
 		String command = cmd.replace("/", "");
 
 		if(command.contentEquals("help")) {
 			append("setSpawn - sets spawn location of server - (setSpawn <x> <z>)");
-			append("seed - returns the seed of the world - (seed)");
 			append("save - saves the world - (save)");
 			append("kick - kicks a player from their ip - (kick <id> <reason>) or (kick <playerName> <reason>)");
-			append("chunks - returns total chunk size of world - (chunks)");
 			append("players - see every player on server - (players)");
 		} else if(command.startsWith("setSpawn ")) {
 			String[] split = cmd.split(" ");
@@ -242,6 +265,10 @@ public class MainServer {
 		}
 	}
 	
+	/**
+	 * Logging
+	 * @param toAppend To add
+	 */
 	public void append(String toAppend) {
 		Logger.log(LogLevel.INFO, toAppend);
 	}

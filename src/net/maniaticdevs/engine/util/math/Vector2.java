@@ -31,9 +31,13 @@ public class Vector2 {
 		this.y = y;
 	}
 	
-	public Vector2(Vector2 position) {
-		this.x = position.x;
-		this.y = position.y;
+	/**
+	 * Creates vector from existing vector
+	 * @param vector Vector to set to
+	 */
+	public Vector2(Vector2 vector) {
+		this.x = vector.x;
+		this.y = vector.y;
 	}
 
 	/**
@@ -84,6 +88,10 @@ public class Vector2 {
 		return "Vector2[x="+x+",y="+y+"]";
 	}
 	
+	/**
+	 * The calculated length of the vector
+	 * @return {@link Double}
+	 */
 	public double magnitude() {
 		return Math.sqrt((x*x)+(y*y));
 	}

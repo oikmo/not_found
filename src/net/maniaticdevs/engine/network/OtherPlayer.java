@@ -14,27 +14,46 @@ import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 
+/**
+ * Represents players on a server
+ * @author Oikmo
+ */
 public class OtherPlayer {
-
+	
+	/** Active connection */
 	public Connection c;
+	/** Active connection id */
 	public int id = -1;
-
+	
+	/** Player name */
 	public String userName;
+	/** Current animation frame */
 	public int anim;
+	/** Current facing direction */
 	public int direction;
-
+	
+	/** Chat bubbles */
 	public List<ChatMessage> messages = new ArrayList<>();
-
+	
+	/** World position */
 	public int x, y;
 
 	/** Used for collision checking */
 	protected Rectangle hitBox = new Rectangle(8, 1, 32, 46);
-
+	
+	/**
+	 * Sets the position to given parameters
+	 * @param x X position
+	 * @param y Y position
+	 */
 	public void updatePosition(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
-
+	
+	/**
+	 * To remove messages after a while (or remove extra ones)
+	 */
 	public void tick() {
 		for(int i = 0; i < messages.size(); i++) {
 			if(messages.size() > 5) {
@@ -45,7 +64,8 @@ public class OtherPlayer {
 	}
 
 	/**
-	 * Draws player, if is not seen by player then it is not drawn
+	 * Draws player, if is not seen by player then it is not drawn.
+	 * <br>Draws username and chat bubbles
 	 * @param g2 Graphics
 	 * @param playerPos Player world position
 	 * @param playerScreenPos Player screen position
@@ -89,7 +109,11 @@ public class OtherPlayer {
 			}
 		}
 	}
-
+	
+	/**
+	 * Returns {@link #hitBox}
+	 * @return {@link Rectangle}
+	 */
 	public Rectangle getHitBox() {
 		return hitBox;
 	}

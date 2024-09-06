@@ -14,33 +14,50 @@ import net.maniaticdevs.engine.util.CollisionChecker;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 
+/**
+ * Runs around doing stupid stuff (and may give out quests to players)
+ * @author Oikmo
+ *
+ */
 public class NPC extends Entity {
 	
+	/** For {@link net.maniaticdevs.main.gui.GuiDialogue} */
 	public List<String> dialogueToBeLoaded;
 	
+	/** Completely random decision making */
 	protected Random random = new Random();
 	
-	public Vector2 defaultPosition = new Vector2(1,1);
-	
+	/** If it reaches {@link #maximumLockCount} then it does an action */
 	protected int actionLockCounter = 0;
+	/** Action time */
 	protected int maximumLockCount = 120;
+	/** To represent NPC on screen from player position */
 	protected Vector2 playerPos = new Vector2(), playerScreenPos = new Vector2();
-	
+	/** Networking only, for keeping track of position as to update when needed */
 	protected Vector2 lastPos = new Vector2(position);
 	
+	/** Networking only, for keeping track of animation frames as to update when needed */
 	protected int lastFrame = spriteNum;
+	/** Networking only, for keeping track of direction as to update when needed */
 	protected int lastDirection = direction.ordinal();
-
+	
+	/** Freeze */
 	public boolean lock;
 	
+	/**
+	 * NPC Constructor
+	 * @param position Where to spawn at
+	 */
 	public NPC(Vector2 position) {
 		this.position.set(position);
 	}
 	
 	protected void setDefaultValues() {}
 	
+	/** if NPC gets damaged, do something. */
 	public void react() {}
 	
+	/** To not overwrite the tick loop */
 	protected void altTick() {}
 	
 	public void tick() {
@@ -179,6 +196,11 @@ public class NPC extends Entity {
 		
 	}
 	
+	/**
+	 * Drawing purposes
+	 * @param playerPos Position of player
+	 * @param playerScreenPos Screen position of player
+	 */
 	public void update(Vector2 playerPos, Vector2 playerScreenPos) {
 		this.playerPos.set(playerPos);
 		this.playerScreenPos.set(playerScreenPos);

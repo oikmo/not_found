@@ -16,7 +16,13 @@ public class PickableObject extends OBJ {
 	private BufferedImage image1;
 	/** Rotated image */
 	private BufferedImage image2;
-	
+
+	/**
+	 * PickableObject contructor
+	 * @param item Object to be picked up
+	 * @param x X position
+	 * @param y Y position
+	 */
 	public PickableObject(OBJ item, int x, int y) {
 		this.item = item;
 		this.image1 = ResourceLoader.loadImage("/textures/object/pickable_object.png");
@@ -43,7 +49,8 @@ public class PickableObject extends OBJ {
 		}
 	}
 	
-	/** Return stored item */
+	/** Return stored item
+	 * @return {@link OBJ} */
 	public OBJ getItem() {
 		return item;
 	}

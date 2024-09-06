@@ -11,10 +11,15 @@ import paulscode.sound.SoundSystemException;
 import paulscode.sound.codecs.CodecJOrbis;
 import paulscode.sound.libraries.LibraryJavaSound;
 
+/**
+ * Sound Library using paulscode {@link SoundSystem}
+ * @author Oikmo
+ */
 public class Sound {
-	
+	/** SoundSystem to play audio from */
 	private SoundSystem soundSystem;
 	
+	/** Sets up {@link SoundSystemConfig} */
 	public static void init() {
 		try {
 			SoundSystemConfig.addLibrary(LibraryJavaSound.class);
@@ -24,7 +29,9 @@ public class Sound {
 		}
 	}
 	
+	/** Loaded sounds */
 	private String soundURL[];
+	/** Keeps track of tracks that loop (as to stop it) */
 	private List<String> loopers = new ArrayList<>();
 	
 	/**
@@ -39,10 +46,19 @@ public class Sound {
 		}
 	}
 	
+	/** 
+	 * Plays audio files without looping ever
+	 * @param i Index of sound track from {@link #soundURL}
+	 */
 	public void play(int i) {
 		play(i, false);
 	}
 	
+	/**
+	 * Plays audio files 
+	 * @param i Index of sound track from {@link #soundURL}
+	 * @param loop Should the track loop
+	 */
 	public void play(int i, boolean loop) {
 		String name = soundURL[i].split("/")[soundURL[i].split("/").length-1].replace(".ogg", "") + "" + new Random().nextInt();
 		if(loop) {
@@ -55,14 +71,18 @@ public class Sound {
 		soundSystem.play(name);
 	}
 	
+	/** 
+	 * Returns true if the {@link #soundSystem} is playing anything
+	 *  @return {@link Boolean}
+	 */
 	public boolean isPlaying() {
 		return soundSystem.playing();
 	}
 	
+	/** Stops all sources (and removes all temporary ones) */
 	public void stop() {
 		for(int i = 0; i < loopers.size(); i++) {
 			String l = loopers.get(i);
-			System.out.println(l);
 			soundSystem.stop(l);
 			soundSystem.removeSource(l);
 			loopers.remove(i);

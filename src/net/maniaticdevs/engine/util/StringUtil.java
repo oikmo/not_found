@@ -7,8 +7,18 @@ import java.util.Scanner;
 
 import net.maniaticdevs.engine.ResourceLoader;
 
+/**
+ * Utility class for {@link String}
+ * @author Oikmo
+ */
 public class StringUtil {
 	
+	/**
+	 * Loads text file into {@link List}
+	 * @param fileName File to load
+	 * @return {@link List}&#60;{@link String}&#62;
+	 * @throws IOException Exception for Input/Output
+	 */
 	public static List<String> loadTextFile(String fileName) throws IOException {
 		Scanner s = new Scanner(ResourceLoader.class.getResourceAsStream("/"+fileName));
 		ArrayList<String> list = new ArrayList<String>();

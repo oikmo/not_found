@@ -10,6 +10,7 @@ import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.level.MapLoader.LevelData;
 import net.maniaticdevs.engine.network.packet.PacketRemoveObject;
+import net.maniaticdevs.engine.objects.MovingImage;
 import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.tile.Tile;
 import net.maniaticdevs.engine.util.math.Vector2;
@@ -78,7 +79,6 @@ public class Level {
 				obj.draw(g2, position, screenPosition);
 			}
 			
-			
 			for(Entity e : entities) {
 				if(e instanceof NPC) {
 					((NPC)e).update(position, screenPosition);
@@ -99,8 +99,17 @@ public class Level {
 	public void tick(boolean server) {
 		try {
 			for(OBJ obj : objects) {
-				obj.tick();
+				if(Main.theNetwork == null || server) {
+					if(obj instanceof MovingImage && !server) {
+						System.out.println(server);
+						obj.tick();
+					} else if(!(obj instanceof MovingImage)) {
+						System.out.println(server + " " + obj.getClass().getSimpleName());
+						obj.tick();
+					}
+				} 
 			}
+			
 			
 			if(Main.theNetwork == null || server) {
 				for(Entity e : entities) {

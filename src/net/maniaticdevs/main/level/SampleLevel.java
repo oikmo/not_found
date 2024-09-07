@@ -5,8 +5,10 @@ import net.maniaticdevs.engine.level.Level;
 import net.maniaticdevs.engine.objects.DataBuffer;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
+import net.maniaticdevs.engine.objects.MovingImage;
 import net.maniaticdevs.engine.objects.PickableObject;
 import net.maniaticdevs.engine.util.math.Vector2;
+import net.maniaticdevs.main.SoundSFXEnum;
 import net.maniaticdevs.main.entity.Test;
 import net.maniaticdevs.main.entity.Watcher;
 
@@ -31,6 +33,7 @@ public class SampleLevel extends Level {
 		this.objects.add(new DataBuffer("test", 2, Settings.worldTileSize*14,Settings.worldTileSize));
 		this.entities.add(new Test(new Vector2(Settings.worldTileSize*5, Settings.worldTileSize*7)));
 		this.entities.add(new Watcher(new Vector2(Settings.worldTileSize*10, Settings.worldTileSize*18)));
+		this.objects.add(new MovingImage(SoundSFXEnum.catgif, "catgif", 6, 5, 5, Settings.worldTileSize*29, Settings.worldTileSize*29));
 	}
 
 }

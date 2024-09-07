@@ -60,14 +60,38 @@ public class Sound {
 	 * @param loop Should the track loop
 	 */
 	public void play(int i, boolean loop) {
+		play(i, loop, 0.5f, 0, 0, 0, 0);
+	}
+	
+	/**
+	 * Set's the audio listener
+	 * @param x X position
+	 * @param y Y Position
+	 */
+	public void setListener(int x, int y) {
+		soundSystem.setListenerPosition(x, 0, y);
+		//soundSystem.set
+	}
+	
+	/**
+	 * Plays audio files 
+	 * @param i Index of sound track from {@link #soundURL}
+	 * @param loop Should the track loop
+	 * @param volume Volume to play at
+	 * @param x X position of the sound
+	 * @param y Y position of the sound
+	 * @param model The model to use for rolling off the audio
+	 * @param rolloff The distance to rolloff the audio
+	 */
+	public void play(int i, boolean loop, float volume, int x, int y, int model, int rolloff) {
 		String name = soundURL[i].split("/")[soundURL[i].split("/").length-1].replace(".ogg", "") + "" + new Random().nextInt();
 		if(loop) {
 			System.out.println(name);
 			loopers.add(name);
 		}
-		soundSystem.newSource(false, name, Main.class.getResource(soundURL[i]), soundURL[i].split("/")[soundURL[i].split("/").length-1], loop, 0, 0, 0, 0, 0);
+		soundSystem.newSource(false, name, Main.class.getResource(soundURL[i]), soundURL[i].split("/")[soundURL[i].split("/").length-1], loop, x, y, 0, model, rolloff);
 		soundSystem.setTemporary(name, !loop);
-		soundSystem.setVolume(name, 1f);
+		soundSystem.setVolume(name, volume);
 		soundSystem.play(name);
 	}
 	

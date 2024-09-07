@@ -36,11 +36,8 @@ import paulscode.sound.libraries.LibraryJavaSound;
 
 /**
  * Main class, enters thread, is thread.
- * 
  * @author Oikmo, LYCNK
- *
  */
-
 public class Main extends JPanel implements Runnable  {
 	/** 02/08/2022 */
 	private static final long serialVersionUID = 282022L;
@@ -151,15 +148,6 @@ public class Main extends JPanel implements Runnable  {
 		this.setDoubleBuffered(true); // better performance
 		this.addKeyListener(new Input());
 		this.setFocusable(true); // so that the input class can actually work
-
-		try {
-			SoundSystemConfig.addLibrary(LibraryJavaSound.class);
-			SoundSystemConfig.setCodec("ogg", CodecJOrbis.class);
-			SoundSystemConfig.setCodec("wav", CodecWav.class);
-		} catch( SoundSystemException e ) {
-			System.err.println("error linking with the plug-ins");
-		}
-
 		
 		gameThread = new Thread(this);
 		gameThread.setName("Main thread");
@@ -168,7 +156,7 @@ public class Main extends JPanel implements Runnable  {
 		Sound.init();
 		GuiScreen.init();
 		MapLoader.init();
-		sfxLib = new Sound("sfx/00cursor","sfx/01door","sfx/02hitmonster","sfx/03key","sfx/04powerup","sfx/05receivedamage","sfx/06swingweapon");
+		sfxLib = new Sound("sfx/00cursor","sfx/01door","sfx/02hitmonster","sfx/03key","sfx/04powerup","sfx/05receivedamage","sfx/06swingweapon", "sfx/07catgif");
 
 		currentScreen = new GuiMainMenu();
 	}
@@ -307,7 +295,7 @@ public class Main extends JPanel implements Runnable  {
 
 		g2.setColor(Color.WHITE);
 		g2.setFont(GuiScreen.font.deriveFont(18.0F));
-		g2.drawString("not_found <REMAKE> [[A1.0.0]]", 0, 18);
+		g2.drawString("not_found <REMAKE> [[A1.0.1]]", 0, 18);
 
 		g2.dispose();
 	}

@@ -26,12 +26,14 @@ import net.maniaticdevs.engine.network.packet.PacketRemoveObject;
 import net.maniaticdevs.engine.network.packet.PacketRemovePlayer;
 import net.maniaticdevs.engine.network.packet.PacketUpdateEntityAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdateEntityDirection;
+import net.maniaticdevs.engine.network.packet.PacketUpdateObjectAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerDirection;
 import net.maniaticdevs.engine.network.packet.PacketUserName;
 import net.maniaticdevs.engine.objects.DataBuffer;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
+import net.maniaticdevs.engine.objects.MovingImage;
 import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.objects.PickableObject;
 import net.maniaticdevs.engine.util.Logger;
@@ -270,6 +272,31 @@ public class PlayerClientListener extends Listener {
 					needsToBeAddedObjs.add(buffer);
 				}
 				break;
+			case "MovingImage":
+				String[] intData = packet.subNetworkID.split(",");
+				MovingImage movingImage = new MovingImage(Integer.parseInt(packet.subObj), packet.subObjName, Integer.parseInt(intData[0]), Integer.parseInt(intData[1]), Integer.parseInt(intData[2]), packet.x, packet.y);
+				movingImage.setNetworkID(packet.networkID);
+				movingImage.setImageIndex(Integer.parseInt(intData[3]));
+				if(Main.currentLevel != null) {
+					Main.currentLevel.addObject(movingImage);
+				} else {
+					needsToBeAddedObjs.add(movingImage);
+				}
+				break;
+			}
+		}
+		else if(object instanceof PacketUpdateObjectAnimation) {
+			PacketUpdateObjectAnimation packet = (PacketUpdateObjectAnimation) object;
+			if(Main.currentLevel == null) {
+				return;
+			}
+			for(OBJ obj : Main.currentLevel.getObjects()) {
+				if(obj.networkID.contentEquals(packet.networkID)) {
+					if(obj instanceof PickableObject) {
+						((PickableObject)obj).setImageIndex(packet.anim);
+						break;
+					}
+				}
 			}
 		}
 		else if(object instanceof PacketRemoveObject) {

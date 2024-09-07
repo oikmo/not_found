@@ -26,6 +26,7 @@ import net.maniaticdevs.engine.network.packet.PacketRemovePlayer;
 import net.maniaticdevs.engine.network.packet.PacketSavePlayerPosition;
 import net.maniaticdevs.engine.network.packet.PacketUpdateEntityAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdateEntityDirection;
+import net.maniaticdevs.engine.network.packet.PacketUpdateObjectAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerDirection;
 import net.maniaticdevs.engine.network.packet.PacketUserName;
@@ -96,6 +97,7 @@ public class MainServer {
 		kryo.register(PacketUpdatePlayerAnimation.class);
 		kryo.register(PacketUpdatePlayerDirection.class);
 		kryo.register(PacketAddObject.class);
+		kryo.register(PacketUpdateObjectAnimation.class);
 		kryo.register(PacketRemoveObject.class);
 		kryo.register(PacketGameJoin.class);
 		kryo.register(PacketAddEntity.class);

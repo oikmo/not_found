@@ -29,6 +29,7 @@ import net.maniaticdevs.engine.network.packet.PacketUserName;
 import net.maniaticdevs.engine.network.packet.RandomNumber;
 import net.maniaticdevs.engine.objects.DataBuffer;
 import net.maniaticdevs.engine.objects.Door;
+import net.maniaticdevs.engine.objects.MovingImage;
 import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.objects.PickableObject;
 import net.maniaticdevs.main.Main;
@@ -153,6 +154,11 @@ public class MainServerListener extends Listener {
 						DataBuffer buffer = (DataBuffer) obj;
 						packetaddobj.subObj = buffer.bufferName;
 						packetaddobj.subNetworkID = Integer.toString(buffer.direction);
+					} else if(obj instanceof MovingImage) {
+						MovingImage movingImage = (MovingImage)obj;
+						packetaddobj.subObj = Integer.toString(movingImage.getAudioTrack());
+						packetaddobj.subObjName = movingImage.getImagePath();
+						packetaddobj.subNetworkID = movingImage.getImageRows() +","+movingImage.getImageColumns()+","+movingImage.getImageTicksLimit()+","+movingImage.getImageIndex();
 					}
 					connection.sendUDP(packetaddobj);
 				}

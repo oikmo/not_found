@@ -124,7 +124,7 @@ public class GuiDialogue extends GuiScreen {
 				
 				if(combinedText.contentEquals("... ACCESSING DATA BUFFER ...")) {
 					if(!playBG && dataBuffer) {
-						blackbox.play(2, true);
+						blackbox.play(2, true, 0.75f, 0, 0, 0, 0);
 						//blackbox.play(3, true);
 						playBG = true;
 					}

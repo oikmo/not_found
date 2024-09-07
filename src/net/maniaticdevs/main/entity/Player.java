@@ -117,6 +117,9 @@ public class Player extends Entity {
 
 	@Override
 	public void tick() {
+		
+		Main.sfxLib.setListener(position.x, position.y);
+		
 		if (isInvince) { invinceCounter++; if (invinceCounter > 40) { isInvince = false; invinceCounter = 0; } }
 		
 		if(notficationTicks != 0 && GuiInGame.message != null) {

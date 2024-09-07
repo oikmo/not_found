@@ -19,4 +19,6 @@ public class SoundSFXEnum {
 	public final static int recieveDmg = 5;
 	/** Track of ID 6 */
 	public final static int swingWeapon = 6;
+	/** Track of ID 7 */
+	public final static int catgif = 7;
 }

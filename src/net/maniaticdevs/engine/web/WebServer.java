@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -20,23 +19,31 @@ import javax.imageio.ImageIO;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import com.sun.xml.internal.ws.api.ResourceLoader;
+
+import net.maniaticdevs.engine.ResourceLoader;
 
 /**
- * Runs 
- * @author Oikmo
+ * Runs a website at a port... Wait what the fuck is this doing here?<br>
+ * I didn't implement this??? Is this some fucking joke?
+ * @author not Oikmo
  */
 public class WebServer implements Runnable {
-
+	
+	/** All html pages, indexed with a label */
 	private static Map<String, String> pages = new HashMap<>();
+	/** All pngs, indexed with a label */
 	private static Map<String, BufferedImage> pngs = new HashMap<>();
+	/** All gifs, indexed with a label */
 	private static Map<String, byte[]> gifs = new HashMap<>();
-
-	public static void main(String[] args)  {
-		new Thread(new WebServer()).run();
-	}
-
-	public WebServer() {
+	/** The port that it runs the server on */
+	private int webport;
+	
+	/**
+	 * HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. 
+	 * @param port Sets {@link #webport} to given port
+	 */
+	public WebServer(int port) {
+		this.webport = port;
 		try {
 			load();
 		} catch (IOException e) {
@@ -46,22 +53,27 @@ public class WebServer implements Runnable {
 
 	public void run() {
 		try {
-			HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+			HttpServer server = HttpServer.create(new InetSocketAddress(webport), 0);
 			server.createContext("/", new ServerHttpHandler("index"));
 			server.createContext("/test.html", new ServerHttpHandler("test"));
 			
+			/* Image instantiation */
 			server.createContext("/smile.png", new ServerImageHttpHandler("smile.png"));
 			server.createContext("/favicon.png", new ServerImageHttpHandler("favicon.png"));
 			server.createContext("/matrix.gif", new ServerImageHttpHandler("matrix.gif"));
 			server.setExecutor(null);
 			server.start();
 
-			System.out.println("Website is running on port 8000");
+			System.out.println(String.format("Website is running on port %s", webport));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * Loads the compressed file and loads all sub files into the maps. Ha.
+	 * @throws IOException shut the fuck up you stupid shit
+	 */
 	private void load() throws IOException {
 		try (
 				GZIPInputStream gzipInputStream = new GZIPInputStream(ResourceLoader.class.getResourceAsStream("/ws"));
@@ -114,11 +126,19 @@ public class WebServer implements Runnable {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * Information to display. My words can expand and be discovered. At a distance.
+	 * @author not Oikmo
+	 */
 	private static class ServerHttpHandler implements HttpHandler {
-
+		/** Path to the given page */
 		private String filePath;
 
+		/**
+		 * Instantiates handler with page.
+		 * @param filePath Path to the subfile.
+		 */
 		public ServerHttpHandler(String filePath) {
 			this.filePath = filePath;
 		}
@@ -148,11 +168,19 @@ public class WebServer implements Runnable {
 			os.close();
 		}
 	}
-
+	
+	/**
+	 * Visual stimuli. Helps to get points across. Maybe. If they aren't stupid. In which you are.
+	 * @author not Oikmo
+	 */
 	private static class ServerImageHttpHandler implements HttpHandler {
-
+		/** Path to the given image */
 		private String filePath;
-
+		
+		/**
+		 * Instantiates handler with image path.
+		 * @param filePath Path to the subfile.
+		 */
 		public ServerImageHttpHandler(String filePath) {
 			this.filePath = filePath;
 		}
@@ -172,6 +200,4 @@ public class WebServer implements Runnable {
 			os.close();
 		}
 	}
-
-
 }

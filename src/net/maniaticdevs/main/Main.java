@@ -28,11 +28,6 @@ import net.maniaticdevs.main.gui.GuiDisconnected;
 import net.maniaticdevs.main.gui.GuiInGame;
 import net.maniaticdevs.main.gui.GuiMainMenu;
 import net.maniaticdevs.main.gui.GuiPauseScreen;
-import paulscode.sound.SoundSystemConfig;
-import paulscode.sound.SoundSystemException;
-import paulscode.sound.codecs.CodecJOrbis;
-import paulscode.sound.codecs.CodecWav;
-import paulscode.sound.libraries.LibraryJavaSound;
 
 /**
  * Main class, enters thread, is thread.

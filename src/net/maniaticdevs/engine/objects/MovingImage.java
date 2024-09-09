@@ -3,11 +3,8 @@ package net.maniaticdevs.engine.objects;
 import java.awt.image.BufferedImage;
 
 import net.maniaticdevs.engine.Settings;
-import net.maniaticdevs.engine.network.packet.PacketUpdateObjectAnimation;
-import net.maniaticdevs.engine.network.server.MainServer;
 import net.maniaticdevs.engine.util.ImageUtils;
 import net.maniaticdevs.main.Main;
-import paulscode.sound.SoundSystemConfig;
 
 /**
  * GIF player for the funnies

@@ -51,6 +51,14 @@ public class WebServer implements Runnable {
 		}
 	}
 
+	/**
+	 * Returns {@link #webport}
+	 * @return Integer
+	 */
+	public int getPort() {
+		return webport;
+	}
+	
 	public void run() {
 		try {
 			HttpServer server = HttpServer.create(new InetSocketAddress(webport), 0);

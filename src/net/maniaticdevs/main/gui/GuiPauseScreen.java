@@ -159,6 +159,9 @@ public class GuiPauseScreen extends GuiScreen {
 						Main.server.stopServer();
 					}
 				}
+				if(Main.webThread != null) {
+					Main.webThread.interrupt();
+				}
 				Main.currentLevel = null;
 				Main.thePlayer = null;
 				Main.currentScreen = new GuiMainMenu();

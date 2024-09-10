@@ -3,12 +3,15 @@ package net.maniaticdevs.main.gui;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.network.client.NetworkHandler;
 import net.maniaticdevs.engine.network.server.MainServer;
 import net.maniaticdevs.engine.util.Input;
+import net.maniaticdevs.engine.web.WebServer;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
 import net.maniaticdevs.main.entity.Player;
@@ -76,6 +79,8 @@ public class GuiMultiplayerChoice extends GuiScreen {
 					Main.server = new MainServer(25565, "sample");
 					Main.thePlayer = new Player();
 					Main.currentScreen = new GuiInGame();
+					Main.webThread = new Thread(new WebServer(ThreadLocalRandom.current().nextInt(2048, 72000)));
+					Main.webThread.start();
 					try {
 						Main.theNetwork = new NetworkHandler("localhost");
 					} catch (Exception e) {

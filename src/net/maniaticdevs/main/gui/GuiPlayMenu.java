@@ -3,10 +3,12 @@ package net.maniaticdevs.main.gui;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.util.concurrent.ThreadLocalRandom;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.util.Input;
+import net.maniaticdevs.engine.web.WebServer;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
 import net.maniaticdevs.main.entity.Player;
@@ -70,6 +72,8 @@ public class GuiPlayMenu extends GuiScreen {
 					Main.currentLevel = new SampleLevel(false);
 					Main.thePlayer = new Player(); // would you look at that
 					Main.currentScreen = new GuiInGame();
+					Main.webThread = new Thread(new WebServer(ThreadLocalRandom.current().nextInt(2048, 72000)));
+					Main.webThread.start();
 					break;
 				case 1:
 					Main.currentScreen = new GuiMultiplayerChoice();

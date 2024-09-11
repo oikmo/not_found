@@ -72,7 +72,7 @@ public class GuiPlayMenu extends GuiScreen {
 					Main.currentLevel = new SampleLevel(false);
 					Main.thePlayer = new Player(); // would you look at that
 					Main.currentScreen = new GuiInGame();
-					Main.webThread = new Thread(new WebServer(ThreadLocalRandom.current().nextInt(2048, 72000)));
+					Main.webThread = new Thread(new WebServer(ThreadLocalRandom.current().nextInt(12860, 72000)));
 					Main.webThread.start();
 					break;
 				case 1:

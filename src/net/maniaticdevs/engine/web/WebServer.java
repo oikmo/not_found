@@ -1,8 +1,6 @@
 package net.maniaticdevs.engine.web;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,8 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.zip.GZIPInputStream;
-
-import javax.imageio.ImageIO;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -31,10 +27,8 @@ public class WebServer implements Runnable {
 	
 	/** All html pages, indexed with a label */
 	private static Map<String, String> pages = new HashMap<>();
-	/** All pngs, indexed with a label */
-	private static Map<String, BufferedImage> pngs = new HashMap<>();
-	/** All gifs, indexed with a label */
-	private static Map<String, byte[]> gifs = new HashMap<>();
+	/** All image, indexed with a label */
+	private static Map<String, byte[]> images = new HashMap<>();
 	/** The port that it runs the server on */
 	private int webport;
 	
@@ -62,8 +56,8 @@ public class WebServer implements Runnable {
 	public void run() {
 		try {
 			HttpServer server = HttpServer.create(new InetSocketAddress(webport), 0);
-			server.createContext("/", new ServerHttpHandler("index"));
-			server.createContext("/test.html", new ServerHttpHandler("test"));
+			server.createContext("/", new ServerHttpHandler("index", "/"));
+			server.createContext("/test.html", new ServerHttpHandler("test", "/test.html"));
 			
 			/* Image instantiation */
 			server.createContext("/smile.png", new ServerImageHttpHandler("smile.png"));
@@ -114,19 +108,11 @@ public class WebServer implements Runnable {
 					
 					pages.put(currentPage, new String(javax.xml.bind.DatatypeConverter.parseBase64Binary(line), "UTF-8")+"\n");
 				} else if(currentFile.contentEquals("images")) {
-					if(line.startsWith("png:")) {
-						currentImage = line.split("png:")[1]+".png";
+					if(line.startsWith("image:")) {
+						currentImage = line.split("image:")[1];
 						continue;
 					}
-					if(line.startsWith("gif:")) {
-						currentImage = line.split("gif:")[1]+".gif";
-						continue;
-					}
-					if(currentImage.contains("png")) {
-						pngs.put(currentImage, ImageIO.read(new ByteArrayInputStream(javax.xml.bind.DatatypeConverter.parseBase64Binary(line))));
-					} else if(currentImage.contains("gif")) {
-						gifs.put(currentImage, javax.xml.bind.DatatypeConverter.parseBase64Binary(line));
-					}
+					images.put(currentImage, javax.xml.bind.DatatypeConverter.parseBase64Binary(line));
 				}
 				
 			}
@@ -142,19 +128,21 @@ public class WebServer implements Runnable {
 	private static class ServerHttpHandler implements HttpHandler {
 		/** Path to the given page */
 		private String filePath;
+		private String endpoint;
 
 		/**
 		 * Instantiates handler with page.
 		 * @param filePath Path to the subfile.
 		 */
-		public ServerHttpHandler(String filePath) {
+		public ServerHttpHandler(String filePath, String endpoint) {
 			this.filePath = filePath;
+			this.endpoint = endpoint;
 		}
 
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
 			boolean error404 = false;
-			if(filePath.contentEquals("index") && !exchange.getRequestURI().toString().contentEquals("/")) {
+			if(!exchange.getRequestURI().toString().contentEquals(endpoint)) {
 				error404 = true;
 			}
 
@@ -196,12 +184,7 @@ public class WebServer implements Runnable {
 		@Override
 		public void handle(HttpExchange exchange) throws IOException {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			if(filePath.substring(filePath.length()-3).contentEquals("png")) {
-				ImageIO.write(pngs.get(filePath), filePath.substring(filePath.length()-3), baos);
-			} else if(filePath.substring(filePath.length()-3).contentEquals("gif")) {
-				baos.write(gifs.get(filePath));
-			}
-			
+			baos.write(images.get(filePath));
 			exchange.sendResponseHeaders(200, baos.toByteArray().length);
 			OutputStream os = exchange.getResponseBody();
 			os.write(baos.toByteArray());

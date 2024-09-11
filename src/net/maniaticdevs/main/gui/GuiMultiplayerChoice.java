@@ -79,7 +79,7 @@ public class GuiMultiplayerChoice extends GuiScreen {
 					Main.server = new MainServer(25565, "sample");
 					Main.thePlayer = new Player();
 					Main.currentScreen = new GuiInGame();
-					Main.webThread = new Thread(new WebServer(ThreadLocalRandom.current().nextInt(2048, 72000)));
+					Main.webThread = new Thread(new WebServer(ThreadLocalRandom.current().nextInt(12860, 72000)));
 					Main.webThread.start();
 					try {
 						Main.theNetwork = new NetworkHandler("localhost");

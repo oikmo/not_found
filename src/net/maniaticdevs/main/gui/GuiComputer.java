@@ -68,30 +68,34 @@ public class GuiComputer extends GuiScreen {
 	
 	public void draw(Graphics2D g2) {
 		g2.setColor(color);
+		int currentMeasurement = Main.getInstance().getHeight();
+		if(Main.getInstance().getHeight() > Main.getInstance().getWidth()) {
+			currentMeasurement = Main.getInstance().getWidth();
+		}
 		g2.fillRect(0, 0, Main.getInstance().getWidth(), Main.getInstance().getHeight());
-		int x = (Main.getInstance().getWidth()/2)-Main.getInstance().getHeight()/2;
+		int x = (Main.getInstance().getWidth()/2)-currentMeasurement/2;
 		int y = 0;
-		g2.drawImage(computerImage, x, y, Main.getInstance().getHeight(), Main.getInstance().getHeight(), null);
+		g2.drawImage(computerImage, x, y, currentMeasurement, currentMeasurement, null);
 		String toShow = Input.getTextInput();
-		int screenlength = (int)((Main.getInstance().getHeight()/1.3f)/GuiScreen.font.getSize())-1;
+		int screenlength = (int)((currentMeasurement/1.3f)/GuiScreen.font.getSize())-1;
 		if(Input.getTextInput().length() > screenlength) {
 			toShow = toShow.substring(Input.getTextInput().length()-screenlength, Input.getTextInput().length());
 		}
-		this.drawString(g2, font, Color.green, "> "+toShow+(cursor ? "_" : ""), x+(int)(Main.getInstance().getHeight()/3.9f), y+(Main.getInstance().getHeight()/5)+ (int)(Main.getInstance().getHeight()/2.72f));
+		this.drawString(g2, font, Color.green, "> "+toShow+(cursor ? "_" : ""), x+(int)(currentMeasurement/3.9f), y+(currentMeasurement/5)+ (int)(currentMeasurement/2.72f));
 		int textY = 17;
 		int size = input.size();
 		
-		screenlength = (int)((Main.getInstance().getHeight()/1.3f)/GuiScreen.font.getSize())-1;
-		if(input.size() > (int)((Main.getInstance().getHeight()/2.41f)/17)-1) {
-			for(int i = size-1; i >= input.size()-((int)((Main.getInstance().getHeight()/2.41f)/17)-1); i--) {
+		screenlength = (int)((currentMeasurement/1.3f)/GuiScreen.font.getSize())-1;
+		if(input.size() > (int)((currentMeasurement/2.41f)/17)-1) {
+			for(int i = size-1; i >= input.size()-((int)((currentMeasurement/2.41f)/17)-1); i--) {
 				String inp = input.get(i);
-				drawString(g2, font, Color.green, inp.length() > screenlength ? inp.substring(0, screenlength)+" ->" : inp, x+(int)(Main.getInstance().getHeight()/3.9f), y+(Main.getInstance().getHeight()/5)+ (int)(Main.getInstance().getHeight()/2.72f)-textY);
+				drawString(g2, font, Color.green, inp.length() > screenlength ? inp.substring(0, screenlength)+" ->" : inp, x+(int)(currentMeasurement/3.9f), y+(currentMeasurement/5)+ (int)(currentMeasurement/2.72f)-textY);
 				textY += 17;
 			}
 		} else {
 			for(int i = size-1; i >= 0; i--) {
 				String inp = input.get(i);
-				drawString(g2, font, Color.green, inp.length() > screenlength ? inp.substring(0, screenlength)+" ->" : inp, x+(int)(Main.getInstance().getHeight()/3.9f), y+(Main.getInstance().getHeight()/5)+ (int)(Main.getInstance().getHeight()/2.72f)-textY);
+				drawString(g2, font, Color.green, inp.length() > screenlength ? inp.substring(0, screenlength)+" ->" : inp, x+(int)(currentMeasurement/3.9f), y+(currentMeasurement/5)+ (int)(currentMeasurement/2.72f)-textY);
 				textY += 17;
 			}
 		}
@@ -99,7 +103,7 @@ public class GuiComputer extends GuiScreen {
 		
 		if(Main.debug) {
 			g2.setColor(Color.WHITE);
-			g2.drawRect(x+(int)(Main.getInstance().getHeight()/4.1f), y+(Main.getInstance().getHeight()/6), (int)(Main.getInstance().getHeight()/2.005f), (int)(Main.getInstance().getHeight()/2.41f));
+			g2.drawRect(x+(int)(currentMeasurement/4.1f), y+(currentMeasurement/6), (int)(currentMeasurement/2.005f), (int)(currentMeasurement/2.41f));
 		}
 	}
 

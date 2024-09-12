@@ -3,7 +3,6 @@ package net.maniaticdevs.main.gui;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.util.concurrent.ThreadLocalRandom;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
@@ -78,7 +77,8 @@ public class GuiMultiplayerChoice extends GuiScreen {
 					Main.server = new MainServer(25565, "sample");
 					Main.thePlayer = new Player();
 					Main.currentScreen = new GuiInGame();
-					Main.webThread = new Thread(new WebServer(ThreadLocalRandom.current().nextInt(12860, 72000)));
+					Main.ws = new WebServer();
+					Main.webThread = new Thread(Main.ws);
 					Main.webThread.start();
 					try {
 						Main.theNetwork = new NetworkHandler("localhost");

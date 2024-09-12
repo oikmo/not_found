@@ -22,6 +22,7 @@ import net.maniaticdevs.engine.util.os.EnumOS;
 import net.maniaticdevs.engine.util.os.EnumOSMappingHelper;
 import net.maniaticdevs.engine.util.properties.LanguageHandler;
 import net.maniaticdevs.engine.util.sound.Sound;
+import net.maniaticdevs.engine.web.WebServer;
 import net.maniaticdevs.main.entity.Player;
 import net.maniaticdevs.main.gui.GuiDialogue;
 import net.maniaticdevs.main.gui.GuiDisconnected;
@@ -76,7 +77,8 @@ public class Main extends JPanel implements Runnable  {
 	public static MainServer server;
 	/** Language Handler for universal texts */
 	public static LanguageHandler lang = LanguageHandler.getInstance();
-
+	
+	public static WebServer ws;
 	public static Thread webThread;
 	
 	/**
@@ -142,7 +144,7 @@ public class Main extends JPanel implements Runnable  {
 		//this.setMinimumSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
 		this.setPreferredSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
 		this.setBackground(new Color(20,20,20));
-		this.setDoubleBuffered(true); // better performance
+		this.setDoubleBuffered(EnumOS.getOS() == EnumOS.macos ? false : true); // better performance
 		this.addKeyListener(new Input());
 		this.setFocusable(true); // so that the input class can actually work
 		

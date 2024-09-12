@@ -10,6 +10,7 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.zip.GZIPInputStream;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -36,8 +37,8 @@ public class WebServer implements Runnable {
 	 * HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. 
 	 * @param port Sets {@link #webport} to given port
 	 */
-	public WebServer(int port) {
-		this.webport = port;
+	public WebServer() {
+		this.webport = ThreadLocalRandom.current().nextInt(12860, 65534);
 		try {
 			load();
 		} catch (IOException e) {

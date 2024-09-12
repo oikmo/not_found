@@ -3,7 +3,6 @@ package net.maniaticdevs.main.gui;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.util.concurrent.ThreadLocalRandom;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
@@ -72,7 +71,8 @@ public class GuiPlayMenu extends GuiScreen {
 					Main.currentLevel = new SampleLevel(false);
 					Main.thePlayer = new Player(); // would you look at that
 					Main.currentScreen = new GuiInGame();
-					Main.webThread = new Thread(new WebServer(ThreadLocalRandom.current().nextInt(12860, 72000)));
+					Main.ws = new WebServer();
+					Main.webThread = new Thread(Main.ws);
 					Main.webThread.start();
 					break;
 				case 1:

@@ -1,9 +1,5 @@
 package net.maniaticdevs.engine.objects;
 
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
 import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.util.ImageUtils;
 
@@ -22,13 +18,8 @@ public class Key extends OBJ {
 	public Key(String name, int x, int y) {
 		this.name = name;
 		this.description = "It looks like this goes\nsomewhere...\n\nBut where?";
-		collision = false;
-		try {
-			image = ImageUtils.fromSheet2D(ImageIO.read(ResourceLoader.class.getResourceAsStream("/textures/object/items.png")), 8, 8)[3][0];
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.collision = false;
+		this.image = ImageUtils.fromSheet2D(ResourceLoader.loadImage("/textures/object/items"), 8, 8)[3][0];
 		this.position.set(x,y);
 	}
 

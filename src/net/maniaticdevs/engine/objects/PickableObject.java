@@ -28,8 +28,8 @@ public class PickableObject extends OBJ {
 	 */
 	public PickableObject(OBJ item, int x, int y) {
 		this.item = item;
-		this.image1 = ResourceLoader.loadImage("/textures/object/pickable_object.png");
-		this.image2 = ResourceLoader.loadImage("/textures/object/pickable_object_rotated.png");
+		this.image1 = ResourceLoader.loadImage("/textures/object/pickable_object");
+		this.image2 = ResourceLoader.loadImage("/textures/object/pickable_object_rotated");
 		this.image = image1;
 		position.set(x,y);
 	}

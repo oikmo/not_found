@@ -59,7 +59,7 @@ public class ResourceLoader {
 	 */
 	public static BufferedImage loadImage(String loc) {
 		try {
-			return ImageIO.read(ResourceLoader.class.getResourceAsStream("/"+loc+".png"));
+			return ImageIO.read(ResourceLoader.class.getResourceAsStream(loc+".png"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -13,6 +13,8 @@ import net.maniaticdevs.engine.network.packet.PacketRemoveObject;
 import net.maniaticdevs.engine.objects.MovingImage;
 import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.tile.Tile;
+import net.maniaticdevs.engine.util.Logger;
+import net.maniaticdevs.engine.util.Logger.LogLevel;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.entity.Player;
@@ -87,7 +89,7 @@ public class Level {
 			}
 			
 		} catch(Exception e) {
-			System.err.println("[LEVEL] I am infact shitting myself");
+			Logger.log(LogLevel.ERROR, "I don't like drawing...");
 		}
 		
 	}
@@ -100,14 +102,14 @@ public class Level {
 		try {
 			for(OBJ obj : objects) {
 				if(Main.theNetwork == null || server) {
-					if(obj instanceof MovingImage && !server) {
-						System.out.println(server);
-						obj.tick();
-					} else if(!(obj instanceof MovingImage)) {
-						System.out.println(server + " " + obj.getClass().getSimpleName());
+					if(!(obj instanceof MovingImage)) {
 						obj.tick();
 					}
-				} 
+					
+				}
+				if(obj instanceof MovingImage) {
+					obj.tick();
+				}
 			}
 			
 			

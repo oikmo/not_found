@@ -37,6 +37,9 @@ public class OtherPlayer {
 	
 	/** World position */
 	public int x, y;
+	
+	/** Is the player dead or not */
+	public boolean dead = false;
 
 	/** Used for collision checking */
 	protected Rectangle hitBox = new Rectangle(8, 1, 32, 46);

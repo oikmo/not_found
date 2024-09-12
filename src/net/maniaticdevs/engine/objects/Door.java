@@ -23,7 +23,7 @@ public class Door extends OBJ {
 	public Door(Key key, boolean removesKey, int x, int y) {
 		this.removesKey = removesKey;
 		name = "Door";
-		image = ResourceLoader.loadImage("/textures/object/door.png");
+		image = ResourceLoader.loadImage("/textures/object/door");
 		collision = true;
 		position.set(x,y);
 		this.keyToUnlockWith = key;

@@ -3,7 +3,6 @@ package net.maniaticdevs.main.gui;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import net.maniaticdevs.engine.Settings;
@@ -84,7 +83,6 @@ public class GuiMultiplayerChoice extends GuiScreen {
 					try {
 						Main.theNetwork = new NetworkHandler("localhost");
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					break;

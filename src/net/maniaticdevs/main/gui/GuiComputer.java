@@ -35,7 +35,7 @@ public class GuiComputer extends GuiScreen {
 	 */
 	public GuiComputer() {
 		if(computerImage == null) {
-			computerImage = ResourceLoader.loadImage("textures/computer");
+			computerImage = ResourceLoader.loadImage("/textures/computer");
 		}
 		Input.inputType = Input.InputType.Chat;
 		Input.needsInput = true;
@@ -51,14 +51,18 @@ public class GuiComputer extends GuiScreen {
 		}
 		if(Input.isKeyDownExplicit(Input.KEY_ENTER) && Input.getTextInput().length() != 0 && !Input.getTextInput().replace(" ", "").isEmpty()) {
 			
-			if(Input.getTextInput().contentEquals("ls")) {
-				input.add("ls command?? no way");
-			} else {
-				input.add("command not found: "+ Input.getTextInput());
-			}
+			handleCommand(Input.getTextInput());
 			Input.clearInput();
 			Input.needsInput = true;
 			
+		}
+	}
+	
+	private void handleCommand(String cmd) {
+		if(cmd.contentEquals("ls")) {
+			input.add("ls command?? no way");
+		} else {
+			input.add("command not found: "+ Input.getTextInput());
 		}
 	}
 	

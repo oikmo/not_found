@@ -22,12 +22,11 @@ import net.maniaticdevs.engine.util.os.EnumOS;
 import net.maniaticdevs.engine.util.os.EnumOSMappingHelper;
 import net.maniaticdevs.engine.util.properties.LanguageHandler;
 import net.maniaticdevs.engine.util.sound.Sound;
-import net.maniaticdevs.engine.web.WebServer;
 import net.maniaticdevs.main.entity.Player;
-import net.maniaticdevs.main.gui.GuiComputer;
 import net.maniaticdevs.main.gui.GuiDialogue;
 import net.maniaticdevs.main.gui.GuiDisconnected;
 import net.maniaticdevs.main.gui.GuiInGame;
+import net.maniaticdevs.main.gui.GuiMainMenu;
 import net.maniaticdevs.main.gui.GuiPauseScreen;
 
 /**
@@ -103,7 +102,6 @@ public class Main extends JPanel implements Runnable  {
 
 		window.setLocationRelativeTo(null); // center window
 		window.setVisible(true);
-		window.setPreferredSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
 		window.setMinimumSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
 
 		mainPanel.runThreads();
@@ -141,6 +139,7 @@ public class Main extends JPanel implements Runnable  {
 	 * Main constructor, sets ups the panel values such as size and listeners and threads
 	 */
 	public Main() {
+		//this.setMinimumSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
 		this.setPreferredSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
 		this.setBackground(new Color(20,20,20));
 		this.setDoubleBuffered(true); // better performance
@@ -156,7 +155,7 @@ public class Main extends JPanel implements Runnable  {
 		MapLoader.init();
 		sfxLib = new Sound("sfx/00cursor","sfx/01door","sfx/02hitmonster","sfx/03key","sfx/04powerup","sfx/05receivedamage","sfx/06swingweapon", "sfx/07catgif");
 
-		currentScreen = new GuiComputer();
+		currentScreen = new GuiMainMenu();
 	}
 
 	/**

@@ -88,7 +88,7 @@ public class Player extends Entity {
 		screenPos = new Vector2((Main.getInstance().getWidth() / 2 - (Settings.tileSize / 2)), Main.getInstance().getHeight() / 2 - (Settings.tileSize / 2));
 		position.set(Settings.tileSize*4, Settings.tileSize*4);
 		sprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
-		deadSprite = ImageUtils.scaleImage(ResourceLoader.loadImage("/textures/player/player_dead.png"), Settings.tileSize, Settings.tileSize);
+		deadSprite = ImageUtils.scaleImage(ResourceLoader.loadImage("/textures/player/player_dead"), Settings.tileSize, Settings.tileSize);
 	}
 	
 	/**

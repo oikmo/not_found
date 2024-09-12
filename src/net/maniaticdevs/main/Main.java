@@ -221,9 +221,8 @@ public class Main extends JPanel implements Runnable  {
 				} else {
 					if(currentScreen instanceof GuiDialogue) {
 						((GuiDialogue)currentScreen).cancelDialogue();
-						
-						currentScreen = new GuiInGame();
 					}
+					currentScreen = new GuiInGame();
 				}
 			}
 			lockEscapeToGame = true;

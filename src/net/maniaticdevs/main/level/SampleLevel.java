@@ -2,6 +2,7 @@ package net.maniaticdevs.main.level;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.level.Level;
+import net.maniaticdevs.engine.objects.Computer;
 import net.maniaticdevs.engine.objects.DataBuffer;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
@@ -33,7 +34,8 @@ public class SampleLevel extends Level {
 		this.objects.add(new DataBuffer("test", 2, Settings.worldTileSize*14,Settings.worldTileSize));
 		this.entities.add(new Test(new Vector2(Settings.worldTileSize*5, Settings.worldTileSize*7)));
 		this.entities.add(new Watcher(new Vector2(Settings.worldTileSize*10, Settings.worldTileSize*18)));
-		this.objects.add(new MovingImage(SoundSFXEnum.catgif, "catgif", 6, 5, 5, Settings.worldTileSize*29, Settings.worldTileSize*29));
+		this.objects.add(new MovingImage(SoundSFXEnum.catgif, "object/catgif", 6, 5, 5, Settings.worldTileSize*29, Settings.worldTileSize*29));
+		this.objects.add(new Computer(Settings.worldTileSize*30, Settings.worldTileSize*1));
 	}
 
 }

@@ -59,7 +59,12 @@ public class GuiComputer extends GuiScreen {
 	}
 	
 	private void handleCommand(String cmd) {
-		if(cmd.contentEquals("ls")) {
+		if(cmd.contentEquals("help")) {
+			input.add("NFOS V1.0 - Copyright GETSVER");
+			input.add("  help - this screen");
+			input.add("  ls - dummy command");
+			input.add("");
+		} else if(cmd.contentEquals("ls")) {
 			input.add("ls command?? no way");
 		} else {
 			input.add("command not found: "+ Input.getTextInput());
@@ -69,12 +74,14 @@ public class GuiComputer extends GuiScreen {
 	public void draw(Graphics2D g2) {
 		g2.setColor(color);
 		int currentMeasurement = Main.getInstance().getHeight();
+		int y = 0;
 		if(Main.getInstance().getHeight() > Main.getInstance().getWidth()) {
 			currentMeasurement = Main.getInstance().getWidth();
+			y = (Main.getInstance().getHeight()/2)-(currentMeasurement/2);
 		}
 		g2.fillRect(0, 0, Main.getInstance().getWidth(), Main.getInstance().getHeight());
 		int x = (Main.getInstance().getWidth()/2)-currentMeasurement/2;
-		int y = 0;
+		
 		g2.drawImage(computerImage, x, y, currentMeasurement, currentMeasurement, null);
 		String toShow = Input.getTextInput();
 		int screenlength = (int)((currentMeasurement/1.3f)/GuiScreen.font.getSize())-1;

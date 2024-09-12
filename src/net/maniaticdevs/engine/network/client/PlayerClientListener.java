@@ -30,6 +30,7 @@ import net.maniaticdevs.engine.network.packet.PacketUpdateObjectAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerDirection;
 import net.maniaticdevs.engine.network.packet.PacketUserName;
+import net.maniaticdevs.engine.objects.Computer;
 import net.maniaticdevs.engine.objects.DataBuffer;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
@@ -281,6 +282,15 @@ public class PlayerClientListener extends Listener {
 					Main.currentLevel.addObject(movingImage);
 				} else {
 					needsToBeAddedObjs.add(movingImage);
+				}
+				break;
+			case "Computer":
+				Computer computer = new Computer(packet.x, packet.y);
+				computer.setNetworkID(packet.networkID);
+				if(Main.currentLevel != null) {
+					Main.currentLevel.addObject(computer);
+				} else {
+					needsToBeAddedObjs.add(computer);
 				}
 				break;
 			}

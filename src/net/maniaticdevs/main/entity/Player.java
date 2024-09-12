@@ -16,7 +16,6 @@ import net.maniaticdevs.engine.entity.Monster;
 import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.network.ChatMessage;
-import net.maniaticdevs.engine.objects.DataBuffer;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
 import net.maniaticdevs.engine.objects.OBJ;
@@ -64,13 +63,13 @@ public class Player extends Entity {
 	boolean lockTakeLife = false;
 	/** To prevent action to be done repeatedly in a short period of time */
 	boolean lockGiveLife = false;
-	
+
 	/** If set, it will count down to 0 in which it removes the active notification from {@link GuiInGame} */
 	private int notficationTicks = 0;
-	
+
 	/** Chat bubbles for player */
 	public List<ChatMessage> messages = new ArrayList<>();
-	
+
 	/** When the player dies, this shows up */
 	private BufferedImage deadSprite;
 
@@ -90,7 +89,7 @@ public class Player extends Entity {
 		sprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
 		deadSprite = ImageUtils.scaleImage(ResourceLoader.loadImage("/textures/player/player_dead"), Settings.tileSize, Settings.tileSize);
 	}
-	
+
 	/**
 	 * If the player kills a monster, this is ran.
 	 * If {@link #exp} is higher than (or equal to) {@link #nextLevelExp} then level up.
@@ -107,9 +106,9 @@ public class Player extends Entity {
 			//attack = getAttack();
 			//defense = getDefense();
 		}
-		
+
 	}
-	
+
 	/** Updates the player center of screen */
 	public void updateScreenPos() {
 		screenPos.set((Main.getInstance().getWidth() / 2 - (Settings.tileSize / 2)), Main.getInstance().getHeight() / 2 - (Settings.tileSize / 2));
@@ -117,11 +116,11 @@ public class Player extends Entity {
 
 	@Override
 	public void tick() {
-		
+
 		Main.sfxLib.setListener(position.x, position.y);
-		
+
 		if (isInvince) { invinceCounter++; if (invinceCounter > 40) { isInvince = false; invinceCounter = 0; } }
-		
+
 		if(notficationTicks != 0 && GuiInGame.message != null) {
 			notficationTicks--;
 			if(notficationTicks <= 0 && GuiInGame.message != null) {
@@ -135,10 +134,10 @@ public class Player extends Entity {
 			}
 			messages.get(i).tick();
 		}
-		
+
 		if((Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) && ((GuiInGame)Main.currentScreen).chatScreen == null && health != 0) {
 			animate();
-			
+
 			if(Input.needsInput) {
 				Input.clearInput();
 			}
@@ -152,11 +151,11 @@ public class Player extends Entity {
 			} else if(Input.isKeyDown(Input.KEY_A)) {
 				direction = EntityDirection.WEST;
 			}
-			
+
 		} else if(Main.currentScreen instanceof GuiDialogue) {
 			spriteNum = 0;
 		}
-		
+
 		if(Input.isKeyDown(Input.KEY_MINUS)) {
 			if(!lockTakeLife) {
 				if(health != 0) {
@@ -176,7 +175,7 @@ public class Player extends Entity {
 						maxHealth = ((maxHealth/2)+1)*2;
 					}
 				}
-				
+
 			}
 			lockGiveLife = true;
 		} else {
@@ -191,7 +190,7 @@ public class Player extends Entity {
 			if(Main.theNetwork != null) {
 				CollisionChecker.checkOtherPlayer(this);
 			}
-			
+
 			if(ent instanceof Monster) {
 				if(!isInvince) {
 					((Monster)ent).react();
@@ -199,13 +198,13 @@ public class Player extends Entity {
 					Main.sfxLib.play(SoundSFXEnum.recieveDmg);
 					isInvince = true;
 				}
-				
-				
+
+
 			}
-			
+
 			OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
 			if(Input.isKeyDown(Input.KEY_ENTER)) {
-				
+
 				if(ent != null) {
 					if(ent instanceof NPC) {
 						if(!((NPC)ent).lock) {
@@ -213,7 +212,7 @@ public class Player extends Entity {
 						}
 					}
 				}
-				
+
 				if(contactOBJ instanceof PickableObject) {
 					inventory.add(((PickableObject)contactOBJ).getItem());
 					notficationTicks = 180;
@@ -223,7 +222,7 @@ public class Player extends Entity {
 					}
 					Main.currentLevel.removeObject(contactOBJ);
 				}
-				
+
 				if(obj instanceof Door) {
 					if(holdingItem != null) {
 						if(holdingItem.networkID.contentEquals(((Door)obj).getRequiredKey().networkID)) {
@@ -235,11 +234,14 @@ public class Player extends Entity {
 							Main.sfxLib.play(SoundSFXEnum.door);
 						}
 					}
-				} else if(obj instanceof DataBuffer) {
-					 ((DataBuffer)obj).interact(this);
+				} else {
+					if(obj != null) {
+						obj.interact(this);
+					}
+
 				}
 			}
-			
+
 		}
 
 
@@ -272,7 +274,7 @@ public class Player extends Entity {
 			direction = EntityDirection.IDLE;
 		}
 	}
-	
+
 	/**
 	 * Changes the player health
 	 * @param amount Amount to change health by
@@ -321,6 +323,8 @@ public class Player extends Entity {
 		//if debug flag is enabled
 		if (isInvince) {
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+		} else {
+			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		}
 		if(Main.debug) {
 			g2.setColor(Color.WHITE);
@@ -335,30 +339,33 @@ public class Player extends Entity {
 			g2.drawString("KEY_D:"+Input.isKeyDown(Input.KEY_D), 0, 100);
 		}
 		g2.setFont(GuiScreen.font.deriveFont(18.0F));
-		int height = (int)g2.getFontMetrics().getStringBounds("cock", g2).getHeight();
-		int change = height + 20;
-		int offsetY = 0;
-		for(int i = messages.size(); i > 0; i--) {
-			int j = i - 1;
-			ChatMessage chatmessage = messages.get(j);
-			String msg = chatmessage.getMessage(); 
+		if(messages.size() != 0) {
+			int height = (int)g2.getFontMetrics().getStringBounds("G", g2).getHeight();
+			int change = height + 20;
+			int offsetY = 0;
+			for(int i = messages.size(); i > 0; i--) {
+				int j = i - 1;
+				ChatMessage chatmessage = messages.get(j);
+				String msg = chatmessage.getMessage(); 
 
-			int width = (int)g2.getFontMetrics().getStringBounds(msg, g2).getWidth();
-			g2.setColor(Color.WHITE);
-			g2.fillRoundRect((Main.getInstance().getWidth()/2)-((width+15)/2), (int) (screenPos.y-height*2.5f)-offsetY, width+15, height+15, 15, 15);
-			g2.setColor(Color.BLACK);
-			g2.setStroke(new BasicStroke(3));
-			g2.drawRoundRect((Main.getInstance().getWidth()/2)-((width+15)/2), (int) (screenPos.y-height*2.5f)-offsetY, width+15, height+15, 5, 5);
-			g2.setColor(Color.BLACK);
-			g2.drawString(msg, (Main.getInstance().getWidth()/2)-((width)/2), screenPos.y-height-(offsetY));
-			offsetY += change;
+				int width = (int)g2.getFontMetrics().getStringBounds(msg, g2).getWidth();
+				g2.setColor(Color.WHITE);
+				g2.fillRoundRect((Main.getInstance().getWidth()/2)-((width+15)/2), (int) (screenPos.y-height*2.5f)-offsetY, width+15, height+15, 15, 15);
+				g2.setColor(Color.BLACK);
+				g2.setStroke(new BasicStroke(3));
+				g2.drawRoundRect((Main.getInstance().getWidth()/2)-((width+15)/2), (int) (screenPos.y-height*2.5f)-offsetY, width+15, height+15, 5, 5);
+				g2.setColor(Color.BLACK);
+				g2.drawString(msg, (Main.getInstance().getWidth()/2)-((width)/2), screenPos.y-height-(offsetY));
+				offsetY += change;
+			}
 		}
+		
 		if(health != 0) {
 			g2.drawImage(sprites[spriteNum+getDirection().ordinal()*6], null, screenPos.x, screenPos.y);
 		} else {
 			g2.drawImage(deadSprite, null, screenPos.x, screenPos.y);
 		}
-		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+		
 
 	}
 

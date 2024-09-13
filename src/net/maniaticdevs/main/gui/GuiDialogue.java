@@ -58,13 +58,17 @@ public class GuiDialogue extends GuiScreen {
 	/** Lock to prevent sounds to play all at once */
 	private boolean playBG = false;
 	
+	/** Loaded scenario */
+	private DialogueScenario scenario;
+	
 	/** 
 	 * Constructor 
 	 * @param dataBuffer was this called from {@link net.maniaticdevs.engine.objects.DataBuffer}
 	 * @param dialogue Dialogues to be loaded
 	 * @param npc To lock and unlock when done
+	 * @param scenario Scenario to load
 	 */
-	public GuiDialogue(boolean dataBuffer, List<String> dialogue, NPC npc) {
+	public GuiDialogue(boolean dataBuffer, List<String> dialogue, NPC npc, DialogueScenario scenario) {
 		if(bufferImage == null) {
 			try {
 				bufferImage = ImageIO.read(ResourceLoader.class.getResourceAsStream("/textures/data-buffer.png"));
@@ -94,6 +98,7 @@ public class GuiDialogue extends GuiScreen {
 				this.npc.lock = true;
 			}
 		}
+		this.scenario = scenario;
 	}
 	
 	public void draw(Graphics2D g2) {
@@ -101,6 +106,9 @@ public class GuiDialogue extends GuiScreen {
 	}
 	
 	public void tick() {
+		if(scenario != null) {
+			scenario.tick();
+		}
 		if(tickDelay != 0) {
 			tickDelay--;
 		} else {
@@ -110,6 +118,9 @@ public class GuiDialogue extends GuiScreen {
 					String[] raw = dialogues.get(dialogueIndex).split("%");
 					name = raw[0];
 					dialogue = raw[1];
+					if(scenario != null) {
+						scenario.callback(name, dialogue);
+					}
 				}
 				
 				char[] diaChars = dialogue.toCharArray();
@@ -173,10 +184,13 @@ public class GuiDialogue extends GuiScreen {
 		int height = Settings.tileSize*5;
 		int y = Main.getInstance().getHeight() - (Settings.tileSize/2) - height;
 		
+		g2.setColor(color);
+		g2.fillRect(0, 0, Main.getInstance().getWidth(), Main.getInstance().getHeight());
+		
 		if(this.dataBuffer) {
-			g2.setColor(color);
-			g2.fillRect(0, 0, Main.getInstance().getWidth(), Main.getInstance().getHeight());
 			g2.drawImage(bufferImage, (Main.getInstance().getWidth()/2)-y/2, 0, y, y, null);
+		} else {
+			scenario.draw(g2);
 		}
 		
 		drawSubWindow(g2, x, y, width, height);

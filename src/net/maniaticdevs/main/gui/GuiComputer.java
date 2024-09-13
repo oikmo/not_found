@@ -22,7 +22,7 @@ public class GuiComputer extends GuiScreen {
 	
 	private static BufferedImage computerImage;
 	/** Background */
-	private static Color color = new Color(0,0,0,180);
+	private static Color color = new Color(0,0,0,80);
 	/** Ticks counter */
 	private int cursorTicks = 0;
 	/** Every 30 ticks that is reached by {@link #cursorTicks}, this will flip and if true the "_" will show */

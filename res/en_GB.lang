@@ -20,4 +20,4 @@ gui.name.question=It seems like you forgot your name...
 gui.name.select=SELECT
 gui.play.reminder=You are %s and always will be.
 gui.play.solo=SOLO
-gui.play.mulitplayer=MULTIPLAYER
+gui.play.multiplayer=MULTIPLAYER

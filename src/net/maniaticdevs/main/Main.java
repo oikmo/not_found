@@ -105,7 +105,7 @@ public class Main extends JPanel implements Runnable  {
 		window.setLocationRelativeTo(null); // center window
 		window.setVisible(true);
 		window.setMinimumSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
-
+		Main.getWorkingDirectory();
 		mainPanel.runThreads();
 	}
 
@@ -299,7 +299,7 @@ public class Main extends JPanel implements Runnable  {
 	}
 
 	/**
-	 * Retrieves data directory of .blockbase/ using {@code Main.getWorkingDirectory(String)}
+	 * Retrieves data directory of .not_found/ using {@code Main.getWorkingDirectory(String)}
 	 * @return Directory (File)
 	 */
 	public static File getWorkingDirectory() {
@@ -315,6 +315,7 @@ public class Main extends JPanel implements Runnable  {
 	 */
 	public static File getWorkingDirectory(String name) {
 		String userDir = System.getProperty("user.home", ".");
+		System.out.println(userDir);
 		File folder;
 		switch(EnumOSMappingHelper.os[EnumOS.getOS().ordinal()]) {
 		case 1:

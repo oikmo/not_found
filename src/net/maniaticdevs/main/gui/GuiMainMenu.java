@@ -8,6 +8,7 @@ import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.save.SaveSystem;
 import net.maniaticdevs.engine.util.Input;
+import net.maniaticdevs.engine.util.properties.LanguageHandler;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
 import net.maniaticdevs.main.save.PlayerSaveData;
@@ -125,7 +126,7 @@ public class GuiMainMenu extends GuiScreen {
 
 		//menu
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
-		text = "PLAY";
+		text = LanguageHandler.getInstance().translateKey("gui.mainmenu.play");
 		x = getXforCenteredText(g2, text);
 		y += Settings.tileSize*5;
 		g2.drawString(text, x, y);
@@ -133,7 +134,7 @@ public class GuiMainMenu extends GuiScreen {
 			g2.drawString(">", x-Settings.tileSize, y);
 		}
 
-		text = "OPTIONS";
+		text = LanguageHandler.getInstance().translateKey("gui.mainmenu.options");
 		x = getXforCenteredText(g2, text);
 		y += Settings.tileSize;
 		g2.drawString(text, x, y);
@@ -143,7 +144,7 @@ public class GuiMainMenu extends GuiScreen {
 			g2.setColor(Color.white);
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
 		}
-		text = "QUIT";
+		text = LanguageHandler.getInstance().translateKey("gui.mainmenu.quit");
 		x = getXforCenteredText(g2, text);
 		y += Settings.tileSize;
 		g2.drawString(text, x, y);

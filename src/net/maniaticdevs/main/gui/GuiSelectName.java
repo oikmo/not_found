@@ -10,6 +10,7 @@ import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.save.SaveSystem;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.engine.util.Input.InputType;
+import net.maniaticdevs.engine.util.properties.LanguageHandler;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
 import net.maniaticdevs.main.save.PlayerSaveData;
@@ -133,7 +134,7 @@ public class GuiSelectName extends GuiScreen {
 		//menu
 		
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 28F));
-		String text = "It seems like you forgot your name...";
+		String text = LanguageHandler.getInstance().translateKey("gui.name.question");
 		x = getXforCenteredText(g2, text);
 		g2.drawString(text, x, (int) (y-g2.getFontMetrics().getStringBounds(text, g2).getHeight()*2));
 		
@@ -155,7 +156,7 @@ public class GuiSelectName extends GuiScreen {
 			g2.drawString(">",subX+15, y);
 		}
 		
-		text = "SELECT";
+		text = LanguageHandler.getInstance().translateKey("gui.name.select");
 		x = getXforCenteredText(g2, text);
 		y += Settings.tileSize;
 		g2.drawString(text, x, y);
@@ -163,7 +164,7 @@ public class GuiSelectName extends GuiScreen {
 			g2.drawString(">", x-Settings.tileSize, y);
 		}
 
-		text = "BACK";
+		text = LanguageHandler.getInstance().translateKey("gui.back");
 		x = getXforCenteredText(g2, text);
 		y += Settings.tileSize;
 		g2.drawString(text, x, y);

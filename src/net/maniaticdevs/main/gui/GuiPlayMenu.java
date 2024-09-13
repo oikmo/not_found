@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.util.Input;
+import net.maniaticdevs.engine.util.properties.LanguageHandler;
 import net.maniaticdevs.engine.web.WebServer;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
@@ -108,7 +109,7 @@ public class GuiPlayMenu extends GuiScreen {
 		g2.setFont(font);
 		//menu
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 24F));
-		String text = "You are " + Main.playerName + " and always will be";
+		String text = LanguageHandler.getInstance().translateKey("gui.play.reminder").replace("%s", Main.playerName);
 		g2.drawString(text, getXforCenteredText(g2, text), 48);
 		
 
@@ -118,7 +119,7 @@ public class GuiPlayMenu extends GuiScreen {
 		//g2.drawImage(gp.player.shadow, x,(int) (y - gp.tileSize), gp.tileSize*5, gp.tileSize*5, null);
 		
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
-		text = "SOLO";
+		text = LanguageHandler.getInstance().translateKey("gui.play.solo");
 		x = getXforCenteredText(g2, text);
 		g2.drawString(text, x, y);
 		if(optionSelected == 0) {
@@ -126,7 +127,7 @@ public class GuiPlayMenu extends GuiScreen {
 		}
 
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
-		text = "MULTIPLAYER";
+		text = LanguageHandler.getInstance().translateKey("gui.play.multiplayer");
 		x = getXforCenteredText(g2, text);
 		y += Settings.tileSize;
 		g2.drawString(text, x, y);
@@ -137,7 +138,7 @@ public class GuiPlayMenu extends GuiScreen {
 			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
 		}
 
-		text = "BACK";
+		text = LanguageHandler.getInstance().translateKey("gui.back");
 		x = getXforCenteredText(g2, text);
 		y += Settings.tileSize;
 		g2.drawString(text, x, y);

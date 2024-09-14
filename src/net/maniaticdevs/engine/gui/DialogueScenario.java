@@ -1,4 +1,4 @@
-package net.maniaticdevs.main.gui;
+package net.maniaticdevs.engine.gui;
 
 import java.awt.Graphics2D;
 
@@ -10,17 +10,24 @@ import java.awt.Graphics2D;
 public abstract class DialogueScenario {
 	
 	/** Logic function to do logic things */
-	protected abstract void tick();
+	public abstract void tick();
 	/** 
 	 * Draws the required things on the screen
 	 *  @param g2 Graphics
 	 */
-	protected abstract void draw(Graphics2D g2);
+	public abstract void draw(Graphics2D g2);
 	/** 
 	 * When a new dialogue is called, this is also called
 	 * @param name Name of person speaking
 	 * @param dialogue The speech itself
 	 */
-	protected abstract void callback(String name, String dialogue);
+	public abstract void callback(String name, String dialogue);
+	/** 
+	 * When a new dialogue is called, this is also called but another line ahead
+	 * @param name Name of person speaking
+	 * @param dialogue The speech itself
+	 */
+	public abstract void callbackAhead(String name, String dialogue);
+	
 	
 }

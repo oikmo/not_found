@@ -13,6 +13,7 @@ import javax.imageio.ImageIO;
 import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.NPC;
+import net.maniaticdevs.engine.gui.DialogueScenario;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.network.packet.PacketNPCLock;
 import net.maniaticdevs.engine.util.Input;
@@ -49,7 +50,8 @@ public class GuiDialogue extends GuiScreen {
 	public NPC npc;
 	
 	/** Background */
-	private static Color color = new Color(0,0,0,180);
+	private static Color bufferColor = new Color(0,0,0,180);
+	private static Color color = new Color(0,0,0,30);
 	/** DataBuffer image */
 	private static BufferedImage bufferImage;
 	/** Cool background audio for DataBuffer */
@@ -60,6 +62,10 @@ public class GuiDialogue extends GuiScreen {
 	
 	/** Loaded scenario */
 	private DialogueScenario scenario;
+	
+	public static int x, y;
+	public static final int width = Settings.tileSize*14, height = Settings.tileSize*5;
+	public static boolean lockEnter;
 	
 	/** 
 	 * Constructor 
@@ -115,11 +121,14 @@ public class GuiDialogue extends GuiScreen {
 			if(dialogueIndex < dialogues.size()) {
 				String dialogue = dialogues.get(dialogueIndex);
 				if(dialogue.contains("%")) {
-					String[] raw = dialogues.get(dialogueIndex).split("%");
+					String[] raw = dialogue.split("%");
 					name = raw[0];
 					dialogue = raw[1];
-					if(scenario != null) {
+					
+					if(scenario != null && dialogues.size() > dialogueIndex+1) {
 						scenario.callback(name, dialogue);
+						String[] r = dialogues.get(dialogueIndex+1).split("%");
+						scenario.callbackAhead(r[0], r[1]);
 					}
 				}
 				
@@ -147,7 +156,7 @@ public class GuiDialogue extends GuiScreen {
 					Main.currentScreen = new GuiInGame();
 				}
 				
-				if(Input.isKeyDownExplicit(Input.KEY_ENTER)) {
+				if(Input.isKeyDownExplicit(Input.KEY_ENTER) && !lockEnter) {
 					if(dialogue.contentEquals(combinedText)) {
 						//wait for blackbox start to end
 						if(dialogue.contentEquals("... ACCESSING DATA BUFFER ...") && playBG) {
@@ -179,12 +188,10 @@ public class GuiDialogue extends GuiScreen {
 	 * @param g2 Graphics
 	 */
 	public void drawDialogueScreen(Graphics2D g2) {
-		int width = (Settings.tileSize*14);
-		int x = (Main.getInstance().getWidth()/2)-(width/2);
-		int height = Settings.tileSize*5;
-		int y = Main.getInstance().getHeight() - (Settings.tileSize/2) - height;
+		x = (Main.getInstance().getWidth()/2)-(width/2);
+		y = Main.getInstance().getHeight() - (Settings.tileSize/2) - height;
 		
-		g2.setColor(color);
+		g2.setColor(dataBuffer ? bufferColor : color);
 		g2.fillRect(0, 0, Main.getInstance().getWidth(), Main.getInstance().getHeight());
 		
 		if(this.dataBuffer) {

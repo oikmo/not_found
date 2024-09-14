@@ -35,7 +35,6 @@ public class WebServer implements Runnable {
 	
 	/**
 	 * HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. HATE. 
-	 * @param port Sets {@link #webport} to given port
 	 */
 	public WebServer() {
 		this.webport = ThreadLocalRandom.current().nextInt(12860, 65534);
@@ -130,7 +129,7 @@ public class WebServer implements Runnable {
 		/** Path to the given page */
 		private String filePath;
 		private String endpoint;
-
+		
 		/**
 		 * Instantiates handler with page.
 		 * @param filePath Path to the subfile.

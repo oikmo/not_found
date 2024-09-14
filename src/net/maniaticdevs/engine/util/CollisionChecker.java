@@ -5,11 +5,13 @@ import java.util.ConcurrentModificationException;
 
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
+import net.maniaticdevs.engine.entity.Monster;
 import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.network.server.MainServer;
 import net.maniaticdevs.engine.network.server.MainServerListener;
 import net.maniaticdevs.engine.objects.OBJ;
 import net.maniaticdevs.engine.tile.Tile;
+import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.entity.Player;
 
@@ -229,6 +231,51 @@ public class CollisionChecker {
 					break;
 				default:
 					break;
+				}
+			}
+			
+		}
+		return interactedEntity;
+	}
+	
+	/**
+	 * Checks to see if entity is colliding with an entity from {@link Main#currentLevel}<br>
+	 * If entity is player, then the collided entity will be returned.
+	 * 
+	 * @param worldPos position to offset from
+	 * @param bb Collision box to test from
+	 * @return {@link Entity}
+	 */
+	public static Entity checkEntityFromBoundingBox(Vector2 worldPos, Rectangle bb) {
+		Entity interactedEntity = null;
+		
+		Rectangle selfEntityChecker = new Rectangle();
+		Rectangle entityChecker = new Rectangle();
+		Iterable<Entity> entities = Main.currentLevel.getEntities();
+		
+		if(Main.server != null) {
+			entities = MainServer.currentLevel.getEntities();
+		}
+		
+		for(Entity ent : entities) {
+			if(ent instanceof Monster) {
+				int solidSelfEntityX = worldPos.x + bb.x;
+				int solidSelfEntityY = worldPos.y + bb.y;
+				selfEntityChecker.x = solidSelfEntityX;
+				selfEntityChecker.y = solidSelfEntityY;
+				selfEntityChecker.width = bb.width;
+				selfEntityChecker.height = bb.height;
+				
+				int solidEntityX = ent.getPosition().x + ent.getHitBox().x;
+				int solidEntityY = ent.getPosition().y + ent.getHitBox().y;
+				
+				entityChecker.x = solidEntityX;
+				entityChecker.y = solidEntityY;
+				entityChecker.width = ent.getHitBox().width;
+				entityChecker.height = ent.getHitBox().height;
+				
+				if(selfEntityChecker.intersects(entityChecker)) {
+					interactedEntity = ent;
 				}
 			}
 			

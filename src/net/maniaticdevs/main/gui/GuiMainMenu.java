@@ -3,10 +3,13 @@ package net.maniaticdevs.main.gui;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
+import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.save.SaveSystem;
+import net.maniaticdevs.engine.util.ImageUtils;
 import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.engine.util.properties.LanguageHandler;
 import net.maniaticdevs.main.Main;
@@ -31,7 +34,27 @@ public class GuiMainMenu extends GuiScreen {
 	/** Prevent action being done on the same frame as the last one to enter */
 	private int tickDelay = 60;
 
+	private BufferedImage[] playerSprites;
+	private BufferedImage playerShadow;
+	private int spriteCounter, spriteNum;
+	
+	public GuiMainMenu() {
+		playerSprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
+		playerShadow = ImageUtils.scaleImage(ResourceLoader.loadImage("/textures/player/shadow"), Settings.tileSize, Settings.tileSize);
+	}
+	
 	public void tick() {
+		spriteCounter++;
+		if (spriteCounter > 4) { 
+			if (spriteNum >= 0) { 
+				spriteNum++; 
+			} 
+			if (spriteNum > 5) { 
+				spriteNum = 0; 
+			} 
+			spriteCounter = 0; 
+		}
+		
 		if(GuiChat.originalMessages.size() != 0) {
 			GuiChat.originalMessages.clear();
 		}
@@ -122,7 +145,8 @@ public class GuiMainMenu extends GuiScreen {
 		//System.out.println((gp.screenWidth/2) - (gp.tileSize + (gp.tileSize*2) + 16));
 		x = (Main.getInstance().getWidth() - Settings.tileSize*5)/2;
 		y += Settings.tileSize;
-		//g2.drawImage(gp.player.shadow, x,(int) (y - gp.tileSize), gp.tileSize*5, gp.tileSize*5, null);
+		g2.drawImage(playerShadow, ((Main.getInstance().getWidth()/2)-(Settings.tileSize*3)/2),(int) (y+(Settings.tileSize/2)), Settings.tileSize*3, Settings.tileSize*3, null);
+		g2.drawImage(playerSprites[spriteNum], ((Main.getInstance().getWidth()/2)-(Settings.tileSize*3)/2),(int) (y - (Settings.tileSize/2)), Settings.tileSize*3, Settings.tileSize*3, null);
 
 		//menu
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));

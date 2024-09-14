@@ -213,4 +213,9 @@ public class Level {
 	public void addEntity(Entity ent) {
 		entities.add(ent);
 	}
+
+	public void removeEntity(Entity entity) {
+		entities.remove(entity);
+		
+	}
 }

@@ -4,6 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +73,13 @@ public class Player extends Entity {
 
 	/** When the player dies, this shows up */
 	private BufferedImage deadSprite;
+	
+	private boolean isAttacking;
+	private int attackCooldownMax = 60, attackCooldown = attackCooldownMax;
+	private int atkSpriteNum;
+	private BufferedImage atkSprites[];
+	private EntityDirection attackingDirection;
+	public Rectangle attackArea = new Rectangle(0, 0, 24, 24);
 
 	@Override
 	protected void setDefaultValues() {
@@ -88,6 +96,21 @@ public class Player extends Entity {
 		position.set(Settings.tileSize*4, Settings.tileSize*4);
 		sprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
 		deadSprite = ImageUtils.scaleImage(ResourceLoader.loadImage("/textures/player/player_dead"), Settings.tileSize, Settings.tileSize);
+		atkSprites = new BufferedImage[8];
+		BufferedImage[] atk1 = ImageUtils.setupSheet("player/playerAttackSheet_1", 2, 2, 16, 32);
+		//atkLeft1 = setup("/player/attack_left_1", gp.tileSize * 2, gp.tileSize);
+		BufferedImage[] atk2 = ImageUtils.setupSheet("player/playerAttackSheet_2", 2, 2, 32, 16);
+		atk1 = ImageUtils.scaleArray(atk1, Settings.tileSize, Settings.tileSize*2);
+		atk2 = ImageUtils.scaleArray(atk2, Settings.tileSize*2, Settings.tileSize);
+		atkSprites[0] = atk1[0];
+		atkSprites[1] = atk1[1];
+		atkSprites[2] = atk1[2];
+		atkSprites[3] = atk1[3];
+		
+		atkSprites[4] = atk2[0];
+		atkSprites[5] = atk2[1];
+		atkSprites[6] = atk2[2];
+		atkSprites[7] = atk2[3];
 	}
 
 	/**
@@ -116,7 +139,11 @@ public class Player extends Entity {
 
 	@Override
 	public void tick() {
-
+		
+		if(attackCooldown != attackCooldownMax) {
+			attackCooldown++;
+		}
+		
 		Main.sfxLib.setListener(position.x, position.y);
 
 		if (isInvince) { invinceCounter++; if (invinceCounter > 40) { isInvince = false; invinceCounter = 0; } }
@@ -134,8 +161,8 @@ public class Player extends Entity {
 			}
 			messages.get(i).tick();
 		}
-
-		if((Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) && ((GuiInGame)Main.currentScreen).chatScreen == null && health != 0) {
+		
+		if(!isAttacking && (Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) && ((GuiInGame)Main.currentScreen).chatScreen == null && health != 0) {
 			animate();
 
 			if(Input.needsInput) {
@@ -151,37 +178,11 @@ public class Player extends Entity {
 			} else if(Input.isKeyDown(Input.KEY_A)) {
 				direction = EntityDirection.WEST;
 			}
-
 		} else if(Main.currentScreen instanceof GuiDialogue) {
 			spriteNum = 0;
+		} else if(isAttacking) {
+			attacking();
 		}
-
-		if(Input.isKeyDown(Input.KEY_MINUS)) {
-			if(!lockTakeLife) {
-				if(health != 0) {
-					health--;
-				}
-			}
-			lockTakeLife = true;
-		} else {
-			lockTakeLife = false;
-		}
-
-		if(Input.isKeyDown(Input.KEY_EQUALS)) {
-			if(!lockGiveLife) {
-				if(health != 0) {
-					health++;
-					if(health > maxHealth) {
-						maxHealth = ((maxHealth/2)+1)*2;
-					}
-				}
-
-			}
-			lockGiveLife = true;
-		} else {
-			lockGiveLife = false;
-		}
-
 		if(Main.currentLevel != null) {
 			colliding = false;
 			CollisionChecker.checkTile(this);
@@ -198,21 +199,19 @@ public class Player extends Entity {
 					Main.sfxLib.play(SoundSFXEnum.recieveDmg);
 					isInvince = true;
 				}
-
-
 			}
 
 			OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
 			if(Input.isKeyDown(Input.KEY_ENTER)) {
-
+				boolean interactedWithSomething = false;
 				if(ent != null) {
 					if(ent instanceof NPC) {
 						if(!((NPC)ent).lock) {
 							((NPC)ent).react();
+							interactedWithSomething = true;
 						}
 					}
 				}
-
 				if(contactOBJ instanceof PickableObject) {
 					inventory.add(((PickableObject)contactOBJ).getItem());
 					notficationTicks = 180;
@@ -221,6 +220,7 @@ public class Player extends Entity {
 						Main.sfxLib.play(SoundSFXEnum.key);
 					}
 					Main.currentLevel.removeObject(contactOBJ);
+					interactedWithSomething = true;
 				}
 
 				if(obj instanceof Door) {
@@ -230,22 +230,30 @@ public class Player extends Entity {
 								inventory.remove(((Door)obj).getRequiredKey());
 							}
 							Main.currentLevel.removeObject(obj);
-							//Sound.playSFX("door");
 							Main.sfxLib.play(SoundSFXEnum.door);
+							interactedWithSomething = true;
 						}
 					}
 				} else {
 					if(obj != null) {
 						obj.interact(this);
+						interactedWithSomething = true;
 					}
 
+				}
+				
+				if(!interactedWithSomething && !isAttacking && attackCooldown >= attackCooldownMax) {
+					isAttacking = true;
+					if(direction != EntityDirection.IDLE) {
+						attackingDirection = direction;
+					}
 				}
 			}
 
 		}
 
 
-		if(!colliding) {
+		if(!colliding && !isAttacking) {
 			/*if(getDirection() != EntityDirection.IDLE) {
 				if(footSteps.isStopped()) {
 					footSteps.play();
@@ -271,7 +279,61 @@ public class Player extends Entity {
 
 			}
 		} else {
-			direction = EntityDirection.IDLE;
+			if(!isAttacking) {
+				direction = EntityDirection.IDLE;
+			} else {
+				direction = attackingDirection;
+			}
+		}
+	}
+	
+	public void attacking() {
+		attackCooldown = 0;
+		spriteCounter++;
+		if(spriteCounter <= 5) {
+			atkSpriteNum = 1;
+		}
+		if (spriteCounter > 5 && spriteCounter <= 20) { // SHOW SECOND ATTACK IMAGE FOR 25 FRAMES
+			atkSpriteNum = 2;
+			
+			switch (direction) {
+			case SOUTH: 
+				attackArea.y = 42;
+				attackArea.x = 16;
+				attackArea.width = 12;
+				attackArea.height = 32;
+				break;
+			case NORTH: 
+				attackArea.y = -26;
+				attackArea.x = 24;
+				attackArea.width = 12;
+				attackArea.height = 32;
+				break;
+			case WEST:
+				attackArea.y = 24;
+				attackArea.x = -24;
+				attackArea.width = 32;
+				attackArea.height = 16;
+				break;
+			case EAST: 
+				attackArea.y = 24;
+				attackArea.x = 40;
+				attackArea.width = 32;
+				attackArea.height = 16;
+				break;
+			}
+			
+			Entity entityToHit = CollisionChecker.checkEntityFromBoundingBox(getPosition(), attackArea);
+			if(entityToHit != null) {
+				Main.currentLevel.removeEntity(entityToHit);
+			}
+		}
+		
+		if(spriteCounter > 20) {
+			atkSpriteNum = 1;
+			spriteCounter = 0;
+			
+			isAttacking = false;
 		}
 	}
 
@@ -318,6 +380,7 @@ public class Player extends Entity {
 		}
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public void draw(Graphics2D g2) {
 		//if debug flag is enabled
@@ -326,6 +389,7 @@ public class Player extends Entity {
 		} else {
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		}
+		
 		if(Main.debug) {
 			g2.setColor(Color.WHITE);
 			g2.setStroke(new BasicStroke(2));
@@ -361,11 +425,38 @@ public class Player extends Entity {
 		}
 		
 		if(health != 0) {
-			g2.drawImage(sprites[spriteNum+getDirection().ordinal()*6], null, screenPos.x, screenPos.y);
+			if(isAttacking) {
+				int xOffset = direction == EntityDirection.WEST ? Settings.tileSize : 0;
+				int yOffset = direction == EntityDirection.NORTH ? Settings.tileSize : 0;
+				int spriteNum = 0;
+				int atkSpriteNum = this.atkSpriteNum-1;
+				switch(direction) {
+				case SOUTH:
+					spriteNum = atkSpriteNum;
+					break;
+				case NORTH:
+					spriteNum = atkSpriteNum+2;
+					break;
+				case WEST:
+					spriteNum = atkSpriteNum+4;
+					break;
+				case EAST:
+					spriteNum = atkSpriteNum+6;
+					break;
+				}
+				//System.out.println(spriteNum);
+				g2.drawImage(atkSprites[spriteNum], null, screenPos.x-xOffset, screenPos.y-yOffset);
+			} else {
+				g2.drawImage(sprites[spriteNum+getDirection().ordinal()*6], null, screenPos.x, screenPos.y);
+			}
+			
 		} else {
 			g2.drawImage(deadSprite, null, screenPos.x, screenPos.y);
 		}
-		
+		g2.setColor(Color.WHITE);
+		g2.setStroke(new BasicStroke(2));
+		//shows hitbox
+		g2.drawRect(screenPos.x+attackArea.x, screenPos.y+attackArea.y, attackArea.width, attackArea.height);
 
 	}
 

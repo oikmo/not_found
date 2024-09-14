@@ -8,6 +8,7 @@ import net.maniaticdevs.engine.util.StringUtil;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.gui.GuiDialogue;
+import net.maniaticdevs.main.gui.scenarios.HorseScenario;
 
 /**
  * Test NPC (it just has that name now canonically)
@@ -24,7 +25,7 @@ public class Test extends NPC {
 		//player/playerSheet
 		sprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
 		try {
-			dialogueToBeLoaded = StringUtil.loadTextFile("dialogues/test.txt");
+			dialogueToBeLoaded = StringUtil.loadTextFile("dialogues/horse.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -35,7 +36,7 @@ public class Test extends NPC {
 	}
 	
 	public void react() {
-		Main.currentScreen = new GuiDialogue(false, dialogueToBeLoaded, this);
+		Main.currentScreen = new GuiDialogue(false, dialogueToBeLoaded, this, new HorseScenario());
 	}
 
 }

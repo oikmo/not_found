@@ -73,7 +73,7 @@ public class DataBuffer extends OBJ {
 		}
 		
 		if(interact) {
-			Main.currentScreen = new GuiDialogue(true, getBuffer(), null);
+			Main.currentScreen = new GuiDialogue(true, getBuffer(), null, null);
 		}
 		
 	}

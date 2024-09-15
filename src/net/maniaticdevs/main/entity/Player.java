@@ -139,7 +139,6 @@ public class Player extends Entity {
 
 	@Override
 	public void tick() {
-		
 		if(attackCooldown != attackCooldownMax) {
 			attackCooldown++;
 		}
@@ -162,24 +161,25 @@ public class Player extends Entity {
 			messages.get(i).tick();
 		}
 		
-		if(!isAttacking && (Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) && ((GuiInGame)Main.currentScreen).chatScreen == null && health != 0) {
+		if(!isAttacking) {
 			animate();
 
 			if(Input.needsInput) {
 				Input.clearInput();
 			}
-			direction = EntityDirection.IDLE;
-			if(Input.isKeyDown(Input.KEY_S)) {
-				direction = EntityDirection.SOUTH;
-			} else if(Input.isKeyDown(Input.KEY_W)) {
-				direction = EntityDirection.NORTH;
-			}if(Input.isKeyDown(Input.KEY_D)) {
-				direction = EntityDirection.EAST;
-			} else if(Input.isKeyDown(Input.KEY_A)) {
-				direction = EntityDirection.WEST;
+			if((Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) && ((GuiInGame)Main.currentScreen).chatScreen == null && health != 0) {
+				direction = EntityDirection.IDLE;
+				if(Input.isKeyDown(Input.KEY_S)) {
+					direction = EntityDirection.SOUTH;
+				} else if(Input.isKeyDown(Input.KEY_W)) {
+					direction = EntityDirection.NORTH;
+				}if(Input.isKeyDown(Input.KEY_D)) {
+					direction = EntityDirection.EAST;
+				} else if(Input.isKeyDown(Input.KEY_A)) {
+					direction = EntityDirection.WEST;
+				}
 			}
-		} else if(Main.currentScreen instanceof GuiDialogue) {
-			spriteNum = 0;
+			
 		} else if(isAttacking) {
 			attacking();
 		}
@@ -202,7 +202,7 @@ public class Player extends Entity {
 			}
 
 			OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
-			if(Input.isKeyDown(Input.KEY_ENTER)) {
+			if(Input.isKeyDownExplicit(Input.KEY_ENTER)) {
 				boolean interactedWithSomething = false;
 				if(ent != null) {
 					if(ent instanceof NPC) {
@@ -247,6 +247,10 @@ public class Player extends Entity {
 					if(direction != EntityDirection.IDLE) {
 						attackingDirection = direction;
 					}
+				} else {
+					if(interactedWithSomething) {
+						isAttacking = false;
+					}
 				}
 			}
 
@@ -282,7 +286,7 @@ public class Player extends Entity {
 			if(!isAttacking) {
 				direction = EntityDirection.IDLE;
 			} else {
-				direction = attackingDirection;
+				direction = attackingDirection != null ? attackingDirection : direction;
 			}
 		}
 	}
@@ -326,6 +330,7 @@ public class Player extends Entity {
 			Entity entityToHit = CollisionChecker.checkEntityFromBoundingBox(getPosition(), attackArea);
 			if(entityToHit != null) {
 				Main.currentLevel.removeEntity(entityToHit);
+				GuiInGame.sizeGlitches = 0;
 			}
 		}
 		

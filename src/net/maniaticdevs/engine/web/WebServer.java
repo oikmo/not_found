@@ -128,11 +128,13 @@ public class WebServer implements Runnable {
 	private static class ServerHttpHandler implements HttpHandler {
 		/** Path to the given page */
 		private String filePath;
+		/** Endpoint path to page */
 		private String endpoint;
 		
 		/**
 		 * Instantiates handler with page.
 		 * @param filePath Path to the subfile.
+		 * @param Endpoint to path
 		 */
 		public ServerHttpHandler(String filePath, String endpoint) {
 			this.filePath = filePath;

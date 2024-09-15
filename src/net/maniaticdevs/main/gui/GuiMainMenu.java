@@ -33,11 +33,17 @@ public class GuiMainMenu extends GuiScreen {
 
 	/** Prevent action being done on the same frame as the last one to enter */
 	private int tickDelay = 60;
-
+	
+	/** Player animation frames */
 	private BufferedImage[] playerSprites;
+	/** Shadow sprite */
 	private BufferedImage playerShadow;
+	/** Animation frames */
 	private int spriteCounter, spriteNum;
 	
+	/**
+	 * Load images
+	 */
 	public GuiMainMenu() {
 		playerSprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
 		playerShadow = ImageUtils.scaleImage(ResourceLoader.loadImage("/textures/player/shadow"), Settings.tileSize, Settings.tileSize);

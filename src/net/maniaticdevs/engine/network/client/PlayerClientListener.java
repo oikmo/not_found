@@ -27,6 +27,7 @@ import net.maniaticdevs.engine.network.packet.PacketRemovePlayer;
 import net.maniaticdevs.engine.network.packet.PacketUpdateEntityAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdateEntityDirection;
 import net.maniaticdevs.engine.network.packet.PacketUpdateObjectAnimation;
+import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAliveState;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerDirection;
 import net.maniaticdevs.engine.network.packet.PacketUserName;
@@ -124,8 +125,7 @@ public class PlayerClientListener extends Listener {
 		else if(object instanceof PacketUserName){
 			PacketUserName packet = (PacketUserName) object;
 			if(Main.theNetwork == null) {
-				Main.theNetwork.disconnect();
-				Main.disconnect(false, Main.lang.translateKey("network.disconnect.u"));
+				return;
 			} else if(Main.theNetwork.players == null) {
 				Main.theNetwork.players = new HashMap<>();
 			}
@@ -223,6 +223,15 @@ public class PlayerClientListener extends Listener {
 			PacketUpdatePlayerDirection packet = (PacketUpdatePlayerDirection) object;
 			if(Main.theNetwork.players.get(packet.id) != null)
 				Main.theNetwork.players.get(packet.id).direction = packet.dir;
+		}
+		else if(object instanceof PacketUpdatePlayerAliveState) {
+			PacketUpdatePlayerAliveState packet = (PacketUpdatePlayerAliveState) object;
+			if(Main.theNetwork.players.get(packet.id) != null)
+				Main.theNetwork.players.get(packet.id).dead = packet.dead;
+			
+			if(packet.id == Main.theNetwork.client.getID()) {
+				Main.thePlayer.health = 3;
+			}
 		}
 		else if(object instanceof PacketGameJoin) {
 			PacketGameJoin packet = (PacketGameJoin) object;
@@ -344,11 +353,11 @@ public class PlayerClientListener extends Listener {
 			}
 		}
 		else if(object instanceof PacketRemoveEntity) {
-			PacketRemoveObject packet = (PacketRemoveObject) object;
+			PacketRemoveEntity packet = (PacketRemoveEntity) object;
 			try {
-				for(OBJ obj : Main.currentLevel.getObjects()) {
-					if(obj.networkID.contentEquals(packet.networkID)) {
-						Main.currentLevel.removeObjectNoNet(obj);
+				for(Entity entity : Main.currentLevel.getEntities()) {
+					if(entity.networkID.contentEquals(packet.networkID)) {
+						Main.currentLevel.removeEntityNoNet(entity);
 						break;
 					}
 				}

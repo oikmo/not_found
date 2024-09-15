@@ -27,6 +27,13 @@ import net.maniaticdevs.main.SoundSFXEnum;
  */
 public class GuiDialogue extends GuiScreen {
 	
+	/** Position of the dialogue frame box */
+	public static int x, y;
+	/** Size of the dialogue frame box */
+	public static final int width = Settings.tileSize*14, height = Settings.tileSize*5;
+	/** Prevents player from going to the next dialogue if true */
+	public static boolean lockEnter;
+	
 	/** Dialogue list to go through */
 	private List<String> dialogues;
 	/** currently displaying character */
@@ -49,9 +56,11 @@ public class GuiDialogue extends GuiScreen {
 	/** Info for NPC that uses dialogues */
 	public NPC npc;
 	
-	/** Background */
-	private static Color bufferColor = new Color(0,0,0,180);
+	/** Default background */
 	private static Color color = new Color(0,0,0,30);
+	/** Background for DataBuffers */
+	private static Color bufferColor = new Color(0,0,0,180);
+	
 	/** DataBuffer image */
 	private static BufferedImage bufferImage;
 	/** Cool background audio for DataBuffer */
@@ -63,12 +72,10 @@ public class GuiDialogue extends GuiScreen {
 	/** Loaded scenario */
 	private DialogueScenario scenario;
 	
-	public static int x, y;
-	public static final int width = Settings.tileSize*14, height = Settings.tileSize*5;
-	public static boolean lockEnter;
+	private boolean dialogueComplete = false;
 	
 	/** 
-	 * Constructor 
+	 * Loads audios and images (and dialogues, scenarios and the like) 
 	 * @param dataBuffer was this called from {@link net.maniaticdevs.engine.objects.DataBuffer}
 	 * @param dialogue Dialogues to be loaded
 	 * @param npc To lock and unlock when done
@@ -125,10 +132,13 @@ public class GuiDialogue extends GuiScreen {
 					name = raw[0];
 					dialogue = raw[1];
 					
-					if(scenario != null && dialogues.size() > dialogueIndex+1) {
+					if(scenario != null) {
 						scenario.callback(name, dialogue);
-						String[] r = dialogues.get(dialogueIndex+1).split("%");
-						scenario.callbackAhead(r[0], r[1]);
+						if(dialogues.size() > dialogueIndex+1) {
+							String[] r = dialogues.get(dialogueIndex+1).split("%");
+							scenario.callbackAhead(r[0], r[1]);
+						}
+						
 					}
 				}
 				
@@ -156,8 +166,15 @@ public class GuiDialogue extends GuiScreen {
 					Main.currentScreen = new GuiInGame();
 				}
 				
+				if(dialogue.contentEquals(combinedText)) {
+					dialogueComplete = true;
+				} else {
+					dialogueComplete = false;
+				}
+				
 				if(Input.isKeyDownExplicit(Input.KEY_ENTER) && !lockEnter) {
 					if(dialogue.contentEquals(combinedText)) {
+						
 						//wait for blackbox start to end
 						if(dialogue.contentEquals("... ACCESSING DATA BUFFER ...") && playBG) {
 							if(combinedText.contentEquals("... ACCESSING DATA BUFFER ...")) {
@@ -197,12 +214,18 @@ public class GuiDialogue extends GuiScreen {
 		if(this.dataBuffer) {
 			g2.drawImage(bufferImage, (Main.getInstance().getWidth()/2)-y/2, 0, y, y, null);
 		} else {
-			scenario.draw(g2);
+			if(scenario != null) {
+				scenario.draw(g2);
+			}
 		}
 		
 		drawSubWindow(g2, x, y, width, height);
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 15F));
+		if(!lockEnter && dialogueComplete) {
+			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 28F));
+			g2.drawString(">", x+ width-56, y+height-28);
+		}
 		
+		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 15F));
 		if(name != null) {
 			g2.drawString(name, x+Settings.tileSize/4+1, y + Settings.tileSize/ 2);
 			

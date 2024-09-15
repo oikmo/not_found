@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="lib/ss-libraryjavasound.jar"/>
 	<classpathentry kind="lib" path="lib/ss-codecwav.jar"/>
 	<classpathentry kind="lib" path="lib/httpserver.jar"/>
+	<classpathentry kind="lib" path="lib/tts.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

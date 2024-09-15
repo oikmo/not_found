@@ -134,7 +134,7 @@ public class WebServer implements Runnable {
 		/**
 		 * Instantiates handler with page.
 		 * @param filePath Path to the subfile.
-		 * @param Endpoint to path
+		 * @param endpoint Endpoint to path
 		 */
 		public ServerHttpHandler(String filePath, String endpoint) {
 			this.filePath = filePath;

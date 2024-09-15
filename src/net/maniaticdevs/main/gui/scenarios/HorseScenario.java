@@ -12,14 +12,26 @@ import net.maniaticdevs.engine.util.math.Maths;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.gui.GuiDialogue;
 
+/**
+ * I'm so hungry I could eat a...
+ * @author Oikmo
+ */
 public class HorseScenario extends DialogueScenario {
 	
+	/** Activations */
 	private boolean horse = false, horseComplete = false, playerActivate = false;
+	/** Display images */
 	private BufferedImage horseImg, playerImg;
+	/** Horse walks in */
 	private float horseX;
+	/** Horse fades in */
 	private float horseTransparency = 0;
-	private int playerRunTicks, spriteCounter, spriteNum;
+	/** Delay for player sprite switching to running */
+	private int playerRunTicks;
+	/** Animation frames */
+	private int spriteCounter, spriteNum;
 	
+	/** Initalises the images */
 	public HorseScenario() {
 		horseImg = ResourceLoader.loadImage("/textures/horse");
 		playerImg = Main.thePlayer.sprites[0];
@@ -47,14 +59,12 @@ public class HorseScenario extends DialogueScenario {
 		GuiDialogue.lockEnter = !horseComplete && horse;
 		
 		if(horse) {
-			
-			
 			if(!horseComplete) {
 				horseX = Maths.flerp(horseX, (Main.getInstance().getWidth()/2)+Settings.tileSize*2, 0.01f);
 			} else {
 				horseX = (Main.getInstance().getWidth()/2)+Settings.tileSize*2;
 			}
-			if((int)horseX <= ((Main.getInstance().getWidth()/2)+Settings.tileSize*2) + 10) {
+			if(horseTransparency >= 0.95f) {
 				horseComplete = true;
 			}
 			horseTransparency = Maths.flerp(horseTransparency, 1f, 0.009f);
@@ -65,15 +75,12 @@ public class HorseScenario extends DialogueScenario {
 
 	@Override
 	public void draw(Graphics2D g2) {
-		
 		g2.drawImage(playerImg, GuiDialogue.x-64, GuiDialogue.y-(256), 256, 256, null);
 		if(horse) {
-			
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, horseTransparency));
 			g2.drawImage(horseImg, (int)horseX, GuiDialogue.y-(256), 256, 256, null);
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		}
-		
 	}
 
 	@Override
@@ -85,9 +92,8 @@ public class HorseScenario extends DialogueScenario {
 
 	@Override
 	public void callbackAhead(String name, String dialogue) {
-		if(name.contentEquals("Horse") && dialogue.contains("Go on")) {
+		if(name.contentEquals("Horse") && dialogue.contains("...")) {
 			horse = true;
 		}
 	}
-
 }

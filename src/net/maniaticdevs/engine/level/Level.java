@@ -9,6 +9,7 @@ import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.entity.Entity;
 import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.level.MapLoader.LevelData;
+import net.maniaticdevs.engine.network.packet.PacketRemoveEntity;
 import net.maniaticdevs.engine.network.packet.PacketRemoveObject;
 import net.maniaticdevs.engine.objects.MovingImage;
 import net.maniaticdevs.engine.objects.OBJ;
@@ -214,8 +215,24 @@ public class Level {
 		entities.add(ent);
 	}
 
+	/**
+	 * Removes {@link Entity} from {@link #entities} network edition
+	 * @param entity Entity to be removed
+	 */
 	public void removeEntity(Entity entity) {
+		if(Main.theNetwork != null) {
+			PacketRemoveEntity packet = new PacketRemoveEntity();
+			packet.networkID = entity.networkID;
+			Main.theNetwork.client.sendTCP(packet);
+		}
+		removeEntityNoNet(entity);
+	}
+	
+	/**
+	 * To not cause stackoverflow on the network
+	 * @param entity Entity to be removed
+	 */
+	public void removeEntityNoNet(Entity entity) {
 		entities.remove(entity);
-		
 	}
 }

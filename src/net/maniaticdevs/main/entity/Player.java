@@ -17,6 +17,8 @@ import net.maniaticdevs.engine.entity.Monster;
 import net.maniaticdevs.engine.entity.NPC;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.network.ChatMessage;
+import net.maniaticdevs.engine.network.OtherPlayer;
+import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAliveState;
 import net.maniaticdevs.engine.objects.Door;
 import net.maniaticdevs.engine.objects.Key;
 import net.maniaticdevs.engine.objects.OBJ;
@@ -27,7 +29,6 @@ import net.maniaticdevs.engine.util.Input;
 import net.maniaticdevs.engine.util.math.Vector2;
 import net.maniaticdevs.main.Main;
 import net.maniaticdevs.main.SoundSFXEnum;
-import net.maniaticdevs.main.gui.GuiDialogue;
 import net.maniaticdevs.main.gui.GuiInGame;
 
 /**
@@ -72,13 +73,17 @@ public class Player extends Entity {
 	public List<ChatMessage> messages = new ArrayList<>();
 
 	/** When the player dies, this shows up */
-	private BufferedImage deadSprite;
+	public BufferedImage deadSprite;
 	
+	/** If true, it will stop all inputs and call {@link #attacking()} until false */
 	private boolean isAttacking;
-	private int attackCooldownMax = 60, attackCooldown = attackCooldownMax;
+	/** Determines how long the attack can be used again */
+	private int attackCooldownMax = 30, attackCooldown = attackCooldownMax;
+	/** Current attack frame */
 	private int atkSpriteNum;
-	private BufferedImage atkSprites[];
-	private EntityDirection attackingDirection;
+	/** Attack sprites to display */
+	private BufferedImage attackSprites[];
+	/** Hitbox for attacking enemies */
 	public Rectangle attackArea = new Rectangle(0, 0, 24, 24);
 
 	@Override
@@ -96,21 +101,16 @@ public class Player extends Entity {
 		position.set(Settings.tileSize*4, Settings.tileSize*4);
 		sprites = ImageUtils.setupSheet("player/playerSheet", 6, 5);
 		deadSprite = ImageUtils.scaleImage(ResourceLoader.loadImage("/textures/player/player_dead"), Settings.tileSize, Settings.tileSize);
-		atkSprites = new BufferedImage[8];
-		BufferedImage[] atk1 = ImageUtils.setupSheet("player/playerAttackSheet_1", 2, 2, 16, 32);
-		//atkLeft1 = setup("/player/attack_left_1", gp.tileSize * 2, gp.tileSize);
-		BufferedImage[] atk2 = ImageUtils.setupSheet("player/playerAttackSheet_2", 2, 2, 32, 16);
-		atk1 = ImageUtils.scaleArray(atk1, Settings.tileSize, Settings.tileSize*2);
-		atk2 = ImageUtils.scaleArray(atk2, Settings.tileSize*2, Settings.tileSize);
-		atkSprites[0] = atk1[0];
-		atkSprites[1] = atk1[1];
-		atkSprites[2] = atk1[2];
-		atkSprites[3] = atk1[3];
 		
-		atkSprites[4] = atk2[0];
-		atkSprites[5] = atk2[1];
-		atkSprites[6] = atk2[2];
-		atkSprites[7] = atk2[3];
+		attackSprites = new BufferedImage[8];
+		BufferedImage[] atk1 = ImageUtils.scaleArray(ImageUtils.setupSheet("player/playerAttackSheet_1", 2, 2, 16, 32),Settings.tileSize, Settings.tileSize*2);
+		BufferedImage[] atk2 = ImageUtils.scaleArray(ImageUtils.setupSheet("player/playerAttackSheet_2", 2, 2, 32, 16),Settings.tileSize*2, Settings.tileSize);
+		for(int i = 0; i != 4; i++) {
+			attackSprites[i] = atk1[i];
+		}
+		for(int i = 0; i != 4; i++) {
+			attackSprites[i+4] = atk2[i];
+		}
 	}
 
 	/**
@@ -161,13 +161,13 @@ public class Player extends Entity {
 			messages.get(i).tick();
 		}
 		
-		if(!isAttacking) {
+		if(!isAttacking && health != 0) {
 			animate();
-
-			if(Input.needsInput) {
-				Input.clearInput();
-			}
+			
 			if((Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) && ((GuiInGame)Main.currentScreen).chatScreen == null && health != 0) {
+				if(Input.needsInput) {
+					Input.clearInput();
+				}
 				direction = EntityDirection.IDLE;
 				if(Input.isKeyDown(Input.KEY_S)) {
 					direction = EntityDirection.SOUTH;
@@ -183,13 +183,29 @@ public class Player extends Entity {
 		} else if(isAttacking) {
 			attacking();
 		}
+		if(Main.currentScreen instanceof GuiInGame) {
+			if(((GuiInGame)Main.currentScreen).chatScreen != null) {
+				direction = EntityDirection.IDLE;
+			}
+		}
+		
 		if(Main.currentLevel != null) {
 			colliding = false;
 			CollisionChecker.checkTile(this);
 			Entity ent = CollisionChecker.checkEntity(this);
 			OBJ obj = CollisionChecker.checkObject(this);
+			boolean interactedWithSomething = false;
 			if(Main.theNetwork != null) {
-				CollisionChecker.checkOtherPlayer(this);
+				OtherPlayer player = CollisionChecker.checkOtherPlayer(this);
+				if(Input.isKeyDownExplicit(Input.KEY_ENTER) && player != null && player.dead) {
+					
+					PacketUpdatePlayerAliveState packet = new PacketUpdatePlayerAliveState();
+					System.out.println(player.id);
+					packet.id = player.id;
+					packet.dead = false;
+					Main.theNetwork.client.sendTCP(packet);
+					interactedWithSomething = true;
+				}
 			}
 
 			if(ent instanceof Monster) {
@@ -203,7 +219,6 @@ public class Player extends Entity {
 
 			OBJ contactOBJ = CollisionChecker.checkIfTouchingObj(this);
 			if(Input.isKeyDownExplicit(Input.KEY_ENTER)) {
-				boolean interactedWithSomething = false;
 				if(ent != null) {
 					if(ent instanceof NPC) {
 						if(!((NPC)ent).lock) {
@@ -242,11 +257,12 @@ public class Player extends Entity {
 
 				}
 				
-				if(!interactedWithSomething && !isAttacking && attackCooldown >= attackCooldownMax) {
-					isAttacking = true;
-					if(direction != EntityDirection.IDLE) {
-						attackingDirection = direction;
+				if(!interactedWithSomething && !isAttacking && attackCooldown >= attackCooldownMax && direction != EntityDirection.IDLE) {
+					if(Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) {
+						isAttacking = true;
+						Main.sfxLib.play(SoundSFXEnum.swingWeapon);
 					}
+					
 				} else {
 					if(interactedWithSomething) {
 						isAttacking = false;
@@ -255,8 +271,7 @@ public class Player extends Entity {
 			}
 
 		}
-
-
+		
 		if(!colliding && !isAttacking) {
 			/*if(getDirection() != EntityDirection.IDLE) {
 				if(footSteps.isStopped()) {
@@ -285,12 +300,13 @@ public class Player extends Entity {
 		} else {
 			if(!isAttacking) {
 				direction = EntityDirection.IDLE;
-			} else {
-				direction = attackingDirection != null ? attackingDirection : direction;
 			}
 		}
 	}
 	
+	/**
+	 * Handles the attack sprite frames and dealing damage on a valid enemy 
+	 */
 	public void attacking() {
 		attackCooldown = 0;
 		spriteCounter++;
@@ -325,10 +341,13 @@ public class Player extends Entity {
 				attackArea.width = 32;
 				attackArea.height = 16;
 				break;
+			default:
+				break;
 			}
 			
 			Entity entityToHit = CollisionChecker.checkEntityFromBoundingBox(getPosition(), attackArea);
 			if(entityToHit != null) {
+				Main.sfxLib.play(SoundSFXEnum.hit);
 				Main.currentLevel.removeEntity(entityToHit);
 				GuiInGame.sizeGlitches = 0;
 			}
@@ -353,6 +372,11 @@ public class Player extends Entity {
 		} else if(health < 0) {
 			health = 0;
 			isInvince = false;
+			if(Main.theNetwork != null) {
+				PacketUpdatePlayerAliveState packet = new PacketUpdatePlayerAliveState();
+				packet.dead = true;
+				Main.theNetwork.client.sendTCP(packet);
+			}
 		}
 	}
 
@@ -384,8 +408,7 @@ public class Player extends Entity {
 			}
 		}
 	}
-
-	@SuppressWarnings("incomplete-switch")
+	
 	@Override
 	public void draw(Graphics2D g2) {
 		//if debug flag is enabled
@@ -395,18 +418,6 @@ public class Player extends Entity {
 			g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 		}
 		
-		if(Main.debug) {
-			g2.setColor(Color.WHITE);
-			g2.setStroke(new BasicStroke(2));
-			//shows hitbox
-			g2.drawRect(screenPos.x+getHitBox().x, screenPos.y+getHitBox().y, getHitBox().width, getHitBox().height);
-			//prints info on screen
-			g2.drawString("direction:"+direction.name(), 0, 10);
-			g2.drawString("KEY_W:"+Input.isKeyDown(Input.KEY_W), 0, 25);
-			g2.drawString("KEY_A:"+Input.isKeyDown(Input.KEY_A), 0, 50);
-			g2.drawString("KEY_S:"+Input.isKeyDown(Input.KEY_S), 0, 75);
-			g2.drawString("KEY_D:"+Input.isKeyDown(Input.KEY_D), 0, 100);
-		}
 		g2.setFont(GuiScreen.font.deriveFont(18.0F));
 		if(messages.size() != 0) {
 			int height = (int)g2.getFontMetrics().getStringBounds("G", g2).getHeight();
@@ -448,9 +459,10 @@ public class Player extends Entity {
 				case EAST:
 					spriteNum = atkSpriteNum+6;
 					break;
+				default:
+					break;
 				}
-				//System.out.println(spriteNum);
-				g2.drawImage(atkSprites[spriteNum], null, screenPos.x-xOffset, screenPos.y-yOffset);
+				g2.drawImage(attackSprites[spriteNum], null, screenPos.x-xOffset, screenPos.y-yOffset);
 			} else {
 				g2.drawImage(sprites[spriteNum+getDirection().ordinal()*6], null, screenPos.x, screenPos.y);
 			}
@@ -458,11 +470,21 @@ public class Player extends Entity {
 		} else {
 			g2.drawImage(deadSprite, null, screenPos.x, screenPos.y);
 		}
-		g2.setColor(Color.WHITE);
-		g2.setStroke(new BasicStroke(2));
-		//shows hitbox
-		g2.drawRect(screenPos.x+attackArea.x, screenPos.y+attackArea.y, attackArea.width, attackArea.height);
-
+		
+		if(Main.debug) {
+			g2.setColor(Color.WHITE);
+			g2.setStroke(new BasicStroke(2));
+			//shows hitbox
+			g2.drawRect(screenPos.x+attackArea.x, screenPos.y+attackArea.y, attackArea.width, attackArea.height);
+			//shows hitbox
+			g2.drawRect(screenPos.x+getHitBox().x, screenPos.y+getHitBox().y, getHitBox().width, getHitBox().height);
+			//prints info on screen
+			g2.drawString("direction:"+direction.name(), 0, 10);
+			g2.drawString("KEY_W:"+Input.isKeyDown(Input.KEY_W), 0, 25);
+			g2.drawString("KEY_A:"+Input.isKeyDown(Input.KEY_A), 0, 50);
+			g2.drawString("KEY_S:"+Input.isKeyDown(Input.KEY_S), 0, 75);
+			g2.drawString("KEY_D:"+Input.isKeyDown(Input.KEY_D), 0, 100);
+		}
 	}
 
 	/**

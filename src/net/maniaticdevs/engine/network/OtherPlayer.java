@@ -84,7 +84,12 @@ public class OtherPlayer {
 				x - Settings.worldTileSize < playerPos.x + playerScreenPos.x &&
 				y + Settings.worldTileSize > playerPos.y - playerScreenPos.y &&
 				y - Settings.worldTileSize < playerPos.y + playerScreenPos.y) {
-			g2.drawImage(Main.thePlayer.sprites[anim+direction*6], screenX, screenY, Settings.worldTileSize, Settings.worldTileSize, null);
+			if(!dead) {
+				g2.drawImage(Main.thePlayer.sprites[anim+direction*6], screenX, screenY, Settings.worldTileSize, Settings.worldTileSize, null);
+			} else {
+				g2.drawImage(Main.thePlayer.deadSprite, screenX, screenY, Settings.worldTileSize, Settings.worldTileSize, null);
+			}
+			
 			g2.setColor(Color.WHITE);
 			g2.setFont(GuiScreen.font.deriveFont(18.0F));
 			int height = (int)g2.getFontMetrics(GuiScreen.font).getStringBounds(userName, g2).getHeight();

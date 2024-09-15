@@ -253,10 +253,6 @@ public class CollisionChecker {
 		Rectangle entityChecker = new Rectangle();
 		Iterable<Entity> entities = Main.currentLevel.getEntities();
 		
-		if(Main.server != null) {
-			entities = MainServer.currentLevel.getEntities();
-		}
-		
 		for(Entity ent : entities) {
 			if(ent instanceof Monster) {
 				int solidSelfEntityX = worldPos.x + bb.x;

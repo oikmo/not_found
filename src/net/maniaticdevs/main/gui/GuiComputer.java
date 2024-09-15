@@ -20,6 +20,7 @@ import net.maniaticdevs.main.Main;
  */
 public class GuiComputer extends GuiScreen {
 	
+	/** The computer sprite */
 	private static BufferedImage computerImage;
 	/** Background */
 	private static Color color = new Color(0,0,0,80);
@@ -27,7 +28,7 @@ public class GuiComputer extends GuiScreen {
 	private int cursorTicks = 0;
 	/** Every 30 ticks that is reached by {@link #cursorTicks}, this will flip and if true the "_" will show */
 	private boolean cursor = true;
-	
+	/** All inputs and outputs recorded */
 	private List<String> input = new ArrayList<>();
 	
 	/**
@@ -58,6 +59,10 @@ public class GuiComputer extends GuiScreen {
 		}
 	}
 	
+	/**
+	 * Easy command parsing
+	 * @param cmd Command to parse
+	 */
 	private void handleCommand(String cmd) {
 		if(cmd.contentEquals("help")) {
 			input.add("NFOS V1.0 - Copyright GETSVER");

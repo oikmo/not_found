@@ -5,8 +5,13 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
+import java.util.Map;
 
+import javax.speech.Central;
+import javax.speech.EngineException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -14,6 +19,7 @@ import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.level.Level;
 import net.maniaticdevs.engine.level.MapLoader;
+import net.maniaticdevs.engine.network.ChatMessage;
 import net.maniaticdevs.engine.network.OtherPlayer;
 import net.maniaticdevs.engine.network.client.NetworkHandler;
 import net.maniaticdevs.engine.network.server.MainServer;
@@ -78,15 +84,22 @@ public class Main extends JPanel implements Runnable  {
 	/** Language Handler for universal texts */
 	public static LanguageHandler lang = LanguageHandler.getInstance();
 	
+	/** Web server */
 	public static WebServer ws;
+	/** Web server thread (for performance reasons */
 	public static Thread webThread;
 	
 	/**
 	 * Opens window and starts game.
 	 * @param args program arguments
 	 * @throws InterruptedException incase something goes funky
+	 * @throws EngineException TTS
 	 */
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, EngineException {
+		System.setProperty("freetts.voices", "com.sun.speech.freetts.en.us" + ".cmu_us_kal.KevinVoiceDirectory");
+		//registering speech engine
+		Central.registerEngineCentral("com.sun.speech.freetts" + ".jsapi.FreeTTSEngineCentral");
+		ChatMessage.init();
 		//handles arguments given by cli
 		for(String arg : args) {
 			if(arg.contentEquals("-debug")) {
@@ -95,6 +108,28 @@ public class Main extends JPanel implements Runnable  {
 		}
 
 		window = new JFrame("not_found"); // create window with name of "not_found"
+		window.addWindowListener(new WindowListener() {
+
+			@Override
+			public void windowActivated(WindowEvent arg0) {}
+			public void windowClosed(WindowEvent arg){}
+
+			public void windowClosing(WindowEvent arg0) {
+				if(Main.theNetwork != null) {
+					Main.theNetwork.disconnect();
+				}
+				if(Main.server != null) {
+					Main.server.stopServer();
+				}
+				ChatMessage.cleanup();
+			}
+			
+			public void windowDeactivated(WindowEvent arg0) {}
+			public void windowDeiconified(WindowEvent arg0) {}
+			public void windowIconified(WindowEvent arg0) {}
+			public void windowOpened(WindowEvent arg0) {}
+			
+		});
 		/* MAKES THE WINDOW BORDERLESS */
 		//window.setUndecorated(true);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -107,6 +142,8 @@ public class Main extends JPanel implements Runnable  {
 		window.setMinimumSize(new Dimension(Settings.windowWidth, Settings.windowHeight));
 		Main.getWorkingDirectory();
 		mainPanel.runThreads();
+		
+		
 	}
 
 	/**
@@ -171,6 +208,7 @@ public class Main extends JPanel implements Runnable  {
 	public void run() {
 		long lastTime = System.nanoTime();
 		double nsPerTick = 1000000000D / 60D;
+		@SuppressWarnings("unused")
 		int frames = 0;
 
 		long lastTimer = System.currentTimeMillis();
@@ -200,7 +238,6 @@ public class Main extends JPanel implements Runnable  {
 
 			if(System.currentTimeMillis() - lastTimer >= 1000) {
 				lastTimer += 1000;
-				window.setTitle("not_found (" + frames +"FPS)");
 				frames = 0;
 			}
 		}
@@ -221,10 +258,12 @@ public class Main extends JPanel implements Runnable  {
 						((GuiInGame) currentScreen).chatScreen = null;
 					}
 				} else {
-					if(currentScreen instanceof GuiDialogue) {
-						((GuiDialogue)currentScreen).cancelDialogue();
+					if(currentLevel != null) {
+						if(currentScreen instanceof GuiDialogue) {
+							((GuiDialogue)currentScreen).cancelDialogue();
+						}
+						currentScreen = new GuiInGame();
 					}
-					currentScreen = new GuiInGame();
 				}
 			}
 			lockEscapeToGame = true;
@@ -265,7 +304,6 @@ public class Main extends JPanel implements Runnable  {
 		Graphics2D g2 = (Graphics2D) g;
 
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
-		g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
 		g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 		g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 		
@@ -279,7 +317,12 @@ public class Main extends JPanel implements Runnable  {
 				if(theNetwork != null) {
 					theNetwork.update();
 					try {
-						for(OtherPlayer p : Main.theNetwork.players.values()) {
+						
+						for(Map.Entry<Integer, OtherPlayer> set : Main.theNetwork.players.entrySet()) {
+							OtherPlayer p = set.getValue();
+							if(p.id != set.getKey()) {
+								p.id = set.getKey();
+							}
 							p.draw(g2, thePlayer.getPosition(), thePlayer.getScreenPosition());
 						}
 					} catch(Exception e) {}
@@ -293,7 +336,7 @@ public class Main extends JPanel implements Runnable  {
 
 		g2.setColor(Color.WHITE);
 		g2.setFont(GuiScreen.font.deriveFont(18.0F));
-		g2.drawString("not_found <REMAKE> [[A1.0.1]]", 0, 18);
+		g2.drawString("not_found <REMAKE> [[A1.0.2]]", 0, 18);
 
 		g2.dispose();
 	}
@@ -315,7 +358,6 @@ public class Main extends JPanel implements Runnable  {
 	 */
 	public static File getWorkingDirectory(String name) {
 		String userDir = System.getProperty("user.home", ".");
-		System.out.println(userDir);
 		File folder;
 		switch(EnumOSMappingHelper.os[EnumOS.getOS().ordinal()]) {
 		case 1:

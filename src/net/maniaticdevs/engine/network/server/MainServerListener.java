@@ -19,10 +19,12 @@ import net.maniaticdevs.engine.network.packet.PacketGameJoin;
 import net.maniaticdevs.engine.network.packet.PacketNPCLock;
 import net.maniaticdevs.engine.network.packet.PacketPlayerUpdateX;
 import net.maniaticdevs.engine.network.packet.PacketPlayerUpdateY;
+import net.maniaticdevs.engine.network.packet.PacketRemoveEntity;
 import net.maniaticdevs.engine.network.packet.PacketRemoveObject;
 import net.maniaticdevs.engine.network.packet.PacketRemovePlayer;
 import net.maniaticdevs.engine.network.packet.PacketUpdateEntityAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdateEntityDirection;
+import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAliveState;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerAnimation;
 import net.maniaticdevs.engine.network.packet.PacketUpdatePlayerDirection;
 import net.maniaticdevs.engine.network.packet.PacketUserName;
@@ -229,6 +231,16 @@ public class MainServerListener extends Listener {
 			packet.id = connection.getID();
 			MainServer.server.sendToAllExceptUDP(connection.getID(), packet);
 		}
+		else if(object instanceof PacketUpdatePlayerAliveState) {
+			PacketUpdatePlayerAliveState packet = (PacketUpdatePlayerAliveState) object;
+			if(players.get(connection.getID()) != null)
+				players.get(connection.getID()).dead = packet.dead;
+
+			if(packet.id == -1) {
+				packet.id = connection.getID();
+			}
+			MainServer.server.sendToAllExceptUDP(connection.getID(), packet);
+		}
 		else if(object instanceof PacketChatMessage) {
 			PacketChatMessage packet = (PacketChatMessage) object;
 			packet.id = connection.getID();
@@ -244,6 +256,10 @@ public class MainServerListener extends Listener {
 		}
 		else if(object instanceof PacketUpdateEntityDirection) {
 			MainServer.server.sendToAllTCP((PacketUpdateEntityDirection) object);
+		}
+		else if(object instanceof PacketRemoveEntity) {
+			PacketRemoveEntity packet = (PacketRemoveEntity) object;
+			MainServer.server.sendToAllExceptTCP(connection.getID(), packet);
 		}
 		else if(object instanceof PacketNPCLock) {
 			PacketNPCLock packet = (PacketNPCLock) object;

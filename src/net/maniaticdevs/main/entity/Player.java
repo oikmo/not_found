@@ -260,6 +260,7 @@ public class Player extends Entity {
 				if(!interactedWithSomething && !isAttacking && attackCooldown >= attackCooldownMax && direction != EntityDirection.IDLE) {
 					if(Main.currentScreen instanceof GuiInGame && ((GuiInGame)Main.currentScreen).chatScreen == null) {
 						isAttacking = true;
+						spriteCounter = 0;
 						Main.sfxLib.play(SoundSFXEnum.swingWeapon);
 					}
 					

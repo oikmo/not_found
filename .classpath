@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="lib/ss-codecwav.jar"/>
 	<classpathentry kind="lib" path="lib/httpserver.jar"/>
 	<classpathentry kind="lib" path="lib/tts.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-api-2.3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

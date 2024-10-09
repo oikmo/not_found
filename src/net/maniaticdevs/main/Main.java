@@ -33,7 +33,7 @@ import net.maniaticdevs.main.entity.Player;
 import net.maniaticdevs.main.gui.GuiDialogue;
 import net.maniaticdevs.main.gui.GuiDisconnected;
 import net.maniaticdevs.main.gui.GuiInGame;
-import net.maniaticdevs.main.gui.GuiMainMenu;
+import net.maniaticdevs.main.gui.GuiMainMenu_new;
 import net.maniaticdevs.main.gui.GuiPauseScreen;
 
 /**
@@ -194,7 +194,7 @@ public class Main extends JPanel implements Runnable  {
 		MapLoader.init();
 		sfxLib = new Sound("sfx/00cursor","sfx/01door","sfx/02hitmonster","sfx/03key","sfx/04powerup","sfx/05receivedamage","sfx/06swingweapon", "sfx/07catgif");
 
-		currentScreen = new GuiMainMenu();
+		currentScreen = new GuiMainMenu_new();
 	}
 
 	/**

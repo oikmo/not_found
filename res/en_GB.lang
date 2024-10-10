@@ -13,9 +13,6 @@ network.quit.d=Disconnected:
 network.quit.k=Kicked: 
 
 gui.back=BACK
-gui.mainmenu.play=PLAY
-gui.mainmenu.options=OPTIONS
-gui.mainmenu.quit=QUIT
 gui.name.question=It seems like you forgot your name...
 gui.name.select=SELECT
 gui.play.reminder=You are %s and always will be.

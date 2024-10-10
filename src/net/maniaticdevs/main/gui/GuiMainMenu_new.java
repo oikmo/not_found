@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import net.maniaticdevs.engine.ResourceLoader;
 import net.maniaticdevs.engine.Settings;
 import net.maniaticdevs.engine.gui.GuiScreen;
 import net.maniaticdevs.engine.save.SaveSystem;
@@ -35,13 +34,17 @@ public class GuiMainMenu_new extends GuiScreen {
 	private int tickDelay = 60;
 	
 	private BufferedImage[] selector, play, options, quit;
-	private int animationTicks = 0, selectorFrame;
+	private int animationTicks = 0, selectorFrame, playFrame, optionsFrame;
+	
+	private int point5 = (int)(Settings.tileSize/1.5f);
 	
 	/**
 	 * Load images
 	 */
 	public GuiMainMenu_new() {
-		selector = ImageUtils.scaleArray(ImageUtils.setupSheet("ui/option_selector", 1, 3, 16, 16), Settings.tileSize/2, Settings.tileSize/2);
+		selector = ImageUtils.scaleArray(ImageUtils.setupSheet("ui/option_selector", 1, 3, 16, 16), point5, point5);
+		play = ImageUtils.scaleArray(ImageUtils.setupSheet("ui/playgameoption", 1, 3, 100, 22), Settings.tileSize*4, Settings.tileSize);
+		options = ImageUtils.scaleArray(ImageUtils.setupSheet("ui/optionsoption", 1, 3, 88, 22), Settings.tileSize*3, Settings.tileSize);
 		
 	}
 	
@@ -56,6 +59,16 @@ public class GuiMainMenu_new extends GuiScreen {
 			selectorFrame++;
 			if(selectorFrame > 2) {
 				selectorFrame = 0;
+			}
+		} else if(animationTicks % 18 == 1) {
+			playFrame++;
+			if(playFrame > 2) {
+				playFrame = 0;
+			}
+		} else if(animationTicks % 19 == 1) {
+			optionsFrame++;
+			if(optionsFrame > 2) {
+				optionsFrame = 0;
 			}
 		}
 		
@@ -138,44 +151,32 @@ public class GuiMainMenu_new extends GuiScreen {
 		String text = "not_found";
 
 		g2.setFont(font);
-		g2.setFont(g2.getFont().deriveFont(Font.PLAIN,96F));
+		g2.setFont(g2.getFont().deriveFont(Font.ITALIC,96F));
 		int x = Settings.tileSize;
 		int y = Settings.tileSize*3;
 		g2.setColor(Color.gray);
 		g2.drawString(text, x+5, y+5);
-
 		g2.setColor(Color.white);
 		g2.drawString(text, x, y);
-
-		//System.out.println((gp.screenWidth/2) - (gp.tileSize + (gp.tileSize*2) + 16));
-		y += Settings.tileSize;
-		//System.out.println((gp.screenWidth/2) - (gp.tileSize + (gp.tileSize*2) + 16));
-		g2.drawImage(selector[selectorFrame], ((Main.getInstance().getWidth()/2)-(Settings.tileSize*3)/2),(int) (y - (Settings.tileSize/2)), Settings.tileSize, Settings.tileSize, null);
-
 		
 		//menu
 		g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
-		text = LanguageHandler.getInstance().translateKey("gui.mainmenu.play");
 		y = (Main.getInstance().getHeight()/2);
-		g2.drawString(text, x, y);
+		g2.drawImage(play[playFrame], x, y-Settings.tileSize, null);
 		if(commandNum == 0) {
-			g2.drawString(">", x-Settings.tileSize/2, y);
+			g2.drawImage(selector[selectorFrame], x-Settings.tileSize/2, y-(int)(Settings.tileSize/1.5f), null);
 		}
 
-		text = LanguageHandler.getInstance().translateKey("gui.mainmenu.options");
 		y += Settings.tileSize;
-		g2.drawString(text, x, y);
+		g2.drawImage(options[optionsFrame], x, y-Settings.tileSize, null);
 		if(commandNum == 1) {
-			g2.drawString(">", x-Settings.tileSize/2, y);
-
-			g2.setColor(Color.white);
-			g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 48F));
+			g2.drawImage(selector[selectorFrame], x-Settings.tileSize/2, y-point5, null);
 		}
 		text = LanguageHandler.getInstance().translateKey("gui.mainmenu.quit");
 		y += Settings.tileSize;
 		g2.drawString(text, x, y);
 		if(commandNum == 2) {
-			g2.drawString(">", x-Settings.tileSize/2, y);
+			g2.drawImage(selector[selectorFrame], x-Settings.tileSize/2, y-point5, null);
 		}
 	}
 }
